@@ -5,6 +5,6 @@
 
 void cuda_lca_inlabel(int N, const int* parents, int Q,
                                const int* queries, int* answers,
-                               context_t& context);
+                               mgpu::context_t& context);
 
 #endif  // EMC_LCA_CUDA_LCA_INLABEL_H_

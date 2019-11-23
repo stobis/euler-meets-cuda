@@ -5,6 +5,6 @@
 
 void cuda_bridges_hybrid(int N, int M, const int* row_offsets,
                          const int* col_indices, bool* is_bridge,
-                         context_t& context);
+                         mgpu::context_t& context);
 
 #endif  // EMC_BRIDGES_CUDA_HYBRID_H_
