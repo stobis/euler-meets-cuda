@@ -16,26 +16,16 @@ __global__ void cuCalcQueries( int Q,
                                const int *__restrict__ queries,
                                int *answers );
 
-void cuda_lca_naive( int N, const int *parents, int Q, const int *queries, int *answers, mgpu::context_t &context )
+void cuda_lca_naive( int N, const int *parents, int Q, 
+        const int *queries, int *answers, 
+        mgpu::context_t &context )
 {
   std::cout << "inside cuda_lca_naive HELLO THERE!" << std::endl;
 
   Timer timer = Timer( "Parse Input" );
 
   //   cudaSetDevice( 0 );
-  //   standard_context_t context( 0 );
-
-  //   TestCase tc;
-  //   if ( argc == 1 )
-  //   {
-  //     tc = readFromStdIn();
-  //   }
-  //   else
-  //   {
-  //     tc = readFromFile( argv[1] );
-  //   }
-
-  //   timer.setPrefix( "Preprocessing" );
+    //   timer.setPrefix( "Preprocessing" );
 
   //   int *devFather;
   int *devDepth;
