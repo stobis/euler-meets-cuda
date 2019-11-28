@@ -7,11 +7,16 @@
 #include "lca/commons.h"
 #include "lca/cuda_commons.h"
 #include "lca/cuda_list_rank.h"
+#include "lca/cuda_euler_tour.h"
 
 #define ll long long
 
 using namespace std;
 using namespace mgpu;
+
+__device__ long long CudaPackEdge( int from, int to );
+__device__ int CudaUnpackEdgeFrom( long long edge );
+__device__ int CudaUnpackEdgeTo( long long edge );
 
 __device__ int CudaGetEdgeStart( const int *__restrict__ father, int edgeCode );
 __device__ int CudaGetEdgeEnd( const int *__restrict__ father, int edgeCode );
@@ -25,7 +30,7 @@ void cuda_lca_inlabel( int N, const int *parents, int Q, const int *queries, int
 {
   Timer timer( "Parse Input" );
 
-  timer.setPrefix( "Preprocessing" );
+  timer.setPrefix( "Converting to crs" );
 
   const int V = N;
   int root = 0;
@@ -51,118 +56,190 @@ void cuda_lca_inlabel( int N, const int *parents, int Q, const int *queries, int
   CUCHECK( cudaMemcpy( rootArr, devRoot, sizeof( int ), cudaMemcpyDeviceToHost ) );
   root = rootArr[0];
 
+  ll *packedEdges;
+  CUCHECK( cudaMalloc( (void **) &packedEdges, sizeof( ll ) * (V) *2 ) );
+  transform(
+      [] MGPU_DEVICE( int thid, const int *parents, ll *packedEdges ) {
+        if ( parents[thid] == -1 )
+        {
+          packedEdges[thid * 2] = CudaPackEdge( 0, 0 );
+          packedEdges[thid * 2 + 1] = CudaPackEdge( 0, 0 );
+        }
+        else
+        {
+          packedEdges[thid * 2] = CudaPackEdge( thid, parents[thid] );
+          packedEdges[thid * 2 + 1] = CudaPackEdge( parents[thid], thid );
+        }
+      },
+      V,
+      context,
+      parents,
+      packedEdges );
+
+  mergesort( packedEdges, V * 2, [] MGPU_DEVICE( ll a, ll b ) { return a < b; }, context );
+  packedEdges = packedEdges + 2;  // skip two (0, 0)
+
+  int *row_offsets;
+  CUCHECK( cudaMalloc( (void **) &row_offsets, sizeof( int ) * ( V + 1 ) ) );
+  int *col_indices;
+  CUCHECK( cudaMalloc( (void **) &col_indices, sizeof( int ) * ( V - 1 ) * 2 ) );
+
+  transform(
+      [=] MGPU_DEVICE( int thid, ll *packedEdges, int *row_offsets, int *col_indices ) {
+        if ( thid == ( V - 1 ) * 2 )
+        {
+          row_offsets[V] = ( V - 1 ) * 2;
+          return;
+        }
+
+        if ( thid == 0 )
+        {
+          row_offsets[0] = 0;
+        }
+        else
+        {
+          int fromPrev = CudaUnpackEdgeFrom( packedEdges[thid - 1] );
+          int from = CudaUnpackEdgeFrom( packedEdges[thid] );
+
+          if ( from != fromPrev )
+          {
+            row_offsets[from] = thid;
+          }
+
+          printf( "%d: fromPrev: %d, from: %d, to: %d\n", thid, fromPrev, from, CudaUnpackEdgeTo( packedEdges[thid] ) );
+        }
+
+        col_indices[thid] = CudaUnpackEdgeTo( packedEdges[thid] );
+      },
+      ( V - 1 ) * 2 + 1,
+      context,
+      packedEdges,
+      row_offsets,
+      col_indices );
+
+
+
+  // cerr << "Row offsets:" << endl;
+  // CudaPrintTab( row_offsets, V + 1 );
+  // cerr << "Col indices:" << endl;
+  // CudaPrintTab( col_indices, ( V - 1 ) * 2 );
+
+  int *devEdgeRank;
+  CUCHECK( cudaMalloc( (void **) &devEdgeRank, sizeof( int ) * V * 2 ) );
+  cuda_euler_tour( V, root, row_offsets, col_indices, devEdgeRank, context );
+
   // printf( "ROOT: %d", root );
 
   const int *devFather = parents;
   // CUCHECK( cudaMalloc( (void **) &devFather, sizeof( int ) * V ) );
   // CUCHECK( cudaMemcpy( devFather, tc.tree.father.data(), sizeof( int ) * V, cudaMemcpyHostToDevice ) );
 
-  int *devSon;
-  int *devNeighbour;
-  int *devNextEdge;
-  CUCHECK( cudaMalloc( (void **) &devSon, sizeof( int ) * V ) );
-  CUCHECK( cudaMalloc( (void **) &devNeighbour, sizeof( int ) * V ) );
+  // int *devSon;
+  // int *devNeighbour;
+  // int *devNextEdge;
+  // CUCHECK( cudaMalloc( (void **) &devSon, sizeof( int ) * V ) );
+  // CUCHECK( cudaMalloc( (void **) &devNeighbour, sizeof( int ) * V ) );
 
-  transform(
-      [] MGPU_DEVICE( int thid, int *devSon, int *devNeighbour ) {
-        devSon[thid] = -1;
-        devNeighbour[thid] = -1;
-      },
-      V,
-      context,
-      devSon,
-      devNeighbour );
+  // transform(
+  //     [] MGPU_DEVICE( int thid, int *devSon, int *devNeighbour ) {
+  //       devSon[thid] = -1;
+  //       devNeighbour[thid] = -1;
+  //     },
+  //     V,
+  //     context,
+  //     devSon,
+  //     devNeighbour );
 
-  if ( measureTimeDebug )
-  {
-    context.synchronize();
-    timer.measureTime( "Device Allocs" );
-  }
+  // if ( measureTimeDebug )
+  // {
+  //   context.synchronize();
+  //   timer.measureTime( "Device Allocs" );
+  // }
 
-  ll *devEdges;
-  CUCHECK( cudaMalloc( (void **) &devEdges, sizeof( ll ) * V ) );
+  // ll *devEdges;
+  // CUCHECK( cudaMalloc( (void **) &devEdges, sizeof( ll ) * V ) );
 
-  transform(
-      [] MGPU_DEVICE( int thid, ll *devEdges, const int *devFather ) {
-        devEdges[thid] = ( ( (ll) devFather[thid] ) << 32 ) + thid;
-      },
-      V,
-      context,
-      devEdges,
-      devFather );
+  // transform(
+  //     [] MGPU_DEVICE( int thid, ll *devEdges, const int *devFather ) {
+  //       devEdges[thid] = ( ( (ll) devFather[thid] ) << 32 ) + thid;
+  //     },
+  //     V,
+  //     context,
+  //     devEdges,
+  //     devFather );
 
-  mergesort( devEdges, V, [] MGPU_DEVICE( ll a, ll b ) { return a < b; }, context );
+  // mergesort( devEdges, V, [] MGPU_DEVICE( ll a, ll b ) { return a < b; }, context );
 
-  transform(
-      [] MGPU_DEVICE( int thid, const ll *devEdges, int *devNeighbour, int *devSon ) {
-        ll prevEdge = devEdges[thid];
-        ll myEdge = devEdges[thid + 1];
-        if ( prevEdge >> 32 == myEdge >> 32 )
-          devNeighbour[(int) prevEdge] = (int) myEdge;
-        else
-          devSon[myEdge >> 32] = (int) myEdge;
-      },
-      V - 1,
-      context,
-      devEdges,
-      devNeighbour,
-      devSon );
+  // transform(
+  //     [] MGPU_DEVICE( int thid, const ll *devEdges, int *devNeighbour, int *devSon ) {
+  //       ll prevEdge = devEdges[thid];
+  //       ll myEdge = devEdges[thid + 1];
+  //       if ( prevEdge >> 32 == myEdge >> 32 )
+  //         devNeighbour[(int) prevEdge] = (int) myEdge;
+  //       else
+  //         devSon[myEdge >> 32] = (int) myEdge;
+  //     },
+  //     V - 1,
+  //     context,
+  //     devEdges,
+  //     devNeighbour,
+  //     devSon );
 
-  CUCHECK( cudaFree( devEdges ) );
+  // CUCHECK( cudaFree( devEdges ) );
 
 
-  CUCHECK( cudaMalloc( (void **) &devNextEdge, sizeof( int ) * V * 2 ) );
-  transform(
-      [] MGPU_DEVICE( int thid, const int *devFather, const int *devNeighbour, const int *devSon, int *devNextEdge ) {
-        int v = thid / 2;
-        int father = devFather[v];
-        if ( isEdgeToFather( thid ) )
-        {
-          int neighbour = devNeighbour[v];
-          if ( neighbour != -1 )
-            devNextEdge[thid] = CudaGetEdgeCode( neighbour, false );
-          else
-          {
-            if ( father != -1 )
-              devNextEdge[thid] = CudaGetEdgeCode( father, true );
-            else
-              devNextEdge[thid] = -1;
-          }
-        }
-        else
-        {
-          int son = devSon[v];
-          if ( son != -1 )
-            devNextEdge[thid] = CudaGetEdgeCode( son, false );
-          else
-            devNextEdge[thid] = CudaGetEdgeCode( v, true );
-        }
-      },
-      V * 2,
-      context,
-      devFather,
-      devNeighbour,
-      devSon,
-      devNextEdge );
+  // CUCHECK( cudaMalloc( (void **) &devNextEdge, sizeof( int ) * V * 2 ) );
+  // transform(
+  //     [] MGPU_DEVICE( int thid, const int *devFather, const int *devNeighbour, const int *devSon, int *devNextEdge ) {
+  //       int v = thid / 2;
+  //       int father = devFather[v];
+  //       if ( isEdgeToFather( thid ) )
+  //       {
+  //         int neighbour = devNeighbour[v];
+  //         if ( neighbour != -1 )
+  //           devNextEdge[thid] = CudaGetEdgeCode( neighbour, false );
+  //         else
+  //         {
+  //           if ( father != -1 )
+  //             devNextEdge[thid] = CudaGetEdgeCode( father, true );
+  //           else
+  //             devNextEdge[thid] = -1;
+  //         }
+  //       }
+  //       else
+  //       {
+  //         int son = devSon[v];
+  //         if ( son != -1 )
+  //           devNextEdge[thid] = CudaGetEdgeCode( son, false );
+  //         else
+  //           devNextEdge[thid] = CudaGetEdgeCode( v, true );
+  //       }
+  //     },
+  //     V * 2,
+  //     context,
+  //     devFather,
+  //     devNeighbour,
+  //     devSon,
+  //     devNextEdge );
 
-  CUCHECK( cudaFree( devSon ) );
-  CUCHECK( cudaFree( devNeighbour ) );
+  // CUCHECK( cudaFree( devSon ) );
+  // CUCHECK( cudaFree( devNeighbour ) );
 
-  int *devEdgeRank;
-  CUCHECK( cudaMalloc( (void **) &devEdgeRank, sizeof( int ) * V * 2 ) );
+  // int *devEdgeRank;
+  // CUCHECK( cudaMalloc( (void **) &devEdgeRank, sizeof( int ) * V * 2 ) );
 
-  CUCHECK( cudaMemset( devEdgeRank, 0, V * 2 ) );
+  // CUCHECK( cudaMemset( devEdgeRank, 0, V * 2 ) );
 
-  if ( measureTimeDebug )
-  {
-    context.synchronize();
-    timer.measureTime( "Init devNextEdge and devEdgeRank" );
-  }
+  // if ( measureTimeDebug )
+  // {
+  //   context.synchronize();
+  //   timer.measureTime( "Init devNextEdge and devEdgeRank" );
+  // }
 
   // CudaSimpleListRank( devEdgeRank, V * 2, devNextEdge, context);
-  cuda_list_rank( V * 2, getEdgeCode( root, 0 ), devNextEdge, devEdgeRank, context );
+  // cuda_list_rank( V * 2, getEdgeCode( root, 0 ), devNextEdge, devEdgeRank, context );
 
-  CUCHECK( cudaFree( devNextEdge ) );
+  // CUCHECK( cudaFree( devNextEdge ) );
 
   timer.measureTime( "List Rank" );
 
@@ -508,6 +585,21 @@ void cuda_lca_inlabel( int N, const int *parents, int Q, const int *queries, int
   timer.setPrefix( "" );
 }
 
+#define ll long long
+ll CudaPackEdge( int from, int to )
+{
+  return ( ( (ll) from ) << 32 ) + to;
+}
+int CudaUnpackEdgeFrom( ll edge )
+{
+  return edge >> 32;
+}
+int CudaUnpackEdgeTo( ll edge )
+{
+  return edge & ( ( 1 << 32 ) - 1 );
+}
+
+
 __device__ int CudaGetEdgeStart( const int *__restrict__ father, int edgeCode )
 {
   if ( edgeCode % 2 )
@@ -515,7 +607,6 @@ __device__ int CudaGetEdgeStart( const int *__restrict__ father, int edgeCode )
   else
     return father[edgeCode / 2];
 }
-
 __device__ int CudaGetEdgeEnd( const int *__restrict__ father, int edgeCode )
 {
   return CudaGetEdgeStart( father, edgeCode ^ 1 );

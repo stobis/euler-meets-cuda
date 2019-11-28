@@ -29,7 +29,6 @@ OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard *.cpp)) \
 	$(patsubst %.cpp, obj/%.o, $(wildcard src/**/*.cpp)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard *.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard src/**/*.cu)) \
-	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/cudaweijajalistrank/*.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/GpuConnectedComponents/*.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/cudabfs/bfs-mgpu.cu))
 
