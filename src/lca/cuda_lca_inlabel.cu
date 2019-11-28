@@ -1,11 +1,11 @@
+#include <cudaWeiJaJaListRank.h>
 #include <cuda_runtime.h>
 #include <iostream>
 #include <moderngpu/kernel_mergesort.hxx>
 #include <moderngpu/kernel_scan.hxx>
 #include <moderngpu/transform.hxx>
-#include "commons.h"
-#include "cudaCommons.h"
-#include <cudaWeiJaJaListRank.h>
+#include "lca_commons.h"
+#include "lca_cuda_commons.h"
 
 #define ll long long
 
@@ -20,40 +20,41 @@ __device__ bool isEdgeToFather( int edgeCode );
 const int measureTimeDebug = false;
 
 
-int main( int argc, char *argv[] )
+void cuda_lca_inlabel( int N, const int *parents, int Q, const int *queries, int *answers, mgpu::context_t &context )
 {
   Timer timer( "Parse Input" );
 
-  cudaSetDevice( 0 );
-  standard_context_t context( 0 );
-
-  timer.measureTime( "Init cuda" );
-
-  TestCase tc;
-  if ( argc == 1 )
-  {
-    tc = readFromStdIn();
-  }
-  else
-  {
-    tc = readFromFile( argv[1] );
-  }
-
-  int batchSize;
-  if ( argc > 3 )
-    batchSize = atoi( argv[3] );
-  else
-    batchSize = -1;
-
-  timer.measureTime( "Read" );
   timer.setPrefix( "Preprocessing" );
 
-  const int V = tc.tree.V;
-  const int root = tc.tree.root;
+  const int V = N;
+  int root = 0;
 
-  int *devFather;
-  CUCHECK( cudaMalloc( (void **) &devFather, sizeof( int ) * V ) );
-  CUCHECK( cudaMemcpy( devFather, tc.tree.father.data(), sizeof( int ) * V, cudaMemcpyHostToDevice ) );
+  int *devRoot;
+  CUCHECK( cudaMalloc( (void **) &devRoot, sizeof( int ) ) );
+  int *rootArr = new int[1];
+
+  transform(
+      [] MGPU_DEVICE( int thid, const int *devParent, int *devRoot ) {
+        if ( devParent[thid] == -1 )
+        {
+          devRoot[0] = thid;
+        }
+      },
+      V,
+      context,
+      parents,
+      devRoot );
+
+  context.synchronize();
+
+  CUCHECK( cudaMemcpy( rootArr, devRoot, sizeof( int ), cudaMemcpyDeviceToHost ) );
+  root = rootArr[0];
+
+  // printf( "ROOT: %d", root );
+
+  const int *devFather = parents;
+  // CUCHECK( cudaMalloc( (void **) &devFather, sizeof( int ) * V ) );
+  // CUCHECK( cudaMemcpy( devFather, tc.tree.father.data(), sizeof( int ) * V, cudaMemcpyHostToDevice ) );
 
   int *devSon;
   int *devNeighbour;
@@ -395,23 +396,23 @@ int main( int argc, char *argv[] )
 
   timer.setPrefix( "Queries" );
 
-  int Q = tc.q.N;
+  // int Q
 
-  if ( batchSize == -1 ) batchSize = Q;
+  int batchSize = Q;
 
-  int *devQueries;
-  CUCHECK( cudaMalloc( (void **) &devQueries, sizeof( int ) * batchSize * 2 ) );
+  const int *devQueries = queries;
+  // CUCHECK( cudaMalloc( (void **) &devQueries, sizeof( int ) * batchSize * 2 ) );
 
-  int *answers = (int *) malloc( sizeof( int ) * Q );
-  int *devAnswers;
-  CUCHECK( cudaMalloc( (void **) &devAnswers, sizeof( int ) * batchSize ) );
+  // int *answers = (int *) malloc( sizeof( int ) * Q );
+  int *devAnswers = answers;
+  // CUCHECK( cudaMalloc( (void **) &devAnswers, sizeof( int ) * batchSize ) );
 
   for ( int qStart = 0; qStart < Q; qStart += batchSize )
   {
     int queriesToProcess = min( batchSize, Q - qStart );
 
-    CUCHECK( cudaMemcpy(
-        devQueries, tc.q.tab.data() + ( qStart * 2 ), sizeof( int ) * queriesToProcess * 2, cudaMemcpyHostToDevice ) );
+    // CUCHECK( cudaMemcpy(
+    // devQueries, tc.q.tab.data() + ( qStart * 2 ), sizeof( int ) * queriesToProcess * 2, cudaMemcpyHostToDevice ) );
 
 
     transform(
@@ -474,6 +475,7 @@ int main( int argc, char *argv[] )
             devAnswers[thid] = suspects[0];
           else
             devAnswers[thid] = suspects[1];
+
         },
         queriesToProcess,
         context,
@@ -485,7 +487,7 @@ int main( int argc, char *argv[] )
         devHead,
         devAnswers );
 
-    CUCHECK( cudaMemcpy( answers + qStart, devAnswers, sizeof( int ) * queriesToProcess, cudaMemcpyDeviceToHost ) );
+    // CUCHECK( cudaMemcpy( answers + qStart, devAnswers, sizeof( int ) * queriesToProcess, cudaMemcpyDeviceToHost ) );
   }
 
   context.synchronize();
@@ -494,14 +496,14 @@ int main( int argc, char *argv[] )
 
   timer.setPrefix( "Write Output" );
 
-  if ( argc < 3 )
-  {
-    writeAnswersToStdOut( Q, answers );
-  }
-  else
-  {
-    writeAnswersToFile( Q, answers, argv[2] );
-  }
+  // if ( argc < 3 )
+  // {
+  //   writeAnswersToStdOut( Q, answers );
+  // }
+  // else
+  // {
+  //   writeAnswersToFile( Q, answers, argv[2] );
+  // }
 
   timer.setPrefix( "" );
 }
