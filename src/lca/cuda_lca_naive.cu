@@ -1,6 +1,6 @@
 #include "lca/cuda_lca_naive.h"
-#include "lca_commons.h"
-#include "lca_cuda_commons.h"
+#include "lca/commons.h"
+#include "lca/cuda_commons.h"
 
 #include <cuda_runtime.h>
 #include <iostream>

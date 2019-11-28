@@ -4,8 +4,9 @@
 #include <moderngpu/kernel_mergesort.hxx>
 #include <moderngpu/kernel_scan.hxx>
 #include <moderngpu/transform.hxx>
-#include "lca_commons.h"
-#include "lca_cuda_commons.h"
+
+#include "lca/commons.h"
+#include "lca/cuda_commons.h"
 
 #define ll long long
 
@@ -475,7 +476,6 @@ void cuda_lca_inlabel( int N, const int *parents, int Q, const int *queries, int
             devAnswers[thid] = suspects[0];
           else
             devAnswers[thid] = suspects[1];
-
         },
         queriesToProcess,
         context,

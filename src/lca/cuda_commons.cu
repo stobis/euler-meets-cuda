@@ -2,8 +2,9 @@
 #include <math.h>
 #include <iostream>
 #include <moderngpu/transform.hxx>
-#include "lca_commons.h"
-#include "lca_cuda_commons.h"
+
+#include "lca/commons.h"
+#include "lca/cuda_commons.h"
 
 #define ull unsigned long long
 

@@ -19,8 +19,8 @@ NVCCINC=-I $(CUDA)/include \
 		-I ./$(3RDDIR)/GpuConnectedComponents/ \
 		-I ./$(3RDDIR)/cudabfs/ \
 		-I ./$(3RDDIR)/moderngpu/src \
-		-I ./$(INCDIR)/ \
-		-I ./$(INCDIR)/lca
+		-I ./$(INCDIR)/ 
+		
 NVCCFLAGS=-arch $(NVCCSM) -O2 -std=c++11 --expt-extended-lambda -w $(NVCCINC)
 
 LDFLAGS=-L/usr/local/cuda/lib64 -lcudart

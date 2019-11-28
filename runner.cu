@@ -1,11 +1,10 @@
+#include <iostream>
+
 #include "bridges/cuda_algorithms.h"
 #include "lca/cuda_algorithms.h"
 
-#include "lca_commons.h"
-#include "lca_cuda_commons.h"
-
 #include <moderngpu/context.hxx>
-#include<moderngpu/memory.hxx>
+#include <moderngpu/memory.hxx>
 
 int main( int argc, char *argv[] )
 {
@@ -32,7 +31,8 @@ int main( int argc, char *argv[] )
 
   int *answers = new int[Q];
   mgpu::dtoh( answers, cuda_answers.data(), Q );
-  for ( int i = 0; i < Q;  i++) {
+  for ( int i = 0; i < Q; i++ )
+  {
     std::cout << answers[i] << " ";
   }
   std::cout << std::endl;
