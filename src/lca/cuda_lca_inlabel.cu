@@ -1,4 +1,3 @@
-#include <cudaWeiJaJaListRank.h>
 #include <cuda_runtime.h>
 #include <iostream>
 #include <moderngpu/kernel_mergesort.hxx>
@@ -7,6 +6,7 @@
 
 #include "lca/commons.h"
 #include "lca/cuda_commons.h"
+#include "lca/cuda_list_rank.h"
 
 #define ll long long
 
@@ -160,7 +160,7 @@ void cuda_lca_inlabel( int N, const int *parents, int Q, const int *queries, int
   }
 
   // CudaSimpleListRank( devEdgeRank, V * 2, devNextEdge, context);
-  cudaWeiJaJaListRank( devEdgeRank, V * 2, getEdgeCode( root, 0 ), devNextEdge, context );
+  cuda_list_rank( V * 2, getEdgeCode( root, 0 ), devNextEdge, devEdgeRank, context );
 
   CUCHECK( cudaFree( devNextEdge ) );
 
