@@ -106,7 +106,7 @@ void cuda_lca_inlabel( int N, const int *parents, int Q, const int *queries, int
             row_offsets[from] = thid;
           }
 
-          printf( "%d: fromPrev: %d, from: %d, to: %d\n", thid, fromPrev, from, CudaUnpackEdgeTo( packedEdges[thid] ) );
+          // printf( "%d: fromPrev: %d, from: %d, to: %d\n", thid, fromPrev, from, CudaUnpackEdgeTo( packedEdges[thid] ) );
         }
 
         col_indices[thid] = CudaUnpackEdgeTo( packedEdges[thid] );
@@ -119,14 +119,15 @@ void cuda_lca_inlabel( int N, const int *parents, int Q, const int *queries, int
 
 
 
-  // cerr << "Row offsets:" << endl;
-  // CudaPrintTab( row_offsets, V + 1 );
-  // cerr << "Col indices:" << endl;
-  // CudaPrintTab( col_indices, ( V - 1 ) * 2 );
+  cerr << "Row offsets:" << endl;
+  CudaPrintTab( row_offsets, V + 1 );
+  cerr << "Col indices:" << endl;
+  CudaPrintTab( col_indices, ( V - 1 ) * 2 );
 
   int *devEdgeRank;
   CUCHECK( cudaMalloc( (void **) &devEdgeRank, sizeof( int ) * V * 2 ) );
   cuda_euler_tour( V, root, row_offsets, col_indices, devEdgeRank, context );
+  //TODO Fix: it doesn't work
 
   // printf( "ROOT: %d", root );
 

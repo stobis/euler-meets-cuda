@@ -26,11 +26,18 @@ void cuda_list_rank( int N, int head, const int *devNextSrc, int *devRank, conte
 
   int *devNext;
   CUCHECK( cudaMalloc( (void **) &devNext, sizeof( int ) * ( N ) ) );
-  transform( [] MGPU_DEVICE( int i, const int *devNextSrc, int *devNext ) { devNext[i] = devNextSrc[i]; },
-             N,
-             context,
-             devNextSrc,
-             devNext );
+  transform(
+      [=] MGPU_DEVICE( int i, const int *devNextSrc, int *devNext ) {
+        devNext[i] = devNextSrc[i];
+        if ( devNextSrc[i] == head ) devNext[i] = -1;
+      },
+      N,
+      context,
+      devNextSrc,
+      devNext );
+
+  transform( [=] MGPU_DEVICE( int i ) { devRank[i] = 0; }, N, context );
+
 
   int *devSum;
   CUCHECK( cudaMalloc( (void **) &devSum, sizeof( int ) * ( s + 1 ) ) );
@@ -140,6 +147,7 @@ void cuda_list_rank( int N, int head, const int *devNextSrc, int *devRank, conte
       devSum,
       devRank );
 
+  CUCHECK( cudaFree( devNext ) );
   CUCHECK( cudaFree( devSum ) );
   CUCHECK( cudaFree( devSublistHead ) );
   CUCHECK( cudaFree( devSublistId ) );
