@@ -4,9 +4,6 @@
 [submodule "3rdparty/cudabfs"]
 	path = 3rdparty/cudabfs
 	url = https://github.com/stobis/cudabfs
-[submodule "3rdparty/cudaweijajalistrank"]
-	path = 3rdparty/cudaweijajalistrank
-	url = https://bitbucket.org/pierreSquared/cudaweijajalistrank.git
 [submodule "3rdparty/moderngpu"]
 	path = 3rdparty/moderngpu
 	url = https://github.com/moderngpu/moderngpu

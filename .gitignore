@@ -6,3 +6,8 @@
 *.fatbin
 obj/
 *.e
+
+.vscode/*
+
+# Adrian's uploads to miracle
+copyToStudent.sh
