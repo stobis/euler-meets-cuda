@@ -12,8 +12,9 @@ using namespace std;
 using namespace mgpu;
 
 void cuda_euler_tour(int N, int root, const int *edges_from_input,
-                     const int *edges_to_input, int *rank,
-                     mgpu::context_t &context) {
+                     const int *edges_to_input, int *rank_to_output,
+                     mgpu::context_t &context)
+{
 
   int E = N * 2 - 2;
 
@@ -32,8 +33,6 @@ void cuda_euler_tour(int N, int root, const int *edges_from_input,
         int afterRoot = 0;
         if (thid > root)
           afterRoot = 1;
-        if (thid > root + N)
-          afterRoot++;
 
         edges_from[thid + N - afterRoot - 1] = edges_to[thid - afterRoot] =
             edges_to_input[thid];
@@ -74,18 +73,27 @@ void cuda_euler_tour(int N, int root, const int *edges_from_input,
         int f = edges_from[index[thid]];
         int t = edges_to[index[thid]];
 
-        if (index[thid] == 0) {
-          first[t] = thid;
+        if (thid == 0)
+        {
+          first[f] = index[thid];
+          printf("thid:%d, f:%d, t:%d, first[%d]:%d\n", thid, f, t, f, thid);
           return;
         }
 
-        int pf = edges_from[index[thid] - 1];
-        int pt = edges_to[index[thid] - 1];
+        int pf = edges_from[index[thid - 1]];
+        int pt = edges_to[index[thid - 1]];
 
-        if (f != pf) {
-          first[f] = thid;
-        } else {
-          next[thid - 1] = thid;
+        if (f != pf)
+        {
+          first[f] = index[thid];
+          printf("thid:%d, f:%d, t:%d, pf:%d, pt:%d, first[%d]:%d\n",
+                 thid, f, t, pf, pt, f, index[thid]);
+        }
+        else
+        {
+          next[index[thid - 1]] = index[thid];
+          printf("thid:%d, f:%d, t:%d, pf:%d, pt:%d, next[%d]:%d\n",
+                 thid, f, t, pf, pt, index[thid - 1], index[thid]);
         }
       },
       E, context);
@@ -102,31 +110,53 @@ void cuda_euler_tour(int N, int root, const int *edges_from_input,
   CudaPrintTab(next, E);
   cout << "First:" << endl;
   CudaPrintTab(first, N);
-  return;
 
   int *succ;
   CUCHECK(cudaMalloc((void **)&succ, sizeof(int) * E));
   transform(
       [=] MGPU_DEVICE(int thid) {
-        if (next[thid] == -1) {
-          int to = edges_from[rev_index[thid]];
-          succ[thid] = first[to];
-        } else {
-          int reverse_edge = (rev_index[thid] + E / 2) % E;
-          succ[thid] = next[reverse_edge];
+        int revEdge = (thid + E / 2) % E;
+
+        if (next[revEdge] == -1)
+        {
+          succ[thid] = first[edges_from[revEdge]];
+        }
+        else
+        {
+          succ[thid] = next[revEdge];
         }
       },
       E, context);
 
+  cout << "Succ:" << endl;
+  CudaPrintTab(succ, E);
+
   int *head = new int[1];
   CUCHECK(cudaMemcpy(head, first + root, sizeof(int), cudaMemcpyDeviceToHost));
 
+  int *rank;
+  CUCHECK(cudaMalloc((void **)&rank, sizeof(int) * E));
+
   cuda_list_rank(E, *head, succ, rank, context);
 
-  context.synchronize();
-
-  cout << "Succ: " << endl;
-  CudaPrintTab(succ, E);
   cout << "Rank: " << endl;
   CudaPrintTab(rank, E);
+
+  transform([=] MGPU_DEVICE(int thid) {
+    if (thid == root || thid == root + N)
+    {
+      rank_to_output[thid] = -1;
+      return;
+    }
+    int rank_addr = thid;
+    if (thid > root)
+      rank_addr--;
+    if (thid > root + N)
+      rank_addr--;
+    rank_to_output[thid] = rank[rank_addr];
+  },
+            E + 2, context);
+
+  cout << "Rank output: " << endl;
+  CudaPrintTab(rank_to_output, E + 2);
 }

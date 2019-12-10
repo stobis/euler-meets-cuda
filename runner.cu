@@ -6,14 +6,13 @@
 #include <moderngpu/context.hxx>
 #include <moderngpu/memory.hxx>
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  std::ios_base::sync_with_stdio( false );
+  std::ios_base::sync_with_stdio(false);
 
   int *dummy;
-  mgpu::standard_context_t context( false );
+  mgpu::standard_context_t context(false);
   // cuda_bfs(0, 0, dummy, dummy, dummy, dummy, context);
-
 
   // run lca
   int const N = 5;
@@ -28,31 +27,32 @@ int main( int argc, char *argv[] )
   // int const Q = 10;
   // std::vector<int> queries{0, 13, 3, 19, 1, 1, 11, 17, 15, 7, 2, 17, 0, 10, 6, 1, 3, 2, 0, 13};
 
-  mgpu::mem_t<int> cuda_parents = mgpu::to_mem( parents, context );
-  mgpu::mem_t<int> cuda_queries = mgpu::to_mem( queries, context );
-  mgpu::mem_t<int> cuda_answers = mgpu::fill<int>( 0, Q, context );
+  mgpu::mem_t<int> cuda_parents = mgpu::to_mem(parents, context);
+  mgpu::mem_t<int> cuda_queries = mgpu::to_mem(queries, context);
+  mgpu::mem_t<int> cuda_answers = mgpu::fill<int>(0, Q, context);
 
   // cuda_lca_naive( N, cuda_parents.data(), Q, cuda_queries.data(), cuda_answers.data(), context );
-  cuda_lca_inlabel( N, cuda_parents.data(), Q, cuda_queries.data(), cuda_answers.data(), context );
+  cuda_lca_inlabel(N, cuda_parents.data(), Q, cuda_queries.data(), cuda_answers.data(), context);
 
   std::vector<int> correct_answers{11, 11, 1, 11, 18, 11, 16, 11, 11, 11};
 
   bool isOk = true;
   int *answers = new int[Q];
-  mgpu::dtoh( answers, cuda_answers.data(), Q );
-  for ( int i = 0; i < Q; i++ )
+  mgpu::dtoh(answers, cuda_answers.data(), Q);
+  for (int i = 0; i < Q; i++)
   {
-    if ( answers[i] != correct_answers[i] ) isOk = false;
+    if (answers[i] != correct_answers[i])
+      isOk = false;
   }
 
-  if ( isOk )
+  if (isOk)
   {
     std::cout << "OK" << std::endl;
   }
   else
   {
     std::cout << "ERROR!" << std::endl;
-    for ( int i = 0; i < Q; i++ )
+    for (int i = 0; i < Q; i++)
     {
       std::cout << answers[i] << " ";
     }
