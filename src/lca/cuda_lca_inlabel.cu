@@ -26,7 +26,8 @@ __device__ bool isEdgeToFather(int edgeCode);
 const int measureTimeDebug = false;
 
 void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
-                      int *answers, mgpu::context_t &context) {
+                      int *answers, mgpu::context_t &context)
+{
   Timer timer("Parse Input");
 
   timer.setPrefix("Converting to crs");
@@ -40,7 +41,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
 
   transform(
       [] MGPU_DEVICE(int thid, const int *devParent, int *devRoot) {
-        if (devParent[thid] == -1) {
+        if (devParent[thid] == -1)
+        {
           devRoot[0] = thid;
         }
       },
@@ -56,13 +58,27 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   transform([=] MGPU_DEVICE(int thid) { dev_edge_from[thid] = thid; }, V,
             context);
 
+  int *devEdgeRankFromEulerTour;
+  CUCHECK(cudaMalloc((void **)&devEdgeRankFromEulerTour, sizeof(int) * V * 2));
+
+  cuda_euler_tour(V, root, dev_edge_from, parents, devEdgeRankFromEulerTour, context);
+
   int *devEdgeRank;
   CUCHECK(cudaMalloc((void **)&devEdgeRank, sizeof(int) * V * 2));
 
-  cuda_euler_tour(V, root, dev_edge_from, parents, devEdgeRank, context);
+  transform([=] MGPU_DEVICE(int thid) {
+    devEdgeRank[thid * 2] = devEdgeRankFromEulerTour[thid] + 1;
+    devEdgeRank[thid * 2 + 1] = devEdgeRankFromEulerTour[thid + V] + 1;
 
+    if (thid == root)
+    {
+      devEdgeRank[thid * 2] = -1;
+      devEdgeRank[thid * 2 + 1] = V * 2 - 1;
+    }
+  },
+            V, context);
 
-  // TODO Fix: it doesn't work
+    // TODO Fix: it doesn't work
 
   // printf( "ROOT: %d", root );
 
@@ -188,6 +204,9 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
 
   CUCHECK(cudaMalloc((void **)&devSortedEdges, sizeof(int) * E));
 
+  cout << "devEdgeRank" << endl;
+  CudaPrintTab(devEdgeRank, V * 2);
+
   transform(
       [] MGPU_DEVICE(int thid, int V, int *devEdgeRank, int *devSortedEdges) {
         // int edgeRank = E - devEdgeRank[thid];
@@ -215,7 +234,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   CUCHECK(cudaMalloc((void **)&devW2, sizeof(int) * E));
   CUCHECK(cudaMalloc((void **)&devW2Sum, sizeof(int) * E));
 
-  if (measureTimeDebug) {
+  if (measureTimeDebug)
+  {
     context.synchronize();
     timer.measureTime("Inlabel allocs");
   }
@@ -224,10 +244,13 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
       [] MGPU_DEVICE(int thid, int *devW1, int *devW2,
                      const int *devSortedEdges) {
         int edge = devSortedEdges[thid];
-        if (isEdgeToFather(edge)) {
+        if (isEdgeToFather(edge))
+        {
           devW1[thid] = 0;
           devW2[thid] = -1;
-        } else {
+        }
+        else
+        {
           devW1[thid] = 1;
           devW2[thid] = 1;
         }
@@ -241,7 +264,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   scan<scan_type_inc>(devW2, E, devW2Sum, context);
   CUCHECK(cudaFree(devW2));
 
-  if (measureTimeDebug) {
+  if (measureTimeDebug)
+  {
     context.synchronize();
     timer.measureTime("W1 W2 scans");
   }
@@ -260,7 +284,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
                      const int *devW1Sum, const int *devW2Sum) {
         int codeFromFather = CudaGetEdgeCode(thid, 0);
         int codeToFather = CudaGetEdgeCode(thid, 1);
-        if (thid == root) {
+        if (thid == root)
+        {
           devPreorder[thid] = 1;
           devPrePlusSize[thid] = V;
           devLevel[thid] = 0;
@@ -277,7 +302,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
 
   CUCHECK(cudaFree(devW2Sum));
 
-  if (measureTimeDebug) {
+  if (measureTimeDebug)
+  {
     context.synchronize();
     timer.measureTime("Pre PrePlusSize, Level");
   }
@@ -306,11 +332,14 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
         int f = devFather[thid];
         int inLabel = devInlabel[thid];
         int fatherInLabel = devInlabel[f];
-        if (inLabel != fatherInLabel) {
+        if (inLabel != fatherInLabel)
+        {
           int i = __ffs(inLabel) - 1;
           devW1[devEdgeRank[CudaGetEdgeCode(thid, 0)]] = (1 << i);
           devW1[devEdgeRank[CudaGetEdgeCode(thid, 1)]] = -(1 << i);
-        } else {
+        }
+        else
+        {
           devW1[devEdgeRank[CudaGetEdgeCode(thid, 0)]] = 0;
           devW1[devEdgeRank[CudaGetEdgeCode(thid, 1)]] = 0;
         }
@@ -328,7 +357,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   transform(
       [] MGPU_DEVICE(int thid, int root, int l, int *devAscendant,
                      const int *devW1Sum, const int *devEdgeRank) {
-        if (thid == root) {
+        if (thid == root)
+        {
           devAscendant[thid] = (1 << l);
           return;
         }
@@ -340,7 +370,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   CUCHECK(cudaFree(devEdgeRank));
   CUCHECK(cudaFree(devW1Sum));
 
-  if (measureTimeDebug) {
+  if (measureTimeDebug)
+  {
     context.synchronize();
     timer.measureTime("Ascendant scan and calculation");
   }
@@ -351,7 +382,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   transform(
       [] MGPU_DEVICE(int thid, int root, const int *devInlabel,
                      const int *devFather, int *devHead) {
-        if (thid == root || devInlabel[thid] != devInlabel[devFather[thid]]) {
+        if (thid == root || devInlabel[thid] != devInlabel[devFather[thid]])
+        {
           devHead[devInlabel[thid]] = thid;
         }
       },
@@ -376,7 +408,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   int *devAnswers = answers;
   // CUCHECK( cudaMalloc( (void **) &devAnswers, sizeof( int ) * batchSize ) );
 
-  for (int qStart = 0; qStart < Q; qStart += batchSize) {
+  for (int qStart = 0; qStart < Q; qStart += batchSize)
+  {
     int queriesToProcess = min(batchSize, Q - qStart);
 
     // CUCHECK( cudaMemcpy(
@@ -394,7 +427,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
           int inlabelX = devInlabel[x];
           int inlabelY = devInlabel[y];
 
-          if (inlabelX == inlabelY) {
+          if (inlabelX == inlabelY)
+          {
             devAnswers[thid] = devLevel[x] < devLevel[y] ? x : y;
             return;
           }
@@ -410,16 +444,20 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
 
           int suspects[2];
 
-          for (int a = 0; a < 2; a++) {
+          for (int a = 0; a < 2; a++)
+          {
             int tmpX;
             if (a == 0)
               tmpX = x;
             else
               tmpX = y;
 
-            if (devInlabel[tmpX] == inlabelZ) {
+            if (devInlabel[tmpX] == inlabelZ)
+            {
               suspects[a] = tmpX;
-            } else {
+            }
+            else
+            {
               int k = 31 - __clz(devAscendant[tmpX] & ((1 << j) - 1));
 
               int inlabelW = (devInlabel[tmpX] >> k) << (k);
@@ -461,20 +499,26 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
 }
 
 #define ll long long
-ll CudaPackEdge(int from, int to) { return (((ll)from) << 32) + to; }
+ll CudaPackEdge(int from, int to)
+{
+  return (((ll)from) << 32) + to;
+}
 int CudaUnpackEdgeFrom(ll edge) { return edge >> 32; }
 int CudaUnpackEdgeTo(ll edge) { return edge & ((1 << 32) - 1); }
 
-__device__ int CudaGetEdgeStart(const int *__restrict__ father, int edgeCode) {
+__device__ int CudaGetEdgeStart(const int *__restrict__ father, int edgeCode)
+{
   if (edgeCode % 2)
     return edgeCode / 2;
   else
     return father[edgeCode / 2];
 }
-__device__ int CudaGetEdgeEnd(const int *__restrict__ father, int edgeCode) {
+__device__ int CudaGetEdgeEnd(const int *__restrict__ father, int edgeCode)
+{
   return CudaGetEdgeStart(father, edgeCode ^ 1);
 }
 __device__ bool isEdgeToFather(int edgeCode) { return edgeCode % 2; }
-__device__ int CudaGetEdgeCode(int a, bool toFather) {
+__device__ int CudaGetEdgeCode(int a, bool toFather)
+{
   return a * 2 + toFather;
 }
