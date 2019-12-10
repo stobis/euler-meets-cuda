@@ -15,22 +15,34 @@ void cuda_euler_tour(int N, int root, const int *edges_from_input,
                      const int *edges_to_input, int *rank,
                      mgpu::context_t &context) {
 
-  int E = 2 * N - 2;
+  int E = N * 2 - 2;
 
   int *edges_to;
-  CUCHECK(cudaMalloc((void **)&edges_from_to_scan, sizeof(int) * (E)));
+  CUCHECK(cudaMalloc((void **)&edges_to, sizeof(int) * E));
   int *edges_from;
-  CUCHECK(cudaMalloc((void **)&edges_from, sizeof(int) * (E)));
+  CUCHECK(cudaMalloc((void **)&edges_from, sizeof(int) * E));
   int *index;
-  CUCHECK(cudaMalloc((void **)&index, sizeof(int) * (E)));
+  CUCHECK(cudaMalloc((void **)&index, sizeof(int) * E));
 
   transform(
       [=] MGPU_DEVICE(int thid) {
-        edges_from[thid + E / 2] = edges_to[thid] = edges_to_input[thid];
-        edges_to[thid + E / 2] = edges_from[thid] = edges_from_input[thid];
-        index[thid] = thid;
+        if (thid == root)
+          return;
+
+        int afterRoot = 0;
+        if (thid > root)
+          afterRoot = 1;
+        if (thid > root + N)
+          afterRoot++;
+
+        edges_from[thid + N - afterRoot - 1] = edges_to[thid - afterRoot] =
+            edges_to_input[thid];
+        edges_to[thid + N - afterRoot - 1] = edges_from[thid - afterRoot] =
+            edges_from_input[thid];
       },
       N, context);
+
+  transform([=] MGPU_DEVICE(int thid) { index[thid] = thid; }, E, context);
 
   mergesort(index, E,
             [=] MGPU_DEVICE(int a, int b) {
@@ -45,7 +57,7 @@ void cuda_euler_tour(int N, int root, const int *edges_from_input,
             context);
 
   int *rev_index;
-  CUCHECK(cudaMalloc((void **)&rev_index, sizeof(int) * E));
+  CUCHECK(cudaMalloc((void **)&rev_index, sizeof(int) * (E)));
 
   transform([=] MGPU_DEVICE(int thid) { rev_index[index[thid]] = thid; }, E,
             context);
@@ -62,13 +74,13 @@ void cuda_euler_tour(int N, int root, const int *edges_from_input,
         int f = edges_from[index[thid]];
         int t = edges_to[index[thid]];
 
-        if (thid == 0) {
+        if (index[thid] == 0) {
           first[t] = thid;
           return;
         }
 
-        int pf = edges_from[index[thid - 1]];
-        int pt = edges_to[index[thid - 1]];
+        int pf = edges_from[index[thid] - 1];
+        int pt = edges_to[index[thid] - 1];
 
         if (f != pf) {
           first[f] = thid;
@@ -77,6 +89,20 @@ void cuda_euler_tour(int N, int root, const int *edges_from_input,
         }
       },
       E, context);
+
+  cout << "From: " << endl;
+  CudaPrintTab(edges_from, E);
+  cout << "To:" << endl;
+  CudaPrintTab(edges_to, E);
+  cout << "Index:" << endl;
+  CudaPrintTab(index, E);
+  cout << "Rev_index:" << endl;
+  CudaPrintTab(rev_index, E);
+  cout << "Next:" << endl;
+  CudaPrintTab(next, E);
+  cout << "First:" << endl;
+  CudaPrintTab(first, N);
+  return;
 
   int *succ;
   CUCHECK(cudaMalloc((void **)&succ, sizeof(int) * E));
@@ -92,10 +118,15 @@ void cuda_euler_tour(int N, int root, const int *edges_from_input,
       },
       E, context);
 
-  cuda_list_rank(E, first[root], succ, rank, context);
+  int *head = new int[1];
+  CUCHECK(cudaMemcpy(head, first + root, sizeof(int), cudaMemcpyDeviceToHost));
+
+  cuda_list_rank(E, *head, succ, rank, context);
 
   context.synchronize();
 
-  cerr << "Rank: " << endl;
-  CudaPrintTab(rank, N * 2 - 2);
+  cout << "Succ: " << endl;
+  CudaPrintTab(succ, E);
+  cout << "Rank: " << endl;
+  CudaPrintTab(rank, E);
 }
