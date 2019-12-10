@@ -67,18 +67,18 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   CUCHECK(cudaMalloc((void **)&devEdgeRank, sizeof(int) * V * 2));
 
   transform([=] MGPU_DEVICE(int thid) {
-    devEdgeRank[thid * 2] = devEdgeRankFromEulerTour[thid] + 1;
-    devEdgeRank[thid * 2 + 1] = devEdgeRankFromEulerTour[thid + V] + 1;
+    devEdgeRank[thid * 2 + 1] = devEdgeRankFromEulerTour[thid] + 1;
+    devEdgeRank[thid * 2] = devEdgeRankFromEulerTour[thid + V] + 1;
 
     if (thid == root)
     {
-      devEdgeRank[thid * 2] = -1;
+      devEdgeRank[thid * 2] = 0;
       devEdgeRank[thid * 2 + 1] = V * 2 - 1;
     }
   },
             V, context);
 
-    // TODO Fix: it doesn't work
+  // TODO Fix: it doesn't work
 
   // printf( "ROOT: %d", root );
 
