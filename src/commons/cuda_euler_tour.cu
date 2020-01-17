@@ -5,8 +5,8 @@
 #include <moderngpu/transform.hxx>
 
 #include "lca/cuda_commons.h"
-#include "lca/cuda_euler_tour.h"
-#include "lca/cuda_list_rank.h"
+#include "commons/cuda_euler_tour.h"
+#include "commons/cuda_list_rank.h"
 
 using namespace std;
 using namespace mgpu;

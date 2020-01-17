@@ -6,8 +6,9 @@
 
 #include "lca/commons.h"
 #include "lca/cuda_commons.h"
-#include "lca/cuda_euler_tour.h"
-#include "lca/cuda_list_rank.h"
+#include "commons/cuda_euler_tour.h"
+#include "commons/cuda_list_rank.h"
+#include "commons/commons.h"
 
 #define ll long long
 
@@ -26,7 +27,7 @@ __device__ bool isEdgeToFather(int edgeCode);
 const int measureTimeDebug = false;
 
 void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
-                      int *answers, mgpu::context_t &context)
+                      int *answers, mgpu::context_t &context, Logger &logger)
 {
   Timer timer("Parse Input");
 
