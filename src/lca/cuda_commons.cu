@@ -11,7 +11,8 @@
 using namespace std;
 using namespace mgpu;
 
-void CudaSimpleListRank(int *devRank, int N, int *devNext, context_t &context) {
+void CudaSimpleListRank(int *devRank, int N, int *devNext, context_t &context)
+{
   int *notAllDone;
   cudaMallocHost(&notAllDone, sizeof(int));
 
@@ -29,19 +30,22 @@ void CudaSimpleListRank(int *devRank, int N, int *devNext, context_t &context) {
 
   const int loopsWithoutSync = 5;
 
-  do {
+  do
+  {
     transform(
         [] MGPU_DEVICE(int thid, int loopsWithoutSync, ull *devRankNext,
                        int *devNotAllDone) {
           ull rankNext = devRankNext[thid];
-          for (int i = 0; i < loopsWithoutSync; i++) {
+          for (int i = 0; i < loopsWithoutSync; i++)
+          {
             if (thid == 0)
               *devNotAllDone = 0;
 
             int rank = rankNext >> 32;
             int nxt = rankNext - 1;
 
-            if (nxt != -1) {
+            if (nxt != -1)
+            {
               ull grandNext = devRankNext[nxt];
 
               rank += (grandNext >> 32) + 1;
@@ -75,18 +79,36 @@ void CudaSimpleListRank(int *devRank, int N, int *devNext, context_t &context) {
 }
 
 void CudaAssert(cudaError_t error, const char *code, const char *file,
-                int line) {
-  if (error != cudaSuccess) {
+                int line)
+{
+  if (error != cudaSuccess)
+  {
     cerr << "Cuda error :" << code << ", " << file << ":" << error << endl;
     exit(1);
   }
 }
 
-void CudaPrintTab(const int *tab, int size) {
+void CudaPrintTab(const int *tab, int size)
+{
   int *tmp = (int *)malloc(sizeof(int) * size);
   CUCHECK(cudaMemcpy(tmp, tab, sizeof(int) * size, cudaMemcpyDeviceToHost));
 
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < size; i++)
+  {
+    cerr << (tmp[i] < 10 && tmp[i] >= 0 ? " " : "") << tmp[i] << " ";
+  }
+  cerr << endl;
+
+  free(tmp);
+}
+
+void CudaPrintTab(const ull *tab, int size)
+{
+  ull *tmp = (ull *)malloc(sizeof(ull) * size);
+  CUCHECK(cudaMemcpy(tmp, tab, sizeof(ull) * size, cudaMemcpyDeviceToHost));
+
+  for (int i = 0; i < size; i++)
+  {
     cerr << (tmp[i] < 10 && tmp[i] >= 0 ? " " : "") << tmp[i] << " ";
   }
   cerr << endl;

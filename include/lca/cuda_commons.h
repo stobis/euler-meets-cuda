@@ -11,5 +11,6 @@ void CudaAssert(cudaError_t error, const char *code, const char *file,
                 int line);
 
 void CudaPrintTab(const int *tab, int size);
+void CudaPrintTab(const unsigned long long *tab, int size);
 
 #define CUCHECK(x) CudaAssert(x, #x, __FILE__, __LINE__)

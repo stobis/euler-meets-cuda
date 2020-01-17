@@ -4,30 +4,29 @@
 #include "lca/cuda_algorithms.h"
 #include "lca/commons.h"
 #include "lca/cuda_commons.h"
+#include "lca/cpu_lca_inlabel.h"
+#include "lca/cpu_lca_rmq.h"
+#include "lca/cpu_lca_simple.h"
 
 #include <moderngpu/context.hxx>
 #include <moderngpu/memory.hxx>
 
 using namespace std;
 
-// Command line arguments
-//  -b -- sets input to binary
-//    -i input -- sets input file to $input
-//    -o output -- sets output file to $output
-//  -a [cuda-inlabel, ...] -- chooses algorithm to run
-//
-
 const char *help_msg = "Command line arguments\n \
   -b -- sets input to binary\n \
   -i $input -- sets input file to $input\n \
   -o $output -- sets output file to $output\n \
-  -a [cuda-inlabel, ...] -- chooses algorithm to run\n";
+  -a [cuda-inlabel, cuda-naive, cpu-inlabel, cpu-rmq, cpu-simple] -- chooses algorithm to run\n";
 
 enum Algorithm
 {
   unspecified,
   cuda_inlabel_algorithm,
-  cuda_naive_algorithm
+  cuda_naive_algorithm,
+  cpu_inlabel_algorithm,
+  cpu_rmq_algorithm,
+  cpu_simple_algorithm
 };
 bool is_cuda_algorithm(Algorithm alg);
 
@@ -68,6 +67,12 @@ int main(int argc, char *argv[])
         algorithm = cuda_inlabel_algorithm;
       else if (strcmp(optarg, "cuda-naive") == 0)
         algorithm = cuda_naive_algorithm;
+      else if (strcmp(optarg, "cpu-inlabel") == 0)
+        algorithm = cpu_inlabel_algorithm;
+      else if (strcmp(optarg, "cpu-rmq") == 0)
+        algorithm = cpu_rmq_algorithm;
+      else if (strcmp(optarg, "cpu-simple") == 0)
+        algorithm = cpu_simple_algorithm;
       else
       {
         cerr << "Unrecognized algorithm to use\n";
@@ -134,7 +139,17 @@ void solve_lca(TestCase &tc, Algorithm algorithm, vector<int> &answers)
     cuda_lca_inlabel(tc.tree.V, cuda_parents, tc.q.N, cuda_queries, cuda_answers, context);
     break;
   case cuda_naive_algorithm:
-    cuda_lca_naive(tc.tree.V, cuda_queries, tc.q.N, cuda_parents, cuda_answers, context);
+    cuda_lca_naive(tc.tree.V, cuda_parents, tc.q.N, cuda_queries, cuda_answers, context);
+    break;
+  case cpu_inlabel_algorithm:
+    cpu_lca_inlabel(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(), answers.data());
+    break;
+  case cpu_rmq_algorithm:
+    cpu_lca_rmq(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(), answers.data());
+    break;
+  case cpu_simple_algorithm:
+    cpu_lca_simple(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(), answers.data());
+    break;
 
   default:
     //Should not happen

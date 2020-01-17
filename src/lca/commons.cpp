@@ -47,7 +47,7 @@ double Timer::resetTimer(clock_t &timer)
 
 ParentsTree::ParentsTree() : V(0), root(0) {}
 ParentsTree::ParentsTree(int V, int root, const vector<int> &father) : V(V), root(root), father(father) {}
-ParentsTree::ParentsTree(ifstream &in):
+ParentsTree::ParentsTree(ifstream &in)
 {
   in.read((char *)&V, sizeof(int));
   in.read((char *)&root, sizeof(int));

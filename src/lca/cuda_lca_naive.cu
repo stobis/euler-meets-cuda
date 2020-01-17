@@ -20,7 +20,6 @@ void cuda_lca_naive( int N, const int *parents, int Q,
         const int *queries, int *answers, 
         mgpu::context_t &context )
 {
-  std::cout << "inside cuda_lca_naive HELLO THERE!" << std::endl;
 
   Timer timer = Timer( "Parse Input" );
 
@@ -64,7 +63,6 @@ void cuda_lca_naive( int N, const int *parents, int Q,
   timer.measureTime( "Copy Input and Init data" );
 
   CudaSimpleListRank( devDepth, V, devNext, context );
-
   context.synchronize();
 
   timer.setPrefix( "Queries" );
