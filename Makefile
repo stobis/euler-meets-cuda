@@ -25,22 +25,30 @@ NVCCFLAGS=-arch $(NVCCSM) -O2 -std=c++11 --expt-extended-lambda -w $(NVCCINC)
 
 LDFLAGS=-L/usr/local/cuda/lib64 -lcudart
 
-OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard *.cpp)) \
-	$(patsubst %.cpp, obj/%.o, $(wildcard src/**/*.cpp)) \
-	$(patsubst %.cu, obj/%.o, $(wildcard *.cu)) \
+OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard src/**/*.cpp)) \
+	$(patsubst %.cu, obj/%.o, $(wildcard src/**/*.cu)) \
+	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/GpuConnectedComponents/*.cu)) \
+	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/cudabfs/bfs-mgpu.cu))
+
+BRI_OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard src/**/*.cpp)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard src/**/*.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/GpuConnectedComponents/*.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/cudabfs/bfs-mgpu.cu))
 
 $(info $(OBJFILES))
 
+$(info $(BRI_OBJFILES))
+
 # Targets
-all: runner.e # bridges lca
+all: runner.e runner_bridges.e # bridges lca
 remake: clean all
 # bridges: 
 # lca: 
 
-runner.e: $(OBJFILES)
+runner.e: obj/runner.o $(OBJFILES)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+runner_bridges.e: obj/runner_bridges.o $(BRI_OBJFILES)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(OBJDIR)/%.o: %.cu

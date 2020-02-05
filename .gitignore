@@ -11,3 +11,6 @@ obj/
 
 # Adrian's uploads to miracle
 copyToStudent.sh
+
+# Test inputs
+test/in/*
