@@ -13,4 +13,4 @@ obj/
 copyToStudent.sh
 
 # Test inputs
-test/in/*
+test/bridges/in/*
