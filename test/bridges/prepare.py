@@ -27,7 +27,7 @@ def download_one(format, url):
     print('=== Source: {0} ==='.format(url), flush=True)
     # print(filename,testfilename)
 
-    if testfilename + '.bin2' in os.listdir('in/') :
+    if testfilename + '.bin' in os.listdir('in/') :
         print("{0} already exists. Skipping...\n".format(filename + '.bin'))
         return
 
@@ -43,11 +43,14 @@ def download_one(format, url):
     
     print('3. Convert to proper input format')
     os.chmod(os.getcwd() + "/in/" + testfilename, stat.S_IRUSR|stat.S_IWUSR|stat.S_IRGRP|stat.S_IROTH)
-    subprocess.run(["./{}2ecl.e".format(format), "in/{0}".format(testfilename), "in/{0}.bin".format(testfilename)])
+    subprocess.run(["./{}2ecl.e".format(format), "in/{0}".format(testfilename), "in/{0}.bin.tmp".format(testfilename)])
     
     subprocess.run(["rm", "-f", "in/" + testfilename])
-    
-    print('\n')
+
+    print('4. Convert input graph to connected')
+    subprocess.run(["./connect.e", "in/{0}.bin.tmp".format(testfilename), "in/{0}.bin".format(testfilename)])
+    subprocess.run(["rm", "-f", "in/{0}.bin.tmp".format(testfilename)])
+
     return
 
 def download_all():
@@ -65,6 +68,7 @@ def read_config():
 if __name__ == "__main__":
     read_config()
     # print(config)
+    Path("./in").mkdir(exist_ok=True)
     if args.type != None and args.url != None:
         download_one(args.type, args.url)
     else:

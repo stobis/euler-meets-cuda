@@ -4,7 +4,7 @@ CXX=g++
 CXXINC=-I ./$(INCDIR)/
 CXXFLAGS=-O2 -std=c++11 -fno-stack-protector $(CXXINC)
 
-all: dimacs2ecl.e mm2ecl.e nr2ecl.e snap2ecl.e shuffle.e
+all: dimacs2ecl.e mm2ecl.e nr2ecl.e snap2ecl.e shuffle.e connect.e
 
 %.e: %.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
