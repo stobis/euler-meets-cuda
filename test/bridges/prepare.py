@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import argparse
 import requests
 import shutil
@@ -6,6 +8,8 @@ import subprocess
 import os
 import stat
 import yaml
+import re
+from pathlib import Path
 
 parser = argparse.ArgumentParser()
 parser.add_argument("type", help="test format type (one of dimacs/mm/snap)", nargs='?')
@@ -16,12 +20,15 @@ config = None
 
 def download_one(format, url):
     url = url.rstrip()
-    filename = url[url.rfind('/')+1:] # TODO
-    
-    print('=== Prepare {1} from... {0} ==='.format(url, filename), flush=True)
-    
-    if filename + '.bin' in os.listdir('in/') :
-        print("{0} already exists. Skipping...".format(filename + 'bin'))
+    filename = os.path.basename(url) # url[url.rfind('/')+1:] # TODO
+    testfilename = re.sub('.gz', '', filename)
+    testfilename = re.sub('.tar', '.mtx', testfilename)
+
+    print('=== Source: {0} ==='.format(url), flush=True)
+    # print(filename,testfilename)
+
+    if testfilename + '.bin2' in os.listdir('in/') :
+        print("{0} already exists. Skipping...\n".format(filename + '.bin'))
         return
 
     print('1. Download')
@@ -30,12 +37,17 @@ def download_one(format, url):
     print('2. Extract')
     if filename.endswith('.tar.gz'):
         subprocess.run(["tar", "--strip-components=1", "-xzf", "in/" + filename, "-C", "in/", "--wildcards", "*.mtx"])
-        subprocess.run(["rm", "in/" + filename])
     else:
-        subprocess.run(["gzip", "-d", "in/" + filename])    
+        subprocess.run(["gzip", "-d", "in/" + filename])
+    subprocess.run(["rm", "-f", "in/" + filename])
     
     print('3. Convert to proper input format')
-    # os.chmod(os.getcwd() + "/" + local_filepath[:-4] + ".mtx", stat.S_IRUSR|stat.S_IWUSR|stat.S_IRGRP|stat.S_IROTH)
+    os.chmod(os.getcwd() + "/in/" + testfilename, stat.S_IRUSR|stat.S_IWUSR|stat.S_IRGRP|stat.S_IROTH)
+    subprocess.run(["./{}2ecl.e".format(format), "in/{0}".format(testfilename), "in/{0}.bin".format(testfilename)])
+    
+    subprocess.run(["rm", "-f", "in/" + testfilename])
+    
+    print('\n')
     return
 
 def download_all():
@@ -52,7 +64,7 @@ def read_config():
 
 if __name__ == "__main__":
     read_config()
-    print(config)
+    # print(config)
     if args.type != None and args.url != None:
         download_one(args.type, args.url)
     else:

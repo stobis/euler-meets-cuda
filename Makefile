@@ -42,8 +42,12 @@ $(info $(BRI_OBJFILES))
 # Targets
 all: runner.e runner_bridges.e # bridges lca
 remake: clean all
+btest:
+	cd test/bridges && $(MAKE)
 # bridges: 
 # lca: 
+
+
 
 runner.e: obj/runner.o $(OBJFILES)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
@@ -63,3 +67,5 @@ $(OBJDIR)/%.o: %.cpp
 
 clean:
 	rm -rf obj *.e
+	cd test/bridges && $(MAKE) clean
+

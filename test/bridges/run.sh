@@ -1,9 +1,9 @@
 #!/bin/bash
 
-FILES=test/**/*.bin
+FILES=in/*.bin
 
 for f in $FILES
 do
-    # echo "=> Processing $f... <="
-    ./runner.e $f
+    echo "=== Test: $f... ==="
+    ../../runner_bridges.e $f
 done
