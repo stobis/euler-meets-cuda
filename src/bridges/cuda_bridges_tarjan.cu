@@ -12,26 +12,10 @@ using namespace std;
 
 #include "lca/cuda_euler_tour.h"
 
-#include "bridges/gpu-bridges-cc.cuh"
+#include "bridges/cuda_tarjan.h"
+#include "bridges/cuda_spanning_tree.h"
 #include "bridges/gputils.cuh"
-#include "bridges/graph.hpp"
-#include "bridges/test-result.hpp"
 #include "bridges/timer.hpp"
-#include "conn.cuh"
-
-void _csr_to_list2(int N, int M, int const *row_offsets, int *row_indices,
-                   context_t &context)
-{
-    transform(
-        [=] MGPU_DEVICE(int index) {
-            if (index == 0)
-                return;
-            row_indices[row_offsets[index]] = 1;
-        },
-        N, context);
-
-    scan<scan_type_inc>(row_indices, M, row_indices, context);
-}
 
 void make_directed(int const N, int const M, ll const *undirected,
                    ll *directed, int *directed_rev,
@@ -158,48 +142,6 @@ void segtree_init(int const N, int const M, int const *init_data, op_t op,
     }
 }
 
-// Future API function - option 1
-void spanning_tree(int const N, int const M, int const *row_indices, int const *col_indices,
-                   bool *is_tree_edge, context_t &context)
-{
-    mem_t<cc::edge> device_cc_graph(M, context);
-    cc::edge *device_cc_graph_data = device_cc_graph.data();
-
-    mem_t<int> mapping = mgpu::fill<int>(-1, M / 2, context);
-    int *mapping_data = mapping.data();
-
-    mem_t<int> device_tree_edges = mgpu::fill<int>(0, M / 2, context);
-    int *device_tree_edges_data = device_tree_edges.data();
-
-    // Construct input for CC
-    auto compact = transform_compact(M, context);
-
-    int stream_count = compact.upsweep([=] MGPU_DEVICE(int index) {
-        return row_indices[index] < col_indices[index];
-        // TODO: consider hash(r, c) < hash(c, r)
-    });
-
-    compact.downsweep([=] MGPU_DEVICE(int dest_index, int source_index) {
-        device_cc_graph_data[dest_index].x =
-            (static_cast<ll>(row_indices[source_index]) << 32) |
-            (static_cast<ll>(col_indices[source_index]));
-        mapping_data[dest_index] = source_index;
-    });
-    assert(M / 2 == stream_count);
-
-    // Use CC algorithm to find spanning tree
-    cc::compute(N, M / 2, device_cc_graph_data, device_tree_edges_data);
-
-    // Set indicators in output array
-    transform(
-        [=] MGPU_DEVICE(int index) {
-            is_tree_edge[mapping_data[index]] =
-                device_tree_edges_data[index] ? true : false;
-        },
-        M / 2, context);
-}
-
-// Future API function - option 2
 void spanning_tree(int const N, int const M, int const *row_indices,
                    int const *col_indices, ll *tree_edges,
                    context_t &context)
@@ -208,16 +150,6 @@ void spanning_tree(int const N, int const M, int const *row_indices,
     bool *is_tree_edge_data = is_tree_edge.data();
 
     spanning_tree(N, M, row_indices, col_indices, is_tree_edge_data, context);
-
-    // {
-    //     // TODO: rm
-    //     bool* cpuite = new bool[M];
-    //     dtoh(cpuite, is_tree_edge_data, M);
-    //     for (int i = 0; i < M; ++i) {
-    //         cout << cpuite[i] << " ";
-    //     }
-    //     cout << endl;
-    // }
 
     // Select tree edges
     auto compact = transform_compact(M, context);
@@ -483,7 +415,7 @@ void cuda_bridges_tarjan(int N, int M, int const *row_offsets,
 
     // Expand csr to edge list
     mem_t<int> row_indices = mgpu::fill<int>(0, M, context);
-    _csr_to_list2(N, M, row_offsets, row_indices.data(), context);
+    _csr_to_list(N, M, row_offsets, row_indices.data(), context);
 
     // Find spanning tree
     mem_t<ll> tree(N - 1, context);
