@@ -142,14 +142,16 @@ void segtree_init(int const N, int const M, int const *init_data, op_t op,
     }
 }
 
-void spanning_tree(int const N, int const M, int const *row_indices,
+void spanning_tree(int const N, int const M, int const *row_offsets, int const *row_indices,
                    int const *col_indices, ll *tree_edges,
                    context_t &context)
 {
     mem_t<bool> is_tree_edge = mgpu::fill<bool>(false, M, context);
     bool *is_tree_edge_data = is_tree_edge.data();
 
-    spanning_tree(N, M, row_indices, col_indices, is_tree_edge_data, context);
+    // spanning_tree(N, M, row_offsets, col_indices, is_tree_edge_data, context);
+    // spanning_tree_bfs(N, M, row_offsets, col_indices, is_tree_edge_data, context);
+    spanning_tree_ecl(N, M, row_offsets, col_indices, is_tree_edge_data, context);
 
     // Select tree edges
     auto compact = transform_compact(M, context);
@@ -419,7 +421,7 @@ void cuda_bridges_tarjan(int N, int M, int const *row_offsets,
 
     // Find spanning tree
     mem_t<ll> tree(N - 1, context);
-    spanning_tree(N, M, row_indices.data(), col_indices, tree.data(), context);
+    spanning_tree(N, M, row_offsets, row_indices.data(), col_indices, tree.data(), context);
 
     // Direct edges, find reverse edge index
     mem_t<ll> tree_directed(2 * (N - 1), context);

@@ -12,8 +12,8 @@ const std::string _usage =
     " VARIANT IN\n\n"
     "Available variants:\n"
     "gpu-bfs - simple parallel BFS implementation (naive)\n"
-    "gpu-tarjan - parallel implementation using fast CC and Euler Tour technique\n"
-    "gpu-hybrid - parallel implementation combining spanning tree given by BFS with ET technique\n";
+    "gpu-tarjan - parallel implementation using fast CC and Euler Tour technique\n";
+    // "gpu-hybrid - parallel implementation combining spanning tree given by BFS with ET technique\n";
 
 // Configuration of implementations to choose
 typedef void (*BridgesFunction)(int, int, int const *, int const *, bool *, mgpu::context_t &);
