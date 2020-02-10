@@ -42,9 +42,9 @@ $(info $(BRI_OBJFILES))
 # Targets
 all: runner.e runner_bridges.e # bridges lca
 remake: clean all
-btest:
-	cd test/bridges && $(MAKE)
 # bridges: 
+britest:
+	cd test/bridges && $(MAKE)
 # lca: 
 
 
