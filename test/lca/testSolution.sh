@@ -6,45 +6,48 @@ mkdir -p $validityTestsDir
 
 echo "Generating Tests"
 for size in ${validityTestsSizes[@]}; do
-    genTest $validityTestsDir t $size $size $validityGraspSize 1
+    genTest $validityTestsDir $validityTestsEncoding $size $size $validityGraspSize 1
 done
-
+echo
 
 echo "Generating Answers"
-
 mkdir -p $validityAnswersDir
-
-for test in $validityTestsDir/*.t.in; do
+for test in $validityTestsDir/*.$validityTestsEncoding.in; do
     testName=$(basename $test)
     outName=$validityAnswersDir/$testName.out
     if [ ! -f $outName ]; then
         echo "Generating $outName"
-        $runnerPath -i $test -o $outName -a $validityOutGeneratorAlgorithm
+        $runnerPath -$validityTestsEncoding -i $test -o $outName -a $validityOutGeneratorAlgorithm 2>/dev/null
     fi
     echo "$outName generated."
 done
+echo
 
-exit
+for algorithm in ${validitySolutionsToTest[@]}; do
+    echo "Testing $algorithm"
 
-make $validitySolutionToTest.e
+    for test in $validityTestsDir/*.$validityTestsEncoding.in; do
+        testName=$(basename $test)
+        outName=$validityAnswersDir/$testName.out
 
-echo "Testing"
-for test in $validityTestsDir/*.b.in; do
-    testName=$(basename $test)
-    outName=$validityAnswersDir/$testName.out
+        echo -n "  Testing on $testName"
 
-    echo "Testing on $testName"
+        # ./$validitySolutionToTest.e $test $validityAnswersDir/out 
+        # ./$validitySolutionToTest.e $test $validityAnswersDir/out 2>/dev/null
+        $runnerPath -$validityTestsEncoding -i $test -o $validityAnswersDir/outTmp.out 2>/dev/null -a $algorithm
 
-    # ./$validitySolutionToTest.e $test $validityAnswersDir/out 
-    ./$validitySolutionToTest.e $test $validityAnswersDir/out 2>/dev/null
-
-    if diff $validityAnswersDir/out $outName >/dev/null; then
-        echo "$testName OK"
-    else
-        echo "Wrong answer on $testName. Aborting"
-        exit 1
-    fi
+        if diff $validityAnswersDir/outTmp.out $outName >/dev/null; then
+            echo -e "\t\tOK"
+        else
+            echo ""
+            echo "  Wrong answer on $testName. Aborting"
+            exit 1
+        fi
+    done
 done
+
+echo ""
+echo "ALL OK"
 
 # # toTest="cudaSimpleLCA"
 # toTest="cudaInlabelLCA"

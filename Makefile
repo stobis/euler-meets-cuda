@@ -31,7 +31,7 @@ OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard *.cpp)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/GpuConnectedComponents/*.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/cudabfs/bfs-mgpu.cu))
 
-$(info $(OBJFILES))
+# $(info $(OBJFILES))
 
 # Targets
 runner: runner.e # bridges lca

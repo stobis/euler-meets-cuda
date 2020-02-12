@@ -7,22 +7,36 @@ singleRunTimeout=300
 
 validityTestsDir=$testsDir/validity
 validityAnswersDir=$testsDir/validityOut
+
+# Encoding of tests - b for binary, t for text
+validityTestsEncoding=b
+# validityTestsEncoding=t
+
 validityTestsSizes=(
-    10
-    1000
-    2000
-    3000
-    4000
-    5000
-    6000
-    7000
-    8000
-    9000
+    # 10
+    # 1000
+    # 2000
+    # 3000
+    # 4000
+    # 5000
+    # 6000
+    # 7000
+    # 8000
+    # 9000
+    100000
+    # 500000
+    # 1000000
+    # 2000000
+    # 4000000
 )
 validityGraspSize=-1
 runnerPath="../../lca_runner.e"
 validityOutGeneratorAlgorithm="cpu-rmq"
-validitySolutionToTest="cudaInlabelLCA"
+validitySolutionsToTest=(
+    cuda-inlabel
+    cuda-naive
+    cpu-inlabel
+)
 # validitySolutionToTest="cpuInlabelLCA"
 # validitySolutionToTest="cudaSimpleLCA"
 
