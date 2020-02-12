@@ -67,10 +67,11 @@ int getEdgeEnd(ParentsTree &tree, int edgeCode);
 
 void writeToFile(TestCase &tc, const char *filename);
 void writeToStdOut(TestCase &tc);
-TestCase readFromFile(const char *filename);
+TestCase readFromFile(bool isBinary, const char *filename);
+TestCase readFromStream(istream &inputStream);
 TestCase readFromStdIn();
 
-void writeAnswersToFile(int Q, int *ans, const char *filename);
+void writeAnswersToFile(bool binary, int Q, int *ans, const char *filename);
 void writeAnswersToStdOut(int Q, int *ans);
 
 void shuffleFathers(vector<int> &in, vector<int> &out, int &root);

@@ -6,24 +6,25 @@ mkdir -p $validityTestsDir
 
 echo "Generating Tests"
 for size in ${validityTestsSizes[@]}; do
-    genTest $validityTestsDir b $size $size $validityGraspSize 1
+    genTest $validityTestsDir t $size $size $validityGraspSize 1
 done
 
 
 echo "Generating Answers"
 
 mkdir -p $validityAnswersDir
-make $validityOutGenerator.e
 
-for test in $validityTestsDir/*.b.in; do
+for test in $validityTestsDir/*.t.in; do
     testName=$(basename $test)
     outName=$validityAnswersDir/$testName.out
     if [ ! -f $outName ]; then
         echo "Generating $outName"
-        ./$validityOutGenerator.e $test $outName 2>/dev/null
+        $runnerPath -i $test -o $outName -a $validityOutGeneratorAlgorithm
     fi
     echo "$outName generated."
 done
+
+exit
 
 make $validitySolutionToTest.e
 

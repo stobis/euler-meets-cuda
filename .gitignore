@@ -9,5 +9,7 @@ obj/
 
 .vscode/*
 
+test/lca/tests/*
+
 # Adrian's uploads to miracle
 copyToStudent.sh

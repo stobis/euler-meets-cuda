@@ -20,7 +20,8 @@ validityTestsSizes=(
     9000
 )
 validityGraspSize=-1
-validityOutGenerator="cpuRmqLCA"
+runnerPath="../../lca_runner.e"
+validityOutGeneratorAlgorithm="cpu-rmq"
 validitySolutionToTest="cudaInlabelLCA"
 # validitySolutionToTest="cpuInlabelLCA"
 # validitySolutionToTest="cudaSimpleLCA"

@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     algorithm = cuda_inlabel_algorithm;
   }
 
-  TestCase tc = is_binary_input ? readFromFile(input_file) : readFromStdIn();
+  TestCase tc = input_file == NULL ? readFromStdIn() : readFromFile(is_binary_input, input_file);
 
   if (is_verbose)
     cerr << "N: " << tc.tree.V << endl
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
   if (output_file != NULL)
   {
-    writeAnswersToFile(tc.q.N, answers.data(), output_file);
+    writeAnswersToFile(is_binary_input, tc.q.N, answers.data(), output_file);
   }
   else
   {
