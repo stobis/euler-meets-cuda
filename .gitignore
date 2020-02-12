@@ -10,6 +10,7 @@ obj/
 .vscode/*
 
 test/lca/tests/*
+test/lca/resultTimes/*
 
 # Adrian's uploads to miracle
 copyToStudent.sh

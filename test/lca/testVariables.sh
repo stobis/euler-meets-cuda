@@ -1,9 +1,11 @@
 testsDir=tests
 resultTimesDir=resultTimes
-
 defaultBatchSize=-1
-
+runnerPath="../../lca_runner.e"
 singleRunTimeout=300
+
+
+### Validity tests
 
 validityTestsDir=$testsDir/validity
 validityAnswersDir=$testsDir/validityOut
@@ -30,7 +32,6 @@ validityTestsSizes=(
     # 4000000
 )
 validityGraspSize=-1
-runnerPath="../../lca_runner.e"
 validityOutGeneratorAlgorithm="cpu-rmq"
 validitySolutionsToTest=(
     cuda-inlabel
@@ -40,15 +41,25 @@ validitySolutionsToTest=(
 # validitySolutionToTest="cpuInlabelLCA"
 # validitySolutionToTest="cudaSimpleLCA"
 
-# runE1=true
-runE1=false
-# E1PurgeExistingTests=false
-E1PurgeExistingTests=true
+### Time tests
+
+generateAnswers=true
+repeatSingleTest=10
+progressBarWidth=50
+timedTestsEncoding=b
+# timedTestsEncoding=t
+
+testsToRun=(
+    1
+)
+
+runE1=true
+# runE1=false
 E1SolutionsToTest=(
-    "cudaInlabelLCA"
-    "cudaSimpleLCA"
-    # "cpuRmqLCA"
-    "cpuInlabelLCA"
+    "cuda-inlabel"
+    "cuda-simple"
+    "cpu-rmq"
+    "cpu-inlabel"
 )
 E1TestsDir=$testsDir/E1
 E1ResultsDir=$resultTimesDir/E1
@@ -97,8 +108,8 @@ E2BatchSizes=(
     # 100000000
 )
 
-# runE3=false
-runE3=true
+runE3=false
+# runE3=true
 E3PurgeExistingTests=true
 E3SolutionsToTest=(
     "cudaInlabelLCA"
@@ -154,9 +165,4 @@ runE4=false
 
 
 
-generateAnswers=true
 
-
-repeatSingleTest=10
-
-progressBarWidth=50

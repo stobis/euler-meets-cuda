@@ -46,5 +46,10 @@ if [ "$run_check" = 1 ]; then
 fi
 
 if [ "$run_time" = 1 ]; then
+  make lca_runner
   echo "Running timed tests."
+  cwd=$(pwd)
+  cd $testDirectory
+  ./testTime.sh
+  cd $cwd
 fi
