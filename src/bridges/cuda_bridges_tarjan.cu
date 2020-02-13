@@ -200,10 +200,10 @@ void list_rank(int const N, int const M, ll const *tree_directed,
                int const *tree_directed_rev, int *rank,
                context_t &context)
 {
-    cout << "TREE_DIRECTED:" << endl;
-    CudaPrintTabLL(tree_directed, M);
-    cout << "TREE_DIRECTED_REV:" << endl;
-    CudaPrintTabINT(tree_directed_rev, M);
+    // cout << "TREE_DIRECTED:" << endl;
+    // CudaPrintTabLL(tree_directed, M);
+    // cout << "TREE_DIRECTED_REV:" << endl;
+    // CudaPrintTabINT(tree_directed_rev, M);
 
     mem_t<int> edges_from(M, context);
     mem_t<int> edges_to(M, context);
@@ -218,28 +218,29 @@ void list_rank(int const N, int const M, ll const *tree_directed,
         edges_from.data(),
         edges_to.data());
 
-    cuda_euler_tour(M, 0, edges_from.data(), edges_to.data(), rank, context);
+    cuda_euler_tour(N, 0, edges_from.data(), edges_to.data(), rank, context);
 
     // A quick fix for now. We probably should only use one direction of edges in euler_tour, as it expects
-    transform(
-        [=] MGPU_DEVICE(int index) {
-            if (index == 0)
-                rank[index] = M - 1;
-            else
-                rank[index] -= M + 1;
-        },
-        M, context);
+    // transform(
+    //     [=] MGPU_DEVICE(int index) {
+    //         if (index == 0)
+    //             rank[index] = M - 1;
+    //         else
+    //             rank[index] -= M + 1;
+    //     },
+    //     M, context);
 
     // int N, int root, const int *edges_from_input,
     //                  const int *edges_to_input, int *rank_to_output,
     //                  mgpu::context_t &context
 
-    cout
-        << "RANK: " << endl;
-    CudaPrintTabINT(rank, M);
+    // cout
+    //     << "RANK: " << endl;
+    // CudaPrintTabINT(rank, 2*M);
 }
 
 void order_by_rank(int const N, int const M,
+                   ll *tree,
                    ll *tree_directed,
                    int *tree_directed_rev, int const *rank,
                    context_t &context)
@@ -247,23 +248,36 @@ void order_by_rank(int const N, int const M,
     mem_t<ll> rank_ordered_edges(M, context);
     mem_t<int> rank_ordered_edges_rev(M, context);
 
-    // Fill tmp arrays
     transform(
-        [=] MGPU_DEVICE(int index, ll *rank_ordered_edges,
-                        int *rank_ordered_edges_rev) {
-            rank_ordered_edges[rank[index]] = tree_directed[index];
-            rank_ordered_edges_rev[rank[index]] =
-                rank[tree_directed_rev[index]];
+        [=] MGPU_DEVICE(int index) {
+            tree_directed[rank[index]] = tree[index];
+            tree_directed[rank[index + N-1]] = 
+                (static_cast<ll>(tree[index] & 0xFFFFFFFF) << 32) |
+                (static_cast<ll>(tree[index]) >> 32);
+
+            tree_directed_rev[rank[index]] = rank[index + N-1];
+            tree_directed_rev[rank[index + N-1]] = rank[index];
         },
-        M, context,
-        rank_ordered_edges.data(), rank_ordered_edges_rev.data());
-    // Swap in and tmp
-    transform(
-        [=] MGPU_DEVICE(int index, ll const *rank_ordered_edges, int const *rank_ordered_edges_rev) {
-            tree_directed[index] = rank_ordered_edges[index];
-            tree_directed_rev[index] = rank_ordered_edges_rev[index];
-        },
-        M, context, rank_ordered_edges.data(), rank_ordered_edges_rev.data());
+        N-1, context
+    );
+
+    // // Fill tmp arrays
+    // transform(
+    //     [=] MGPU_DEVICE(int index, ll *rank_ordered_edges,
+    //                     int *rank_ordered_edges_rev) {
+    //         rank_ordered_edges[rank[index]] = tree_directed[index];
+    //         rank_ordered_edges_rev[rank[index]] =
+    //             rank[tree_directed_rev[index]];
+    //     },
+    //     M, context,
+    //     rank_ordered_edges.data(), rank_ordered_edges_rev.data());
+    // // Swap in and tmp
+    // transform(
+    //     [=] MGPU_DEVICE(int index, ll const *rank_ordered_edges, int const *rank_ordered_edges_rev) {
+    //         tree_directed[index] = rank_ordered_edges[index];
+    //         tree_directed_rev[index] = rank_ordered_edges_rev[index];
+    //     },
+    //     M, context, rank_ordered_edges.data(), rank_ordered_edges_rev.data());
 }
 
 void count_preorder(int const N, int const M, ll const *tree_edges,
@@ -432,10 +446,10 @@ void cuda_bridges_tarjan(int N, int M, int const *row_offsets,
 
     // List rank
     mem_t<int> rank(2 * (N - 1), context);
-    list_rank(N, 2 * (N - 1), tree_directed.data(), tree_directed_rev.data(), rank.data(), context);
+    list_rank(N, (N - 1), tree.data(), tree_directed_rev.data(), rank.data(), context);
 
     // Rearrange tree edges using counted ranks
-    order_by_rank(N, 2 * (N - 1), tree_directed.data(), tree_directed_rev.data(), rank.data(), context);
+    order_by_rank(N, 2 * (N - 1), tree.data(), tree_directed.data(), tree_directed_rev.data(), rank.data(), context);
 
     show_time("List rank", timer, context);
 

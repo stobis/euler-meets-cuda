@@ -47,7 +47,7 @@ remake: clean all
 runner.e: $(OBJFILES) obj/runner.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
-bridges_runner.e: obj/runner_bridges.o $(OBJFILES)
+bridges_runner.e: obj/bridges_runner.o $(OBJFILES)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 lca_runner.e: $(OBJFILES) obj/lca_runner.o

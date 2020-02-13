@@ -1,14 +1,15 @@
 #!/bin/bash
 
 FILES=in/**.bin
+EXEC=../../bridges_runner.e
 
 for f in $FILES
 do
     echo "=== Test: $f... ==="
     if [ "$1" != "" ]; then
-        ../../runner_bridges.e $1 $f
+        $EXEC $1 $f
     else
-        ../../runner_bridges.e gpu-bfs $f
-        ../../runner_bridges.e gpu-tarjan $f
+        $EXEC gpu-bfs $f
+        $EXEC gpu-tarjan $f
     fi
 done
