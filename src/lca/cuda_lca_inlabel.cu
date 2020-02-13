@@ -55,14 +55,25 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   root = rootArr[0];
 
   int *dev_edge_from;
-  CUCHECK(cudaMalloc((void **)&dev_edge_from, sizeof(int) * V));
-  transform([=] MGPU_DEVICE(int thid) { dev_edge_from[thid] = thid; }, V,
-            context);
+  int *dev_edge_to;
+  CUCHECK(cudaMalloc((void **)&dev_edge_from, sizeof(int) * (V-1)));
+  CUCHECK(cudaMalloc((void **)&dev_edge_to, sizeof(int) * (V-1)));
+  transform([=] MGPU_DEVICE(int thid) {
+    if (thid == root)
+      return;
+    int afterRoot = thid > root;
+    dev_edge_from[thid - afterRoot] = thid;
+    dev_edge_to[thid - afterRoot] = parents[thid];
+    },
+    V,
+    context);
 
   int *devEdgeRankFromEulerTour;
   CUCHECK(cudaMalloc((void **)&devEdgeRankFromEulerTour, sizeof(int) * V * 2));
 
-  cuda_euler_tour(V, root, dev_edge_from, parents, devEdgeRankFromEulerTour, context);
+  CudaPrintTab(dev_edge_from, V-1);
+  CudaPrintTab(dev_edge_to, V-1);
+  cuda_euler_tour(V, root, dev_edge_from, dev_edge_to, devEdgeRankFromEulerTour, context);
 
   int *devEdgeRank;
   CUCHECK(cudaMalloc((void **)&devEdgeRank, sizeof(int) * V * 2));
@@ -210,15 +221,15 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
 
   transform(
       [] MGPU_DEVICE(int thid, int V, int *devEdgeRank, int *devSortedEdges) {
-        // int edgeRank = E - devEdgeRank[thid];
-        int edgeRank = devEdgeRank[thid] - 1;
+    // int edgeRank = E - devEdgeRank[thid];
+    int edgeRank = devEdgeRank[thid] - 1;
 
-        devEdgeRank[thid] = edgeRank;
+    devEdgeRank[thid] = edgeRank;
 
-        if (edgeRank == -1 || edgeRank == V * 2 - 1)
-          return; // edges from root
+    if (edgeRank == -1 || edgeRank == V * 2 - 1)
+      return; // edges from root
 
-        devSortedEdges[edgeRank] = thid;
+    devSortedEdges[edgeRank] = thid;
       },
       V * 2, context, V, devEdgeRank, devSortedEdges);
 
@@ -244,17 +255,17 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   transform(
       [] MGPU_DEVICE(int thid, int *devW1, int *devW2,
                      const int *devSortedEdges) {
-        int edge = devSortedEdges[thid];
-        if (isEdgeToFather(edge))
-        {
-          devW1[thid] = 0;
-          devW2[thid] = -1;
-        }
-        else
-        {
-          devW1[thid] = 1;
-          devW2[thid] = 1;
-        }
+    int edge = devSortedEdges[thid];
+    if (isEdgeToFather(edge))
+    {
+      devW1[thid] = 0;
+      devW2[thid] = -1;
+    }
+    else
+    {
+      devW1[thid] = 1;
+      devW2[thid] = 1;
+    }
       },
       E, context, devW1, devW2, devSortedEdges);
 
@@ -283,20 +294,20 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
       [] MGPU_DEVICE(int thid, int V, int root, int *devPreorder,
                      int *devPrePlusSize, int *devLevel, const int *devEdgeRank,
                      const int *devW1Sum, const int *devW2Sum) {
-        int codeFromFather = CudaGetEdgeCode(thid, 0);
-        int codeToFather = CudaGetEdgeCode(thid, 1);
-        if (thid == root)
-        {
-          devPreorder[thid] = 1;
-          devPrePlusSize[thid] = V;
-          devLevel[thid] = 0;
-          return;
-        }
+    int codeFromFather = CudaGetEdgeCode(thid, 0);
+    int codeToFather = CudaGetEdgeCode(thid, 1);
+    if (thid == root)
+    {
+      devPreorder[thid] = 1;
+      devPrePlusSize[thid] = V;
+      devLevel[thid] = 0;
+      return;
+    }
 
-        int edgeRankFromFather = devEdgeRank[codeFromFather];
-        devPreorder[thid] = devW1Sum[edgeRankFromFather] + 1;
-        devPrePlusSize[thid] = devW1Sum[devEdgeRank[codeToFather]] + 1;
-        devLevel[thid] = devW2Sum[edgeRankFromFather];
+    int edgeRankFromFather = devEdgeRank[codeFromFather];
+    devPreorder[thid] = devW1Sum[edgeRankFromFather] + 1;
+    devPrePlusSize[thid] = devW1Sum[devEdgeRank[codeToFather]] + 1;
+    devLevel[thid] = devW2Sum[edgeRankFromFather];
       },
       V, context, V, root, devPreorder, devPrePlusSize, devLevel, devEdgeRank,
       devW1Sum, devW2Sum);
@@ -316,8 +327,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   transform(
       [] MGPU_DEVICE(int thid, int *devInlabel, const int *devPreorder,
                      const int *devPrePlusSize) {
-        int i = 31 - __clz((devPreorder[thid] - 1) ^ (devPrePlusSize[thid]));
-        devInlabel[thid] = ((devPrePlusSize[thid]) >> i) << i;
+    int i = 31 - __clz((devPreorder[thid] - 1) ^ (devPrePlusSize[thid]));
+    devInlabel[thid] = ((devPrePlusSize[thid]) >> i) << i;
       },
       V, context, devInlabel, devPreorder, devPrePlusSize);
 
@@ -328,22 +339,22 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
       [] MGPU_DEVICE(int thid, int root, const int *devFather,
                      const int *devInlabel, const int *devEdgeRank,
                      int *devW1) {
-        if (thid == root)
-          return;
-        int f = devFather[thid];
-        int inLabel = devInlabel[thid];
-        int fatherInLabel = devInlabel[f];
-        if (inLabel != fatherInLabel)
-        {
-          int i = __ffs(inLabel) - 1;
-          devW1[devEdgeRank[CudaGetEdgeCode(thid, 0)]] = (1 << i);
-          devW1[devEdgeRank[CudaGetEdgeCode(thid, 1)]] = -(1 << i);
-        }
-        else
-        {
-          devW1[devEdgeRank[CudaGetEdgeCode(thid, 0)]] = 0;
-          devW1[devEdgeRank[CudaGetEdgeCode(thid, 1)]] = 0;
-        }
+    if (thid == root)
+      return;
+    int f = devFather[thid];
+    int inLabel = devInlabel[thid];
+    int fatherInLabel = devInlabel[f];
+    if (inLabel != fatherInLabel)
+    {
+      int i = __ffs(inLabel) - 1;
+      devW1[devEdgeRank[CudaGetEdgeCode(thid, 0)]] = (1 << i);
+      devW1[devEdgeRank[CudaGetEdgeCode(thid, 1)]] = -(1 << i);
+    }
+    else
+    {
+      devW1[devEdgeRank[CudaGetEdgeCode(thid, 0)]] = 0;
+      devW1[devEdgeRank[CudaGetEdgeCode(thid, 1)]] = 0;
+    }
       },
       V, context, root, devFather, devInlabel, devEdgeRank, devW1);
 
@@ -358,13 +369,13 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   transform(
       [] MGPU_DEVICE(int thid, int root, int l, int *devAscendant,
                      const int *devW1Sum, const int *devEdgeRank) {
-        if (thid == root)
-        {
-          devAscendant[thid] = (1 << l);
-          return;
-        }
-        devAscendant[thid] =
-            (1 << l) + devW1Sum[devEdgeRank[CudaGetEdgeCode(thid, 0)]];
+    if (thid == root)
+    {
+      devAscendant[thid] = (1 << l);
+      return;
+    }
+    devAscendant[thid] =
+        (1 << l) + devW1Sum[devEdgeRank[CudaGetEdgeCode(thid, 0)]];
       },
       V, context, root, l, devAscendant, devW1Sum, devEdgeRank);
 
@@ -383,10 +394,10 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   transform(
       [] MGPU_DEVICE(int thid, int root, const int *devInlabel,
                      const int *devFather, int *devHead) {
-        if (thid == root || devInlabel[thid] != devInlabel[devFather[thid]])
-        {
-          devHead[devInlabel[thid]] = thid;
-        }
+    if (thid == root || devInlabel[thid] != devInlabel[devFather[thid]])
+    {
+      devHead[devInlabel[thid]] = thid;
+    }
       },
       V, context, root, devInlabel, devFather, devHead);
 

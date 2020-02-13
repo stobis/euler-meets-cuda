@@ -11,25 +11,25 @@ validityTestsDir=$testsDir/validity
 validityAnswersDir=$testsDir/validityOut
 
 # Encoding of tests - b for binary, t for text
-validityTestsEncoding=b
-# validityTestsEncoding=t
+# validityTestsEncoding=b
+validityTestsEncoding=t
 
 validityTestsSizes=(
-    # 10
-    # 1000
-    # 2000
-    # 3000
-    # 4000
-    # 5000
-    # 6000
-    # 7000
-    # 8000
-    # 9000
+    10
+    1000
+    2000
+    3000
+    4000
+    5000
+    6000
+    7000
+    8000
+    9000
     100000
-    # 500000
-    # 1000000
-    # 2000000
-    # 4000000
+    500000
+    1000000
+    2000000
+    4000000
 )
 validityGraspSize=-1
 validityOutGeneratorAlgorithm="cpu-rmq"
@@ -51,10 +51,9 @@ timedTestsEncoding=b
 
 testsToRun=(
     1
+    3
 )
 
-runE1=true
-# runE1=false
 E1SolutionsToTest=(
     "cuda-inlabel"
     "cuda-simple"
@@ -78,10 +77,6 @@ E1GraspSizes=( #how far up a father can be
 )
 E1DifferentSeeds=2
 
-# runE2=true
-runE2=false
-# E2PurgeExistingTests=true
-E2PurgeExistingTests=false
 E2SolutionsToTest=(
     "cudaInlabelLCA"
     "cpuRmqLCA"
@@ -96,21 +91,18 @@ E2GraspSizes=(
     -1
 )
 E2DifferentSeeds=2
-E2BatchSizes=(
-    # 1
-    # 10
-    # 100
-    1000
-    10000
-    100000
-    1000000
-    # 10000000
-    # 100000000
-)
+# E2BatchSizes=(
+#     # 1
+#     # 10
+#     # 100
+#     1000
+#     10000
+#     100000
+#     1000000
+#     # 10000000
+#     # 100000000
+# )
 
-runE3=false
-# runE3=true
-E3PurgeExistingTests=true
 E3SolutionsToTest=(
     "cudaInlabelLCA"
     "cudaSimpleLCA"

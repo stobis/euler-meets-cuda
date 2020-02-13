@@ -27,19 +27,13 @@ void cuda_euler_tour(int N, int root, const int *edges_from_input,
 
   transform(
       [=] MGPU_DEVICE(int thid) {
-        if (thid == root)
-          return;
-
-        int afterRoot = 0;
-        if (thid > root)
-          afterRoot = 1;
-
-        edges_from[thid + N - afterRoot - 1] = edges_to[thid - afterRoot] =
-            edges_to_input[thid];
-        edges_to[thid + N - afterRoot - 1] = edges_from[thid - afterRoot] =
-            edges_from_input[thid];
+        edges_from[thid + N - 1] = edges_to[thid] = edges_to_input[thid];
+        edges_to[thid + N - 1] = edges_from[thid] = edges_from_input[thid];
       },
-      N, context);
+      N - 1, context);
+
+  CudaPrintTab(edges_from, E);
+  CudaPrintTab(edges_to, E);
 
   transform([=] MGPU_DEVICE(int thid) { index[thid] = thid; }, E, context);
 
