@@ -68,7 +68,7 @@ void cpu_lca_rmq(int N, const int *parents, int Q,
   {
     if (tc.tree.father[i] == -1)
       continue;
-    if (son[tc.tree.father[i] != -1])
+    if (son[tc.tree.father[i]] != -1)
     {
       neighbour[i] = son[tc.tree.father[i]];
     }
@@ -97,15 +97,6 @@ void cpu_lca_rmq(int N, const int *parents, int Q,
 
   timer.measureTime(tc.q.N);
   timer.setPrefix("Write Output");
-
-  // if (argc < 3)
-  // {
-  //   writeAnswersToStdOut(tc.q.N, answers.data());
-  // }
-  // else
-  // {
-  //   writeAnswersToFile(tc.q.N, answers.data(), argv[2]);
-  // }
 
   timer.measureTime();
 }
@@ -142,6 +133,7 @@ void dfsRmq(int starting, vector<int> son, vector<int> neighbour)
     s2.push(v);
 
     preorder[v] = preCounter;
+
     reversePreorder[preCounter] = v;
 
     preCounter++;

@@ -11,10 +11,11 @@ validityTestsDir=$testsDir/validity
 validityAnswersDir=$testsDir/validityOut
 
 # Encoding of tests - b for binary, t for text
-# validityTestsEncoding=b
-validityTestsEncoding=t
+validityTestsEncoding=b
+# validityTestsEncoding=t
 
 validityTestsSizes=(
+    5
     10
     1000
     2000
@@ -38,8 +39,6 @@ validitySolutionsToTest=(
     cuda-naive
     cpu-inlabel
 )
-# validitySolutionToTest="cpuInlabelLCA"
-# validitySolutionToTest="cudaSimpleLCA"
 
 ### Time tests
 
