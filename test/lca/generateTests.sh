@@ -25,7 +25,6 @@ function genTest {
         fi
         echo "$name generated."
     done
-    echo
 }
 
 # function genText {

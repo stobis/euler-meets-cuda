@@ -27,20 +27,24 @@ LDFLAGS=-L/usr/local/cuda/lib64 -lcudart
 
 OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard *.cpp)) \
 	$(patsubst %.cpp, obj/%.o, $(wildcard src/**/*.cpp)) \
-	$(patsubst %.cu, obj/%.o, $(wildcard *.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard src/**/*.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/GpuConnectedComponents/*.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/cudabfs/bfs-mgpu.cu))
 
-$(info $(OBJFILES))
+# $(info $(OBJFILES))
 
 # Targets
-all: runner.e # bridges lca
+runner: runner.e # bridges lca
+lca_runner: lca_runner.e
+all: runner lca_runner
 remake: clean all
 # bridges: 
 # lca: 
 
-runner.e: $(OBJFILES)
+runner.e: $(OBJFILES) obj/runner.o
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+lca_runner.e: $(OBJFILES) obj/lca_runner.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(OBJDIR)/%.o: %.cu
