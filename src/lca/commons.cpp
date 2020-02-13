@@ -125,31 +125,44 @@ void writeToStdOut(TestCase &tc)
   cout << endl;
 }
 
-TestCase readFromFile(const char *filename)
+TestCase readFromFile(bool isBinary, const char *filename)
 {
-  ifstream in(filename, ios::binary);
-  return TestCase(in);
+  if (isBinary)
+  {
+    ifstream in(filename, ios::binary);
+    return TestCase(in);
+  }
+  else
+  {
+    ifstream in(filename);
+    return readFromStream(in);
+  }
 }
-TestCase readFromStdIn()
+TestCase readFromStream(istream &inputStream)
 {
   ParentsTree tree;
-  cin >> tree.V >> tree.root;
+  inputStream >> tree.V >> tree.root;
 
   tree.father.resize(tree.V);
   for (int i = 0; i < tree.V; i++)
   {
-    cin >> tree.father[i];
+    inputStream >> tree.father[i];
   }
 
   int N;
-  cin >> N;
+  inputStream >> N;
   vector<int> q(N * 2);
 
   for (int i = 0; i < N * 2; i++)
   {
-    cin >> q[i];
+    inputStream >> q[i];
   }
   return TestCase(tree, Queries(N, q));
+}
+
+TestCase readFromStdIn()
+{
+  return readFromStream(cin);
 }
 
 void writeAnswersToStdOut(int Q, int *ans)
@@ -159,10 +172,22 @@ void writeAnswersToStdOut(int Q, int *ans)
     cout << ans[i] << endl;
   }
 }
-void writeAnswersToFile(int Q, int *ans, const char *filename)
+void writeAnswersToFile(bool binary, int Q, int *ans, const char *filename)
 {
-  ofstream out(filename, ios::binary);
-  out.write((char *)ans, sizeof(int) * Q);
+  if (binary)
+  {
+    ofstream out(filename, ios::binary);
+    out.write((char *)ans, sizeof(int) * Q);
+  }
+  else
+  {
+    ofstream out(filename);
+    for (int i = 0; i < Q; i++)
+    {
+      out << ans[i] << " ";
+    }
+    out << endl;
+  }
 }
 
 void shuffleFathers(vector<int> &in, vector<int> &out, int &root)
