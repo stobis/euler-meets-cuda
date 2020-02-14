@@ -34,6 +34,8 @@ OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard *.cpp)) \
 # $(info $(OBJFILES))
 
 # Targets
+all: runner lca_runner bridges_runner
+
 runner: runner.e
 bridges_runner: bridges_runner.e
 lca_runner: lca_runner.e
@@ -41,7 +43,6 @@ lca_runner: lca_runner.e
 bridges_test:
 	cd test/bridges && $(MAKE)
 
-all: runner lca_runner bridges_runner
 remake: clean all
 
 runner.e: $(OBJFILES) obj/runner.o
