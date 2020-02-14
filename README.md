@@ -3,6 +3,9 @@
 ### Testing
 The simpliest example
 ```shell
+    ulimit -s unlimited
+```
+```shell
     make
     cd test/bridges
     make
