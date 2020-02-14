@@ -74,7 +74,7 @@ void cuda_bridges_naive(int N, int M, const int* row_offsets,
                         const int* col_indices, bool* is_bridge,
                         context_t& context) {
     // Init timer
-    Timer timer("gpu-bfs");
+    Timer timer("naive");
 
     // Allocate array(s)
     mem_t<int> distance = mgpu::fill<int>(-1, N, context);

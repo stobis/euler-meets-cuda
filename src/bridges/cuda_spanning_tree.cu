@@ -64,7 +64,6 @@ void spanning_tree(int const N, int const M, int const *row_offsets,
 void spanning_tree_bfs(int const N, int const M, int const *row_offsets,
                        int const *col_indices, bool *is_tree_edge,
                        context_t &context) {
-    // TODO: rm unnecessary dtod copy
     mem_t<int> mt_parent = mgpu::fill<int>(-1, N, context);
     mem_t<int> mt_distance = mgpu::fill<int>(-1, N, context);
 
@@ -75,15 +74,18 @@ void spanning_tree_bfs(int const N, int const M, int const *row_offsets,
     _csr_to_list(N, M, row_offsets, mt_row_indices.data(), context);
 
     transform(
-        [=] MGPU_DEVICE(int index, int const *row_indices, int const *distance) {
+        [=] MGPU_DEVICE(int index, int const *row_indices, int const *parent) {
             int const from = row_indices[index];
             int const to = col_indices[index];
 
-            if (distance[from] == distance[to] - 1) {
-                is_tree_edge[index] = true;
+            if (parent[to] == from) {
+                // TODO: this if statement is a fix for multigraph
+                if (!(index && row_indices[index-1] == from && col_indices[index-1] == to)) {
+                    is_tree_edge[index] = true;
+                }
             }
         },
-        M, context, mt_row_indices.data(), mt_distance.data());
+        M, context, mt_row_indices.data(), mt_parent.data());
 }
 
 // This impl use ECL-CC by Texas State University

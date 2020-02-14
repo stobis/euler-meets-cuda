@@ -20,8 +20,9 @@ void print_device_mem(mem_t<T>& device_mem) {
     cerr << "= print <T>..." << endl;
     vector<T> tmp = from_mem(device_mem);
     for (auto x : tmp) {
-        cerr << x << endl;
+        cerr << x << " ";
     }
+    cerr << endl;
 }
 
 template <>

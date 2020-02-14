@@ -56,7 +56,8 @@ void spanning_tree(int const N, int const M, int const *row_offsets,
     bool *is_tree_edge_data = is_tree_edge.data();
 
     // spanning_tree(N, M, row_offsets, col_indices, is_tree_edge_data,
-    // context); spanning_tree_bfs(N, M, row_offsets, col_indices,
+    // context); 
+    // spanning_tree_bfs(N, M, row_offsets, col_indices,
     // is_tree_edge_data, context);
     spanning_tree_ecl(N, M, row_offsets, col_indices, is_tree_edge_data,
                       context);
@@ -67,6 +68,7 @@ void spanning_tree(int const N, int const M, int const *row_offsets,
     int stream_count = compact.upsweep([=] MGPU_DEVICE(int index) {
         return is_tree_edge_data[index] == true;
     });
+
     assert(N - 1 == stream_count);
 
     compact.downsweep([=] MGPU_DEVICE(int dest_index, int source_index) {
@@ -238,7 +240,7 @@ void cuda_bridges_tarjan(int N, int M, int const *row_offsets,
                          int const *col_indices, bool *is_bridge,
                          context_t &context) {
     // Init timer
-    Timer timer("gpu-cc");
+    Timer timer("tarjan");
 
     // Expand csr to edge list
     mem_t<int> row_indices = mgpu::fill<int>(0, M, context);

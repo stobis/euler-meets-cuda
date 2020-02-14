@@ -34,7 +34,7 @@ void print_ans(int const M, bool *is_bridge, bool verbose)
       if (ib[i]) amount++;
   }
   if (verbose) std::cout << std::endl;
-  std::cout << "#bridges: " << amount << std::endl;
+  std::cout << "%%% Bridges: " << amount << std::endl;
 }
 
 // Main func
