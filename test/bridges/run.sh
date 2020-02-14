@@ -4,7 +4,7 @@ FILES=in/**.bin
 EXEC=../../bridges_runner.e
 
 if [ "$1" = "-h" ]; then
-    echo "Usage: ./run_and_export.sh [naive|tarjan|hybrid]"
+    echo "Usage: ./run_and_export.sh [naive|tarjan|tarjan-kot|tarjan-bfs|hybrid]"
     exit
 fi
 
@@ -16,6 +16,8 @@ do
     else
         $EXEC naive $f
         $EXEC tarjan $f
+        $EXEC tarjan-kot $f
+        $EXEC tarjan-bfs $f
         $EXEC hybrid $f
     fi
 done

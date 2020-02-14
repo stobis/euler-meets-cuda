@@ -81,7 +81,7 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
 
         writer.writeheader()
 
-        for (filename, fileinfo) in data_dict.items():
+        for (filename, fileinfo) in sorted(data_dict.items()):
             row = {}
             row['file'] = filename
             row['N'] = fileinfo['N']
