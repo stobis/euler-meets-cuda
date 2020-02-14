@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import csv
 import sys
 
@@ -84,7 +86,7 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
             row['file'] = filename
             row['N'] = fileinfo['N']
             row['M'] = fileinfo['M']
-            row['# bridges'] = fileinfo['# bridges']
+            row['# bridges'] = fileinfo['# Bridges']
             row['algo'] = algo
             # print(row)
             # print(fileinfo[algo])

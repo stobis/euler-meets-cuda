@@ -9,7 +9,7 @@ do
     if [ "$1" != "" ]; then
         $EXEC $1 $f
     else
-        $EXEC gpu-bfs $f
-        $EXEC gpu-tarjan $f
+        $EXEC naive $f
+        $EXEC tarjan $f
     fi
 done

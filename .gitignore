@@ -15,5 +15,6 @@ test/lca/resultTimes/*
 # Adrian's uploads to miracle
 copyToStudent.sh
 
-# Test inputs
+# Test bridges
 test/bridges/in/*
+test/bridges/*.csv

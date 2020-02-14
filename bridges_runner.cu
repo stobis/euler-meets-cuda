@@ -11,16 +11,16 @@
 const std::string _usage =
     " VARIANT IN\n\n"
     "Available variants:\n"
-    "gpu-bfs - simple parallel BFS implementation (naive)\n"
-    "gpu-tarjan - parallel implementation using fast CC and Euler Tour technique\n";
+    "naive - simple parallel BFS implementation (naive)\n"
+    "tarjan - parallel implementation using fast CC and Euler Tour technique\n";
     // "gpu-hybrid - parallel implementation combining spanning tree given by BFS with ET technique\n";
 
 // Configuration of implementations to choose
 typedef void (*BridgesFunction)(int, int, int const *, int const *, bool *, mgpu::context_t &);
 
 std::unordered_map<std::string, BridgesFunction> algorithms = {
-    {"gpu-bfs", &cuda_bridges_naive},
-    {"gpu-tarjan", &cuda_bridges_tarjan}
+    {"naive", &cuda_bridges_naive},
+    {"tarjan", &cuda_bridges_tarjan}
 };
 
 // Helpers
@@ -34,7 +34,7 @@ void print_ans(int const M, bool *is_bridge, bool verbose)
       if (ib[i]) amount++;
   }
   if (verbose) std::cout << std::endl;
-  std::cout << "%%% Bridges: " << amount << std::endl;
+  std::cout << "%%% # Bridges: " << amount << std::endl;
 }
 
 // Main func
