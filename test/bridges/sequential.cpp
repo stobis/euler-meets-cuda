@@ -55,7 +55,7 @@ void print_ans(std::vector<bool> const & ans, bool verbose) {
         if (x) amount++;
     }
     if (verbose) std::cout << std::endl;
-    std::cout << "#bridges: " << amount << std::endl;
+    std::cout << "%%% Bridges: " << amount << std::endl;
 }
 
 int main(int argc, char* argv[]) {

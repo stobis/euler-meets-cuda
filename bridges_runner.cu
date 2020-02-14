@@ -12,15 +12,16 @@ const std::string _usage =
     " VARIANT IN\n\n"
     "Available variants:\n"
     "naive - simple parallel BFS implementation (naive)\n"
-    "tarjan - parallel implementation using fast CC and Euler Tour technique\n";
-    // "gpu-hybrid - parallel implementation combining spanning tree given by BFS with ET technique\n";
+    "tarjan - parallel implementation using fast CC and Euler Tour technique\n"
+    "hybrid - parallel implementation combining spanning tree given by BFS with ET technique\n";
 
 // Configuration of implementations to choose
 typedef void (*BridgesFunction)(int, int, int const *, int const *, bool *, mgpu::context_t &);
 
 std::unordered_map<std::string, BridgesFunction> algorithms = {
     {"naive", &cuda_bridges_naive},
-    {"tarjan", &cuda_bridges_tarjan}
+    {"tarjan", &cuda_bridges_tarjan},
+    {"hybrid", &cuda_bridges_hybrid}
 };
 
 // Helpers

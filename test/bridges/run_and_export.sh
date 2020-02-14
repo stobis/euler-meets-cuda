@@ -4,7 +4,7 @@ FILES=in/**.bin
 EXEC=../../bridges_runner.e
 
 if [ "$1" = "" ] || [ "$2" = "" ]; then
-    echo "Usage: ./run_and_export.sh [naive|tarjan] [output]"
+    echo "Usage: ./run_and_export.sh [naive|tarjan|hybrid] [output]"
     exit
 fi
 

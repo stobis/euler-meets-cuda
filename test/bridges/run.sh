@@ -3,6 +3,11 @@
 FILES=in/**.bin
 EXEC=../../bridges_runner.e
 
+if [ "$1" = "-h" ]; then
+    echo "Usage: ./run_and_export.sh [naive|tarjan|hybrid]"
+    exit
+fi
+
 for f in $FILES
 do
     echo "=== Test: $f... ==="
@@ -11,5 +16,6 @@ do
     else
         $EXEC naive $f
         $EXEC tarjan $f
+        $EXEC hybrid $f
     fi
 done
