@@ -1,0 +1,43 @@
+dimacs:
+  # gzip -d [file]
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.USA.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.CTR.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.W.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.E.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.LKS.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.CAL.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.NE.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.NW.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.FLA.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.COL.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.BAY.gr.gz
+  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.NY.gr.gz
+mm:
+  # tar --strip-components 1 -xvzf [file] --wildcards '*.mtx'
+  - https://sparse.tamu.edu/MM/DIMACS10/citationCiteseer.tar.gz
+  # - https://sparse.tamu.edu/MM/SNAP/cit-Patents.tar.gz
+  # - https://sparse.tamu.edu/MM/DIMACS10/coPapersDBLP.tar.gz
+  # - https://sparse.tamu.edu/MM/DIMACS10/delaunay_n24.tar.gz
+  # - https://sparse.tamu.edu/MM/DIMACS10/europe_osm.tar.gz
+  # - https://sparse.tamu.edu/MM/LAW/in-2004.tar.gz
+  # - https://sparse.tamu.edu/MM/Pajek/internet.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn16.tar.gz
+snap:
+  # gzip -d [file]
+  - https://snap.stanford.edu/data/amazon0601.txt.gz
+  # - https://snap.stanford.edu/data/as-skitter.txt.gz
+  # - https://snap.stanford.edu/data/soc-LiveJournal1.txt.gz
+# nr:
+#   # unzip [file] '*.mtx'
+#   # Road networks
+#   - http://nrvis.com/download/data/road/road-great-britain-osm.zip
+#   - http://nrvis.com/download/data/road/road-asia-osm.zip
+#   - http://nrvis.com/download/data/road/road-roadNet-CA.zip
+#   - http://nrvis.com/download/data/road/road-belgium-osm.zip
+#   - http://nrvis.com/download/data/misc/roadNet-PA.zip
+#   # Web graphs/social networks
+#   - http://nrvis.com/download/data/soc/soc-livejournal.zip
+#   - http://nrvis.com/download/data/socfb/socfb-A-anon.zip
+#   - http://nrvis.com/download/data/web/web-wikipedia2009.zip
+#   - http://nrvis.com/download/data/ca/ca-hollywood-2009.zip
+#   - http://nrvis.com/download/data/web/web-Stanford.zip

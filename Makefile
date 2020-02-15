@@ -34,14 +34,21 @@ OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard *.cpp)) \
 # $(info $(OBJFILES))
 
 # Targets
-runner: runner.e # bridges lca
+all: runner lca_runner bridges_runner
+
+runner: runner.e
+bridges_runner: bridges_runner.e
 lca_runner: lca_runner.e
-all: runner lca_runner
+
+bridges_test:
+	cd test/bridges && $(MAKE)
+
 remake: clean all
-# bridges: 
-# lca: 
 
 runner.e: $(OBJFILES) obj/runner.o
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+bridges_runner.e: obj/bridges_runner.o $(OBJFILES)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 lca_runner.e: $(OBJFILES) obj/lca_runner.o
@@ -59,3 +66,5 @@ $(OBJDIR)/%.o: %.cpp
 
 clean:
 	rm -rf obj *.e
+	cd test/bridges && $(MAKE) clean
+	cd test/lca && $(MAKE) clean

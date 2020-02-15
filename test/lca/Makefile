@@ -27,3 +27,4 @@ generateSimple.e: generateSimple.cpp ../../src/lca/commons.cpp
 clean:
 	rm -rf *.e
 	rm -rf *.o
+	rm tests -rf

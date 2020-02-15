@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import csv
 import sys
 
@@ -79,12 +81,12 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
 
         writer.writeheader()
 
-        for (filename, fileinfo) in data_dict.items():
+        for (filename, fileinfo) in sorted(data_dict.items()):
             row = {}
             row['file'] = filename
             row['N'] = fileinfo['N']
             row['M'] = fileinfo['M']
-            row['# bridges'] = fileinfo['# bridges']
+            row['# bridges'] = fileinfo['# Bridges']
             row['algo'] = algo
             # print(row)
             # print(fileinfo[algo])
