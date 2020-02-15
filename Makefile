@@ -67,3 +67,4 @@ $(OBJDIR)/%.o: %.cpp
 clean:
 	rm -rf obj *.e
 	cd test/bridges && $(MAKE) clean
+	cd test/lca && $(MAKE) clean
