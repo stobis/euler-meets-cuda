@@ -37,10 +37,10 @@ validityTestsSizes=(
 validityGraspSize=-1
 validityOutGeneratorAlgorithm="cpu-rmq"
 validitySolutionsToTest=(
-    # cuda-inlabel
+    cuda-inlabel
     cuda-naive
-    # cpu-inlabel
-    # cpu-simple
+    cpu-inlabel
+    cpu-simple
 )
 
 ### Time tests

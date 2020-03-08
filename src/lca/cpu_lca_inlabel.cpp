@@ -7,14 +7,12 @@
 #include <vector>
 using namespace std;
 
-// int main(int argc, char *argv[]) {
-void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers)
-{
+void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries,
+                     int *answers) {
   Timer timer("Parse Input");
 
   int root = 0;
-  for (int i = 0; i < N; i++)
-  {
+  for (int i = 0; i < N; i++) {
     if (parents[i] == -1)
       root = i;
   }
@@ -24,8 +22,7 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
 
   vector<int> child(N, -1), neighbour(N, -1);
 
-  for (int i = 0; i < N; ++i)
-  {
+  for (int i = 0; i < N; ++i) {
     if (parents[i] == -1)
       continue;
     neighbour[i] = child[parents[i]];
@@ -34,7 +31,8 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
 
   vector<int> preorder;
   preorder.reserve(N);
-  vector<uint32_t> preorder_idx(N), size(N), inlabel(N), ascendant(N), level(N), head(N + 1);
+  vector<uint32_t> preorder_idx(N), size(N), inlabel(N), ascendant(N), level(N),
+      head(N + 1);
 
   uint32_t dfstime = 1;
 
@@ -42,24 +40,24 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
     preorder.push_back(u);
     preorder_idx[u] = dfstime++;
     size[u] = 1;
-    for (int v = child[u]; v != -1; v = neighbour[v])
-    {
+    for (int v = child[u]; v != -1; v = neighbour[v]) {
       level[v] = level[u] + 1;
       dfs(v);
       size[u] += size[v];
     }
-    inlabel[u] = (preorder_idx[u] + size[u] - 1) & (((uint32_t)-1) << (31 - __builtin_clz((preorder_idx[u] - 1) ^ (preorder_idx[u] + size[u] - 1))));
+    inlabel[u] = (preorder_idx[u] + size[u] - 1) &
+                 (((uint32_t)-1)
+                  << (31 - __builtin_clz((preorder_idx[u] - 1) ^
+                                         (preorder_idx[u] + size[u] - 1))));
   };
 
   level[root] = 0;
   dfs(root);
 
-  for (int u : preorder)
-  {
+  for (int u : preorder) {
     int p = parents[u];
     ascendant[u] = p == -1 ? 0 : ascendant[p];
-    if (p == -1 || inlabel[u] != inlabel[p])
-    {
+    if (p == -1 || inlabel[u] != inlabel[p]) {
       ascendant[u] += 1 << __builtin_ctz(inlabel[u]);
       head[inlabel[u]] = u;
     }
@@ -68,14 +66,10 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
   timer.measureTime();
   timer.setPrefix("Queries");
 
-  // vector<int> answers(Q);
-
-  for (int i = 0; i < Q; i++)
-  {
+  for (int i = 0; i < Q; i++) {
     int x = queries[2 * i];
     int y = queries[2 * i + 1];
-    if (inlabel[x] != inlabel[y])
-    {
+    if (inlabel[x] != inlabel[y]) {
       int i = max(31 - __builtin_clz(inlabel[x] ^ inlabel[y]),
                   max(__builtin_ctz(inlabel[x]), __builtin_ctz(inlabel[y])));
       uint32_t b = inlabel[x] & (((uint32_t)-1) << i);

@@ -19,8 +19,10 @@ inline __device__ long long CudaPackEdge(int from, int to);
 inline __device__ int CudaUnpackEdgeFrom(long long edge);
 inline __device__ int CudaUnpackEdgeTo(long long edge);
 
-inline __device__ int CudaGetEdgeStart(const int *__restrict__ father, int edgeCode);
-inline __device__ int CudaGetEdgeEnd(const int *__restrict__ father, int edgeCode);
+inline __device__ int CudaGetEdgeStart(const int *__restrict__ father,
+                                       int edgeCode);
+inline __device__ int CudaGetEdgeEnd(const int *__restrict__ father,
+                                     int edgeCode);
 inline __device__ int CudaGetEdgeCode(int a, bool toFather);
 inline __device__ bool isEdgeToFather(int edgeCode);
 
