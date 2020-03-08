@@ -1,6 +1,6 @@
-#include "lca/cuda_lca_naive.h"
 #include "lca/commons.h"
 #include "lca/cuda_commons.h"
+#include "lca/cuda_lca_naive.h"
 
 #include <cuda_runtime.h>
 #include <iostream>
@@ -10,122 +10,71 @@
 using namespace std;
 using namespace mgpu;
 
-__global__ void cuCalcQueries( int Q,
-                               const int *__restrict__ father,
-                               const int *__restrict__ depth,
-                               const int *__restrict__ queries,
-                               int *answers );
+__global__ void cuCalcQueries(int Q, const int *__restrict__ parents,
+                              const int *__restrict__ devDepth,
+                              const int *__restrict__ queries, int *answers);
 
-void cuda_lca_naive( int N, const int *parents, int Q, 
-        const int *queries, int *answers, 
-        mgpu::context_t &context )
-{
+void cuda_lca_naive(int N, const int *parents, int Q, const int *queries,
+                    int *answers, mgpu::context_t &context) {
 
-  Timer timer = Timer( "Parse Input" );
+  Timer timer = Timer("Parse Input");
 
-  //   cudaSetDevice( 0 );
-    //   timer.setPrefix( "Preprocessing" );
-
-  //   int *devFather;
   int *devDepth;
   int *devNext;
-  const int *devQueries;
-  int *devAnswers;
 
-  //   const int V = tc.tree.V;
-  const int V = N;
+  CUCHECK(cudaMalloc((void **)&devDepth, sizeof(int) * N));
+  CUCHECK(cudaMalloc((void **)&devNext, sizeof(int) * N));
 
-  //   CUCHECK( cudaMalloc( (void **) &devFather, sizeof( int ) * V ) );
-  CUCHECK( cudaMalloc( (void **) &devDepth, sizeof( int ) * V ) );
-  CUCHECK( cudaMalloc( (void **) &devNext, sizeof( int ) * V ) );
-
-  timer.measureTime( "Cuda Allocs" );
-
-  //   CUCHECK( cudaMemcpy( devFather, tc.tree.father.data(), sizeof( int ) * V, cudaMemcpyHostToDevice ) );
-  const int *devFather = parents;
+  timer.measureTime("Cuda Allocs");
 
   int threadsPerBlockX = 1024;
-  int blockPerGridX = ( V + threadsPerBlockX - 1 ) / threadsPerBlockX;
+  int blockPerGridX = (N + threadsPerBlockX - 1) / threadsPerBlockX;
 
   transform(
-      [] MGPU_DEVICE( int thid, const int *devFather, int *devDepth, int *devNext ) {
-        devNext[thid] = devFather[thid];
+      [=] MGPU_DEVICE(int thid) {
+        devNext[thid] = parents[thid];
         devDepth[thid] = 0;
       },
-      V,
-      context,
-      devFather,
-      devDepth,
-      devNext );
-
+      N, context);
   context.synchronize();
 
-  timer.measureTime( "Copy Input and Init data" );
+  timer.measureTime("Copy Input and Init data");
 
-  CudaSimpleListRank( devDepth, V, devNext, context );
+  CudaSimpleListRank(devDepth, N, devNext, context);
   context.synchronize();
 
-  timer.setPrefix( "Queries" );
+  timer.setPrefix("Queries");
 
-  devQueries = queries;
-  devAnswers = answers;
+  blockPerGridX = (Q + threadsPerBlockX - 1) / threadsPerBlockX;
 
+  transform(
+      [=] MGPU_DEVICE(int thid) {
+        int p = queries[thid * 2];
+        int q = queries[thid * 2 + 1];
 
-  timer.measureTime( "Copy Queries to Dev" );
+        if (p == q)
+          answers[thid] = p;
 
-  blockPerGridX = ( Q + threadsPerBlockX - 1 ) / threadsPerBlockX;
+        while (devDepth[p] != devDepth[q]) {
+          if (devDepth[p] > devDepth[q])
+            p = parents[p];
+          else
+            q = parents[q];
+        }
 
-  cuCalcQueries<<<blockPerGridX, threadsPerBlockX>>>( Q, devFather, devDepth, devQueries, devAnswers );
-  CUCHECK( cudaDeviceSynchronize() );
+        while (p != q) {
+          p = parents[p];
+          q = parents[q];
+        }
 
-  timer.measureTime( Q );
+        answers[thid] = p;
+      },
+      Q, context);
+  CUCHECK(cudaDeviceSynchronize());
+
+  CUCHECK(cudaFree(devDepth));
+  CUCHECK(cudaFree(devNext));
 
   context.synchronize();
-  timer.measureTime( "Copy answers to Host" );
-  timer.setPrefix( "Write Output" );
-
-  //   if ( argc < 3 )
-  //   {
-  //     writeAnswersToStdOut( Q, answers );
-  //   }
-  //   else
-  //   {
-  //     writeAnswersToFile( Q, answers, argv[2] );
-  //   }
-
-  timer.setPrefix( "" );
-
-  return;
-}
-
-__global__ void cuCalcQueries( int Q,
-                               const int *__restrict__ father,
-                               const int *__restrict__ depth,
-                               const int *__restrict__ queries,
-                               int *answers )
-{
-  int thid = ( blockIdx.x * blockDim.x ) + threadIdx.x;
-
-  if ( thid >= Q ) return;
-
-  int p = queries[thid * 2];
-  int q = queries[thid * 2 + 1];
-
-  if ( p == q ) answers[thid] = p;
-
-  while ( depth[p] != depth[q] )
-  {
-    if ( depth[p] > depth[q] )
-      p = father[p];
-    else
-      q = father[q];
-  }
-
-  while ( p != q )
-  {
-    p = father[p];
-    q = father[q];
-  }
-
-  answers[thid] = p;
+  timer.measureTime(Q);
 }

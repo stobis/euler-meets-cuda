@@ -27,8 +27,6 @@ inline __device__ bool isEdgeToFather(int edgeCode);
 void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
                       int *answers, mgpu::context_t &context, Logger &logger) {
   Timer timer("Parse Input");
-  timer.setPrefix("Converting to crs");
-
   int root = 0;
 
   int *devRoot;
