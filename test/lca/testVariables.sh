@@ -29,15 +29,17 @@ validityTestsSizes=(
     100000
     500000
     1000000
-    2000000
-    4000000
+    # 2000000
+    # 3000000
+    # 4000000
+    # 10000000
 )
 validityGraspSize=-1
 validityOutGeneratorAlgorithm="cpu-rmq"
 validitySolutionsToTest=(
-    # cuda-inlabel
+    cuda-inlabel
     # cuda-naive
-    cpu-inlabel
+    # cpu-inlabel
 )
 
 ### Time tests
