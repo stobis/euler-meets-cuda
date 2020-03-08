@@ -38,6 +38,10 @@ fi
 
 if [ "$run_check" = 1 ]; then
   make lca_runner
+  if [ $? -ne 0 ]; then
+    echo "lca_runner build FAILED!"
+    exit 1
+  fi
   echo "Running valitity checks."
   cwd=$(pwd)
   cd $testDirectory
@@ -47,6 +51,10 @@ fi
 
 if [ "$run_time" = 1 ]; then
   make lca_runner
+  if [ $? -ne 0 ]; then
+    echo "lca_runner build FAILED!"
+    exit 1
+  fi
   echo "Running timed tests."
   cwd=$(pwd)
   cd $testDirectory

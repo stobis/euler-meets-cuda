@@ -18,32 +18,23 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
     if (parents[i] == -1)
       root = i;
   }
-  vector<int> parentsVector(parents, parents + N);
-  ParentsTree pt(N, root, parentsVector);
-
-  vector<int> queriesVector(queries, queries + Q * 2);
-  Queries qs(Q, queriesVector);
-
-  TestCase tc(pt, qs);
 
   timer.measureTime();
   timer.setPrefix("Preprocessing");
 
-  int V = tc.tree.V;
+  vector<int> child(N, -1), neighbour(N, -1);
 
-  vector<int> child(V, -1), neighbour(V, -1);
-
-  for (int i = 0; i < V; ++i)
+  for (int i = 0; i < N; ++i)
   {
-    if (tc.tree.father[i] == -1)
+    if (parents[i] == -1)
       continue;
-    neighbour[i] = child[tc.tree.father[i]];
-    child[tc.tree.father[i]] = i;
+    neighbour[i] = child[parents[i]];
+    child[parents[i]] = i;
   }
 
   vector<int> preorder;
-  preorder.reserve(V);
-  vector<uint32_t> preorder_idx(V), size(V), inlabel(V), ascendant(V), level(V), head(V + 1);
+  preorder.reserve(N);
+  vector<uint32_t> preorder_idx(N), size(N), inlabel(N), ascendant(N), level(N), head(N + 1);
 
   uint32_t dfstime = 1;
 
@@ -60,12 +51,12 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
     inlabel[u] = (preorder_idx[u] + size[u] - 1) & (((uint32_t)-1) << (31 - __builtin_clz((preorder_idx[u] - 1) ^ (preorder_idx[u] + size[u] - 1))));
   };
 
-  level[tc.tree.root] = 0;
-  dfs(tc.tree.root);
+  level[root] = 0;
+  dfs(root);
 
   for (int u : preorder)
   {
-    int p = tc.tree.father[u];
+    int p = parents[u];
     ascendant[u] = p == -1 ? 0 : ascendant[p];
     if (p == -1 || inlabel[u] != inlabel[p])
     {
@@ -77,12 +68,12 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
   timer.measureTime();
   timer.setPrefix("Queries");
 
-  // vector<int> answers(tc.q.N);
+  // vector<int> answers(Q);
 
-  for (int i = 0; i < tc.q.N; i++)
+  for (int i = 0; i < Q; i++)
   {
-    int x = tc.q.tab[2 * i];
-    int y = tc.q.tab[2 * i + 1];
+    int x = queries[2 * i];
+    int y = queries[2 * i + 1];
     if (inlabel[x] != inlabel[y])
     {
       int i = max(31 - __builtin_clz(inlabel[x] ^ inlabel[y]),
@@ -96,7 +87,7 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
           return u;
         int k = 31 - __builtin_clz(ascendant[u] & ((1 << j) - 1));
         uint32_t inlabel_w = ((inlabel[u] >> k) | 1) << k;
-        return tc.tree.father[head[inlabel_w]];
+        return parents[head[inlabel_w]];
       };
       x = climb(x);
       y = climb(y);
@@ -104,13 +95,5 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
     answers[i] = level[x] <= level[y] ? x : y;
   }
 
-  timer.measureTime(tc.q.N);
-  timer.setPrefix("Write Output");
-
-  // if (argc < 3)
-  //   writeAnswersToStdOut(tc.q.N, answers.data());
-  // else
-  //   writeAnswersToFile(tc.q.N, answers.data(), argv[2]);
-
-  timer.measureTime();
+  timer.measureTime(Q);
 }
