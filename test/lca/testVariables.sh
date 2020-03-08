@@ -37,7 +37,8 @@ validityTestsSizes=(
 validityGraspSize=-1
 validityOutGeneratorAlgorithm="cpu-rmq"
 validitySolutionsToTest=(
-    cuda-inlabel
+    cpu-rmq
+    # cuda-inlabel
     # cuda-naive
     # cpu-inlabel
 )
