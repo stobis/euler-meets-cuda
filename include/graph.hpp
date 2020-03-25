@@ -7,22 +7,22 @@
 typedef std::pair<int, int> edge;
 
 class Graph {
-   private:
-    int n, m;
-    std::vector<int> row_offsets, col_indices;
+private:
+  int n, m;
+  std::vector<int> row_offsets, col_indices;
 
-   public:
-    Graph();
-    Graph(std::ifstream&);
-    Graph(int, int, std::vector<int>, std::vector<int>);
+public:
+  Graph();
+  Graph(std::ifstream &);
+  Graph(int, int, std::vector<int>, std::vector<int>);
 
-    int get_N() const;
-    int get_M() const;
-    std::vector<int> const& get_row_offsets() const;
-    std::vector<int> const& get_col_indices() const;
+  int get_N() const;
+  int get_M() const;
+  std::vector<int> const &get_row_offsets() const;
+  std::vector<int> const &get_col_indices() const;
 
-    static Graph read_from_file(const char*);
-    static Graph read_from_stdin();
+  static Graph read_from_file(const char *);
+  static Graph read_from_stdin();
 };
 
-#endif  // GRAPH_HPP
+#endif // GRAPH_HPP

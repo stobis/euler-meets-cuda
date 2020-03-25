@@ -7,8 +7,7 @@ using namespace mgpu;
 // trees (calculates depth)
 void CudaSimpleListRank(int *devRank, int N, int *devNext, context_t &context);
 
-void CudaAssert(cudaError_t error, const char *code, const char *file,
-                int line);
+void CudaAssert(cudaError_t error, const char *code, const char *file, int line);
 
 void CudaPrintTab(const int *tab, int size);
 void CudaPrintTab(const unsigned long long *tab, int size);

@@ -38,8 +38,7 @@ double Timer::resetTimer(clock_t &timer) {
 } // namespace lca
 
 ParentsTree::ParentsTree() : V(0), root(0) {}
-ParentsTree::ParentsTree(int V, int root, const vector<int> &father)
-    : V(V), root(root), father(father) {}
+ParentsTree::ParentsTree(int V, int root, const vector<int> &father) : V(V), root(root), father(father) {}
 ParentsTree::ParentsTree(ifstream &in) {
   in.read((char *)&V, sizeof(int));
   in.read((char *)&root, sizeof(int));
@@ -67,8 +66,7 @@ void Queries::writeToStream(ofstream &out) {
 }
 
 TestCase::TestCase() : tree(ParentsTree()), q(Queries()) {}
-TestCase::TestCase(const ParentsTree &tree, const Queries &q)
-    : tree(tree), q(q) {}
+TestCase::TestCase(const ParentsTree &tree, const Queries &q) : tree(tree), q(q) {}
 TestCase::TestCase(ifstream &in) : tree(in), q(in) {}
 void TestCase::writeToStream(ofstream &out) {
   tree.writeToStream(out);
@@ -82,9 +80,7 @@ int getEdgeStart(ParentsTree &tree, int edgeCode) {
   else
     return tree.father[edgeCode / 2];
 }
-int getEdgeEnd(ParentsTree &tree, int edgeCode) {
-  return getEdgeStart(tree, edgeCode ^ 1);
-}
+int getEdgeEnd(ParentsTree &tree, int edgeCode) { return getEdgeStart(tree, edgeCode ^ 1); }
 
 void writeToFile(TestCase &tc, const char *filename) {
   ofstream out(filename, ios::binary);

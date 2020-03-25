@@ -36,11 +36,11 @@ Authors: Jayadharini Jaiganesh and Martin Burtscher
 */
 #pragma once
 
-#include <stdlib.h>
-#include <stdio.h>
+#include "ecl_cc.h"
 #include <cuda.h>
 #include <set>
-#include "ecl_cc.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 static const int Device = 0;
 static const int ThreadsPerBlock = 256;
@@ -50,9 +50,9 @@ static __device__ int topL, posL, topH, posH;
 
 /* initialize with first smaller neighbor ID */
 
-static __global__ __launch_bounds__(ThreadsPerBlock, 2048 / ThreadsPerBlock)
-void init(const int nodes, const int* const __restrict__ nidx, const int* const __restrict__ nlist, int* const __restrict__ nstat, bool* const __restrict__ estat)
-{
+static __global__ __launch_bounds__(ThreadsPerBlock, 2048 / ThreadsPerBlock) void init(
+    const int nodes, const int *const __restrict__ nidx, const int *const __restrict__ nlist,
+    int *const __restrict__ nstat, bool *const __restrict__ estat) {
   const int from = threadIdx.x + blockIdx.x * ThreadsPerBlock;
   const int incr = gridDim.x * ThreadsPerBlock;
 
@@ -66,16 +66,21 @@ void init(const int nodes, const int* const __restrict__ nidx, const int* const 
       i++;
     }
     nstat[v] = m;
-    if (m != v) estat[i-1] = true;
+    if (m != v)
+      estat[i - 1] = true;
   }
 
-  if (from == 0) {topL = 0; posL = 0; topH = nodes - 1; posH = nodes - 1;}
+  if (from == 0) {
+    topL = 0;
+    posL = 0;
+    topH = nodes - 1;
+    posH = nodes - 1;
+  }
 }
 
 /* intermediate pointer jumping */
 
-static inline __device__ int representative(const int idx, int* const __restrict__ nstat)
-{
+static inline __device__ int representative(const int idx, int *const __restrict__ nstat) {
   int curr = nstat[idx];
   if (curr != idx) {
     int next, prev = idx;
@@ -90,9 +95,9 @@ static inline __device__ int representative(const int idx, int* const __restrict
 
 /* process low-degree vertices at thread granularity and fill worklists */
 
-static __global__ __launch_bounds__(ThreadsPerBlock, 2048 / ThreadsPerBlock)
-void compute1(const int nodes, const int* const __restrict__ nidx, const int* const __restrict__ nlist, int* const __restrict__ nstat, int* const __restrict__ wl, bool* const __restrict__ estat)
-{
+static __global__ __launch_bounds__(ThreadsPerBlock, 2048 / ThreadsPerBlock) void compute1(
+    const int nodes, const int *const __restrict__ nidx, const int *const __restrict__ nlist,
+    int *const __restrict__ nstat, int *const __restrict__ wl, bool *const __restrict__ estat) {
   const int from = threadIdx.x + blockIdx.x * ThreadsPerBlock;
   const int incr = gridDim.x * ThreadsPerBlock;
 
@@ -149,13 +154,14 @@ void compute1(const int nodes, const int* const __restrict__ nidx, const int* co
 
 /* process medium-degree vertices at warp granularity */
 
-static __global__ __launch_bounds__(ThreadsPerBlock, 2048 / ThreadsPerBlock)
-void compute2(const int nodes, const int* const __restrict__ nidx, const int* const __restrict__ nlist, int* const __restrict__ nstat, const int* const __restrict__ wl, bool* const __restrict__ estat)
-{
+static __global__ __launch_bounds__(ThreadsPerBlock, 2048 / ThreadsPerBlock) void compute2(
+    const int nodes, const int *const __restrict__ nidx, const int *const __restrict__ nlist,
+    int *const __restrict__ nstat, const int *const __restrict__ wl, bool *const __restrict__ estat) {
   const int lane = threadIdx.x % warpsize;
 
   int idx;
-  if (lane == 0) idx = atomicAdd(&posL, 1);
+  if (lane == 0)
+    idx = atomicAdd(&posL, 1);
   idx = __shfl(idx, 0);
   while (idx < topL) {
     const int v = wl[idx];
@@ -190,16 +196,17 @@ void compute2(const int nodes, const int* const __restrict__ nidx, const int* co
         } while (repeat);
       }
     }
-    if (lane == 0) idx = atomicAdd(&posL, 1);
+    if (lane == 0)
+      idx = atomicAdd(&posL, 1);
     idx = __shfl(idx, 0);
   }
 }
 
 /* process high-degree vertices at block granularity */
 
-static __global__ __launch_bounds__(ThreadsPerBlock, 2048 / ThreadsPerBlock)
-void compute3(const int nodes, const int* const __restrict__ nidx, const int* const __restrict__ nlist, int* const __restrict__ nstat, const int* const __restrict__ wl, bool* const __restrict__ estat)
-{
+static __global__ __launch_bounds__(ThreadsPerBlock, 2048 / ThreadsPerBlock) void compute3(
+    const int nodes, const int *const __restrict__ nidx, const int *const __restrict__ nlist,
+    int *const __restrict__ nstat, const int *const __restrict__ wl, bool *const __restrict__ estat) {
   __shared__ int vB;
   if (threadIdx.x == 0) {
     const int idx = atomicAdd(&posH, -1);
@@ -250,9 +257,11 @@ void compute3(const int nodes, const int* const __restrict__ nidx, const int* co
 
 /* link all vertices to sink */
 
-static __global__ __launch_bounds__(ThreadsPerBlock, 2048 / ThreadsPerBlock)
-void flatten(const int nodes, const int* const __restrict__ nidx, const int* const __restrict__ nlist, int* const __restrict__ nstat)
-{
+static __global__ __launch_bounds__(ThreadsPerBlock,
+                                    2048 / ThreadsPerBlock) void flatten(const int nodes,
+                                                                         const int *const __restrict__ nidx,
+                                                                         const int *const __restrict__ nlist,
+                                                                         int *const __restrict__ nstat) {
   const int from = threadIdx.x + blockIdx.x * ThreadsPerBlock;
   const int incr = gridDim.x * ThreadsPerBlock;
 
@@ -262,46 +271,75 @@ void flatten(const int nodes, const int* const __restrict__ nidx, const int* con
     while (vstat > (next = nstat[vstat])) {
       vstat = next;
     }
-    if (old != vstat) nstat[v] = vstat;
+    if (old != vstat)
+      nstat[v] = vstat;
   }
 }
 
-
-struct GPUTimer
-{
+struct GPUTimer {
   cudaEvent_t beg, end;
-  GPUTimer() {cudaEventCreate(&beg);  cudaEventCreate(&end);}
-  ~GPUTimer() {cudaEventDestroy(beg);  cudaEventDestroy(end);}
-  void start() {cudaEventRecord(beg, 0);}
-  double stop() {cudaEventRecord(end, 0);  cudaEventSynchronize(end);  float ms;  cudaEventElapsedTime(&ms, beg, end);  return 0.001 * ms;}
+  GPUTimer() {
+    cudaEventCreate(&beg);
+    cudaEventCreate(&end);
+  }
+  ~GPUTimer() {
+    cudaEventDestroy(beg);
+    cudaEventDestroy(end);
+  }
+  void start() { cudaEventRecord(beg, 0); }
+  double stop() {
+    cudaEventRecord(end, 0);
+    cudaEventSynchronize(end);
+    float ms;
+    cudaEventElapsedTime(&ms, beg, end);
+    return 0.001 * ms;
+  }
 };
 
-// static void computeCC(const int nodes, const int edges, const int* const __restrict__ nidx, const int* const __restrict__ nlist, int* const __restrict__ nstat, bool* const __restrict__ estat)
-static void computeCC(const int nodes, const int edges, const int* const __restrict__ nidx_d, const int* const __restrict__ nlist_d, int* const __restrict__ nstat_d, bool* const __restrict__ estat_d)
-{
+// static void computeCC(const int nodes, const int edges, const int* const __restrict__ nidx, const int*
+// const __restrict__ nlist, int* const __restrict__ nstat, bool* const __restrict__ estat)
+static void computeCC(const int nodes, const int edges, const int *const __restrict__ nidx_d,
+                      const int *const __restrict__ nlist_d, int *const __restrict__ nstat_d,
+                      bool *const __restrict__ estat_d) {
   cudaSetDevice(Device);
   cudaDeviceProp deviceProp;
   cudaGetDeviceProperties(&deviceProp, Device);
-  if ((deviceProp.major == 9999) && (deviceProp.minor == 9999)) {fprintf(stderr, "ERROR: there is no CUDA capable device\n\n");  exit(-1);}
+  if ((deviceProp.major == 9999) && (deviceProp.minor == 9999)) {
+    fprintf(stderr, "ERROR: there is no CUDA capable device\n\n");
+    exit(-1);
+  }
   const int SMs = deviceProp.multiProcessorCount;
   const int mTSM = deviceProp.maxThreadsPerMultiProcessor;
-  // printf("gpu: %s with %d SMs and %d mTpSM (%.1f MHz and %.1f MHz)\n", deviceProp.name, SMs, mTSM, deviceProp.clockRate * 0.001, deviceProp.memoryClockRate * 0.001);
+  // printf("gpu: %s with %d SMs and %d mTpSM (%.1f MHz and %.1f MHz)\n", deviceProp.name, SMs, mTSM,
+  // deviceProp.clockRate * 0.001, deviceProp.memoryClockRate * 0.001);
 
   // int* nidx_d;
   // int* nlist_d;
   // int* nstat_d;
-  int* wl_d;
+  int *wl_d;
   // bool* estat_d;
 
-  // if (cudaSuccess != cudaMalloc((void **)&nidx_d, (nodes + 1) * sizeof(int))) {fprintf(stderr, "ERROR: could not allocate nidx_d\n\n");  exit(-1);}
-  // if (cudaSuccess != cudaMalloc((void **)&nlist_d, edges * sizeof(int))) {fprintf(stderr, "ERROR: could not allocate nlist_d\n\n");  exit(-1);}
-  // if (cudaSuccess != cudaMalloc((void **)&nstat_d, nodes * sizeof(int))) {fprintf(stderr, "ERROR: could not allocate nstat_d,\n\n");  exit(-1);}
-  if (cudaSuccess != cudaMalloc((void **)&wl_d, nodes * sizeof(int))) {fprintf(stderr, "ERROR: could not allocate wl_d,\n\n");  exit(-1);}
-  // if (cudaSuccess != cudaMalloc((void **)&estat_d, edges * sizeof(bool))) {fprintf(stderr, "ERROR: could not allocate estat_d\n\n");  exit(-1);}
+  // if (cudaSuccess != cudaMalloc((void **)&nidx_d, (nodes + 1) * sizeof(int))) {fprintf(stderr, "ERROR:
+  // could not allocate nidx_d\n\n");  exit(-1);}
+  // if (cudaSuccess != cudaMalloc((void **)&nlist_d, edges * sizeof(int))) {fprintf(stderr, "ERROR: could not
+  // allocate nlist_d\n\n");  exit(-1);}
+  // if (cudaSuccess != cudaMalloc((void **)&nstat_d, nodes * sizeof(int))) {fprintf(stderr, "ERROR: could not
+  // allocate nstat_d,\n\n");  exit(-1);}
+  if (cudaSuccess != cudaMalloc((void **)&wl_d, nodes * sizeof(int))) {
+    fprintf(stderr, "ERROR: could not allocate wl_d,\n\n");
+    exit(-1);
+  }
+  // if (cudaSuccess != cudaMalloc((void **)&estat_d, edges * sizeof(bool))) {fprintf(stderr, "ERROR: could
+  // not allocate estat_d\n\n");  exit(-1);}
 
-  // if (cudaSuccess != cudaMemcpy(nidx_d, nidx, (nodes + 1) * sizeof(int), cudaMemcpyHostToDevice)) {fprintf(stderr, "ERROR: copying to device failed\n\n");  exit(-1);}
-  // if (cudaSuccess != cudaMemcpy(nlist_d, nlist, edges * sizeof(int), cudaMemcpyHostToDevice)) {fprintf(stderr, "ERROR: copying to device failed\n\n");  exit(-1);}
-  if (cudaSuccess != cudaMemset(estat_d, false, edges)) {fprintf(stderr, "ERROR: memset failed\n\n");  exit(-1);}
+  // if (cudaSuccess != cudaMemcpy(nidx_d, nidx, (nodes + 1) * sizeof(int), cudaMemcpyHostToDevice))
+  // {fprintf(stderr, "ERROR: copying to device failed\n\n");  exit(-1);}
+  // if (cudaSuccess != cudaMemcpy(nlist_d, nlist, edges * sizeof(int), cudaMemcpyHostToDevice))
+  // {fprintf(stderr, "ERROR: copying to device failed\n\n");  exit(-1);}
+  if (cudaSuccess != cudaMemset(estat_d, false, edges)) {
+    fprintf(stderr, "ERROR: memset failed\n\n");
+    exit(-1);
+  }
 
   cudaFuncSetCacheConfig(init, cudaFuncCachePreferL1);
   cudaFuncSetCacheConfig(compute1, cudaFuncCachePreferL1);
@@ -323,9 +361,11 @@ static void computeCC(const int nodes, const int edges, const int* const __restr
   // printf("throughput: %.3f Mnodes/s\n", nodes * 0.000001 / runtime);
   // printf("throughput: %.3f Medges/s\n", edges * 0.000001 / runtime);
 
-  // if (cudaSuccess != cudaMemcpy(nstat, nstat_d, nodes * sizeof(int), cudaMemcpyDeviceToHost)) {fprintf(stderr, "ERROR: copying from device failed\n\n");  exit(-1);}
-  // if (cudaSuccess != cudaMemcpy(estat, estat_d, edges * sizeof(bool), cudaMemcpyDeviceToHost)) {fprintf(stderr, "ERROR: copying from device failed\n\n");  exit(-1);}
-  
+  // if (cudaSuccess != cudaMemcpy(nstat, nstat_d, nodes * sizeof(int), cudaMemcpyDeviceToHost))
+  // {fprintf(stderr, "ERROR: copying from device failed\n\n");  exit(-1);}
+  // if (cudaSuccess != cudaMemcpy(estat, estat_d, edges * sizeof(bool), cudaMemcpyDeviceToHost))
+  // {fprintf(stderr, "ERROR: copying from device failed\n\n");  exit(-1);}
+
   cudaFree(wl_d);
   // cudaFree(nstat_d);
   // cudaFree(nlist_d);
@@ -333,10 +373,13 @@ static void computeCC(const int nodes, const int edges, const int* const __restr
   // cudaFree(estat_d);
 }
 
-static void verify(const int v, const int id, const int* const __restrict__ nidx, const int* const __restrict__ nlist, int* const __restrict__ nstat)
-{
+static void verify(const int v, const int id, const int *const __restrict__ nidx,
+                   const int *const __restrict__ nlist, int *const __restrict__ nstat) {
   if (nstat[v] >= 0) {
-    if (nstat[v] != id) {fprintf(stderr, "ERROR: found incorrect ID value\n\n");  exit(-1);}
+    if (nstat[v] != id) {
+      fprintf(stderr, "ERROR: found incorrect ID value\n\n");
+      exit(-1);
+    }
     nstat[v] = -1;
     for (int i = nidx[v]; i < nidx[v + 1]; i++) {
       verify(nlist[i], id, nidx, nlist, nstat);
@@ -355,11 +398,13 @@ static void verify(const int v, const int id, const int* const __restrict__ nidx
 
 //   int* nodestatus = NULL;
 //   cudaHostAlloc(&nodestatus, g.nodes * sizeof(int), cudaHostAllocDefault);
-//   if (nodestatus == NULL) {fprintf(stderr, "ERROR: nodestatus - host memory allocation failed\n\n");  exit(-1);}
+//   if (nodestatus == NULL) {fprintf(stderr, "ERROR: nodestatus - host memory allocation failed\n\n");
+//   exit(-1);}
 
 //   bool* edgestatus = NULL;
 //   cudaHostAlloc(&edgestatus, g.edges * sizeof(bool), cudaHostAllocDefault);
-//   if (edgestatus == NULL) {fprintf(stderr, "ERROR: edgestatus - host memory allocation failed\n\n");  exit(-1);}
+//   if (edgestatus == NULL) {fprintf(stderr, "ERROR: edgestatus - host memory allocation failed\n\n");
+//   exit(-1);}
 
 //   printf("input graph: %d nodes and %d edges (%s)\n", g.nodes, g.edges, argv[1]);
 //   printf("average degree: %.2f edges per node\n", 1.0 * g.edges / g.nodes);
@@ -385,7 +430,8 @@ static void verify(const int v, const int id, const int* const __restrict__ nidx
 
 //   for (int v = 0; v < g.nodes; v++) {
 //     for (int i = g.nindex[v]; i < g.nindex[v + 1]; i++) {
-//       if (nodestatus[g.nlist[i]] != nodestatus[v]) {fprintf(stderr, "ERROR: found adjacent nodes in different components\n\n");  exit(-1);}
+//       if (nodestatus[g.nlist[i]] != nodestatus[v]) {fprintf(stderr, "ERROR: found adjacent nodes in
+//       different components\n\n");  exit(-1);}
 //     }
 //   }
 
@@ -412,7 +458,8 @@ static void verify(const int v, const int id, const int* const __restrict__ nidx
 //     }
 //   }
 //   printf("number of edges in spanning tree(s): %d\n", count);
-//   if (g.nodes-s1.size() != count) {fprintf(stderr, "ERROR: incorrect number of spanning tree edges\n\n");  exit(-1);}
+//   if (g.nodes-s1.size() != count) {fprintf(stderr, "ERROR: incorrect number of spanning tree edges\n\n");
+//   exit(-1);}
 //   printf("all good\n\n");
 
 //   cudaFreeHost(nodestatus);
