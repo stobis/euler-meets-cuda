@@ -1,24 +1,130 @@
-#include <moderngpu/context.hxx>
-#include <moderngpu/kernel_compact.hxx>
-#include <moderngpu/kernel_mergesort.hxx>
-#include <moderngpu/kernel_scan.hxx>
-#include <moderngpu/kernel_segreduce.hxx>
-#include <moderngpu/memory.hxx>
-using namespace mgpu;
-
 #include <iostream>
 #include <utility>
 using namespace std;
 
+#include <moderngpu/context.hxx>
+#include <moderngpu/memory.hxx>
+#include <moderngpu/kernel_compact.hxx>
+#include <moderngpu/kernel_mergesort.hxx>
+#include <moderngpu/kernel_reduce.hxx>
+#include <moderngpu/kernel_scan.hxx>
+#include <moderngpu/kernel_segreduce.hxx>
+using namespace mgpu;
+
 #include "commons/cuda_euler_tour.h"
+#include "bfs.h"
+#include "spanning_tree.h"
+#include "timer.hpp"
+#include "utils.h"
 
-#include "bridges/cuda_spanning_tree.h"
-#include "bridges/cuda_tarjan_kot.h"
-#include "bridges/gputils.cuh"
-#include "bridges/timer.hpp"
+#include "bridges.h"
 
-namespace {
+namespace emc {
 
+// Naive helpers
+void _mark_bridges(int N, int M, const int *row_offsets, const int *col_indices,
+                   const int *distance, const int *parent, bool *is_bridge,
+                   context_t &context) {
+    mem_t<int> marked = mgpu::fill<int>(0, N, context);
+    mem_t<int> row_indices = mgpu::fill<int>(0, M, context);
+
+    _csr_to_list(N, M, row_offsets, row_indices.data(), context);
+
+    // Mark nodes visited during traversal
+    transform(
+        [] MGPU_DEVICE(int index, int const *row_indices,
+                       int const *col_indices, int const *distance,
+                       int const *parent, int *marked) {
+            int const from = row_indices[index];
+            int const to = col_indices[index];
+
+            // Check if tree edge
+            if (parent[to] == from || parent[from] == to) {
+                return;
+            }
+
+            int higher = distance[to] < distance[from] ? to : from;
+            int lower = higher == to ? from : to;
+            int diff = distance[lower] - distance[higher];
+
+            // Equalize heights
+            while (diff--) {
+                marked[lower] = 1;
+                lower = parent[lower];
+            }
+
+            // Mark till LCA is found
+            while (lower != higher) {
+                marked[lower] = 1;
+                lower = parent[lower];
+
+                marked[higher] = 1;
+                higher = parent[higher];
+            }
+        },
+        M, context, row_indices.data(), col_indices, distance, parent,
+        marked.data());
+
+    // Fill result array
+    transform(
+        [] MGPU_DEVICE(int index, int const *row_indices,
+                       int const *col_indices, int const *parent,
+                       int const *marked, bool *is_bridge) {
+            int const to = row_indices[index];
+            int const from = col_indices[index];
+
+            is_bridge[index] = (parent[to] == from && marked[to] == 0) ||
+                               (parent[from] == to && marked[from] == 0);
+        },
+        M, context, row_indices.data(), col_indices, parent, marked.data(),
+        is_bridge);
+}
+
+// Naive
+void cuda_bridges_naive(int N, int M, const int *row_offsets,
+                        const int *col_indices, bool *is_bridge,
+                        context_t &context) {
+    // Init timer
+    Timer timer("naive");
+
+    // Allocate array(s)
+    mem_t<int> distance = mgpu::fill<int>(-1, N, context);
+    mem_t<int> parent = mgpu::fill<int>(-1, N, context);
+
+    // Execute BFS to compute distances (needed for determine parents)
+    // bfs_mgpu::ParallelBFS(n, directed_m, nodes, edges_to, 0, distance,
+    // context);
+    bfs(N, M, row_offsets, col_indices, distance.data(), parent.data(),
+             context);
+
+    if (detailed_time) {
+        context.synchronize();
+        timer.print_and_restart("BFS");
+    }
+
+    // Find bridges
+    _mark_bridges(N, M, row_offsets, col_indices, distance.data(),
+                  parent.data(), is_bridge, context);
+
+    if (detailed_time) {
+        context.synchronize();
+        timer.print_and_restart("Find Bridges");
+        timer.print_overall();
+    }
+
+    if (detailed_time) {
+        mem_t<int> maxd(1, context);
+        reduce(distance.data(), distance.size(), maxd.data(),
+               mgpu::maximum_t<int>(), context);
+        vector<int> maxd_host = from_mem(maxd);
+
+        context.synchronize();
+        timer.print_and_restart("Max distance: " +
+                                to_string(maxd_host.front()));
+    }
+}
+
+// Tarjan & Hybrid helpers
 int segtree_size(int const N) {
     int M = 1;
     while (M < N) {
@@ -57,12 +163,12 @@ void spanning_tree(int const N, int const M, int const *row_offsets,
     mem_t<bool> is_tree_edge = mgpu::fill<bool>(false, M, context);
     bool *is_tree_edge_data = is_tree_edge.data();
 
-    ::spanning_tree(N, M, row_offsets, col_indices, is_tree_edge_data,
-    context); 
+    // spanning_tree(N, M, row_offsets, col_indices, is_tree_edge_data,
+    // context);
     // spanning_tree_bfs(N, M, row_offsets, col_indices,
     // is_tree_edge_data, context);
-    // spanning_tree_ecl(N, M, row_offsets, col_indices, is_tree_edge_data,
-    //                   context);
+    spanning_tree_ecl(N, M, row_offsets, col_indices, is_tree_edge_data,
+                      context);
 
     // Select tree edges
     auto compact = transform_compact(M, context);
@@ -238,13 +344,12 @@ void show_time(string const label, Timer &timer, context_t &context) {
     }
 }
 
-}
-
-void cuda_bridges_tarjan_kot(int N, int M, int const *row_offsets,
+// Tarjan
+void cuda_bridges_tarjan(int N, int M, int const *row_offsets,
                          int const *col_indices, bool *is_bridge,
                          context_t &context) {
     // Init timer
-    Timer timer("tarjan-kot");
+    Timer timer("tarjan");
 
     // Expand csr to edge list
     mem_t<int> row_indices = mgpu::fill<int>(0, M, context);
@@ -322,3 +427,85 @@ void cuda_bridges_tarjan_kot(int N, int M, int const *row_offsets,
     show_time("Find bridges", timer, context);
     timer.print_overall();
 }
+
+// Hybrid additional helpers
+void count_distance_and_parent(int const N, int const M, ll const *tree_edges,
+                               int const *tree_edges_rev, int *distance,
+                               int *parent, context_t &context) {
+    mem_t<int> scan_params(M, context);
+
+    transform(
+        [=] MGPU_DEVICE(int index, int *scan_params) {
+            scan_params[index] = index < tree_edges_rev[index] ? 1 : -1;
+        },
+        M, context, scan_params.data());
+
+    scan<scan_type_inc>(scan_params.data(), M, scan_params.data(), context);
+
+    transform(
+        [=] MGPU_DEVICE(int index, int const *scan_params) {
+            if (index >= tree_edges_rev[index]) return;
+
+            int const from = static_cast<int>(tree_edges[index] >> 32);
+            int const to = static_cast<int>(tree_edges[index] & 0xFFFFFFFF);
+            distance[to] = scan_params[index];
+            parent[to] = from;
+        },
+        M, context, scan_params.data());
+}
+
+// Hybrid
+void cuda_bridges_hybrid(int N, int M, int const *row_offsets,
+                         int const *col_indices, bool *is_bridge,
+                         context_t &context) {
+    // Init timer
+    Timer timer("hybrid");
+
+    // Expand csr to edge list
+    mem_t<int> row_indices = mgpu::fill<int>(0, M, context);
+    _csr_to_list(N, M, row_offsets, row_indices.data(), context);
+
+    // Find spanning tree
+    mem_t<ll> tree(N - 1, context);
+    spanning_tree(N, M, row_offsets, row_indices.data(), col_indices,
+                  tree.data(), context);
+
+    show_time("Spanning Tree", timer, context);
+
+    // List rank
+    mem_t<int> rank(2 * (N - 1), context);
+    list_rank(N, N - 1, tree.data(), rank.data(), context);
+
+    // Rearrange tree edges using counted ranks
+    // Direct edges, find reverse edge index
+    mem_t<ll> tree_directed(2 * (N - 1), context);
+    mem_t<int> tree_directed_rev(2 * (N - 1), context);
+    order_by_rank(N, 2 * (N - 1), tree.data(), tree_directed.data(),
+                  tree_directed_rev.data(), rank.data(), context);
+
+    show_time("List rank", timer, context);
+
+    // Count preorder
+    // mem_t<int> preorder = mgpu::fill(0, N, context);
+    // count_preorder(N, 2 * (N - 1), tree_directed.data(),
+    //                tree_directed_rev.data(), preorder.data(), context);
+
+    // Count distance
+    mem_t<int> distance = mgpu::fill<int>(-1, N, context);
+    mem_t<int> parent = mgpu::fill<int>(-1, N, context);
+    count_distance_and_parent(N, 2 * (N - 1), tree_directed.data(),
+                              tree_directed_rev.data(), distance.data(),
+                              parent.data(), context);
+
+    show_time("Distance & parent", timer, context);
+
+    // Naive part
+    _mark_bridges(N, M, row_offsets, col_indices, distance.data(),
+                  parent.data(), is_bridge, context);
+
+    // Print exec time
+    show_time("Find bridges", timer, context);
+    timer.print_overall();
+}
+
+}  // namespace

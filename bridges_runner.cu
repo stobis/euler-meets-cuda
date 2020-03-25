@@ -1,11 +1,12 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "bridges/graph.hpp"
-#include "bridges/cuda_algorithms.h"
-
 #include <moderngpu/context.hxx>
 #include <moderngpu/memory.hxx>
+
+#include "graph.hpp"
+#include "bridges.h"
+using namespace emc;
 
 // Misc
 const std::string _usage =
@@ -13,8 +14,6 @@ const std::string _usage =
     "Available variants:\n"
     "naive - BFS + naive\n"
     "tarjan - ECL-CC + Euler\n"
-    "tarjan-kot - Kothapali + Euler\n"
-    "tarjan-bfs - BFS + Euler\n"
     "hybrid - ECL-CC + naive\n";
 
 // Configuration of implementations to choose
@@ -23,8 +22,6 @@ typedef void (*BridgesFunction)(int, int, int const *, int const *, bool *, mgpu
 std::unordered_map<std::string, BridgesFunction> algorithms = {
     {"naive", &cuda_bridges_naive},
     {"tarjan", &cuda_bridges_tarjan},
-    {"tarjan-kot", &cuda_bridges_tarjan_kot},
-    {"tarjan-bfs", &cuda_bridges_tarjan_bfs},
     {"hybrid", &cuda_bridges_hybrid}
 };
 

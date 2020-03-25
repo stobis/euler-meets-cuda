@@ -1,10 +1,11 @@
 #include <iostream>
 
-#include "bridges/cuda_algorithms.h"
+#include "bridges.h"
 #include "lca/cuda_algorithms.h"
 
 #include <moderngpu/context.hxx>
 #include <moderngpu/memory.hxx>
+using namespace emc;
 
 void print_ans(int const M, bool *is_bridge)
 {

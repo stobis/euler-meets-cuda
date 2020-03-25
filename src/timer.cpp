@@ -1,4 +1,4 @@
-#include "bridges/timer.hpp"
+#include "timer.hpp"
 #include <iostream>
 
 Timer::Timer(std::string slug) : slug(slug), c_start(std::clock()), overall(0) {}

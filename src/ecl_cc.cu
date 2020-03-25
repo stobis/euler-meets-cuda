@@ -40,7 +40,7 @@ Authors: Jayadharini Jaiganesh and Martin Burtscher
 #include <stdio.h>
 #include <cuda.h>
 #include <set>
-#include "ECLgraph.h"
+#include "ecl_cc.h"
 
 static const int Device = 0;
 static const int ThreadsPerBlock = 256;

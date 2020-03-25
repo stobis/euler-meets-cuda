@@ -1,8 +1,11 @@
 #ifndef GPUTILS_CUH
 #define GPUTILS_CUH
 
+#include <iostream>
 #include <fstream>
 #include <vector>
+using namespace std;
+
 #include <moderngpu/context.hxx>
 #include <moderngpu/kernel_scan.hxx>
 #include <moderngpu/memory.hxx>

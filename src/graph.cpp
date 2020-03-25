@@ -1,5 +1,6 @@
-#include "bridges/graph.hpp"
 #include <iostream>
+
+#include "graph.hpp"
 
 Graph::Graph() : n(0), m(0) {}
 

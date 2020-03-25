@@ -26,6 +26,8 @@ NVCCFLAGS=-arch $(NVCCSM) -O2 -std=c++11 --expt-extended-lambda -w $(NVCCINC)
 LDFLAGS=-L/usr/local/cuda/lib64 -lcudart
 
 OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard *.cpp)) \
+	$(patsubst %.cpp, obj/%.o, $(wildcard src/*.cpp)) \
+	$(patsubst %.cu, obj/%.o, $(wildcard src/*.cu)) \
 	$(patsubst %.cpp, obj/%.o, $(wildcard src/**/*.cpp)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard src/**/*.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/GpuConnectedComponents/*.cu)) \
