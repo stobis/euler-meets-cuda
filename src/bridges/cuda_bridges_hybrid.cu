@@ -10,7 +10,7 @@ using namespace mgpu;
 #include <utility>
 using namespace std;
 
-#include "commons/cuda_euler_tour.h"
+#include "euler_lca.h"
 
 #include "bridges/cuda_hybrid.h"
 #include "bridges/cuda_spanning_tree.h"

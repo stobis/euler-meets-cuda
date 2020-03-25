@@ -83,8 +83,7 @@ int main(int argc, char *argv[]) {
     algorithm = cuda_inlabel_algorithm;
   }
 
-  TestCase tc = input_file == NULL ? readFromStdIn()
-                                   : readFromFile(is_binary_input, input_file);
+  TestCase tc = input_file == NULL ? readFromStdIn() : readFromFile(is_binary_input, input_file);
 
   if (is_verbose)
     cerr << "N: " << tc.tree.V << endl
@@ -112,36 +111,29 @@ void solve_lca(TestCase &tc, Algorithm algorithm, vector<int> &answers) {
 
   if (is_cuda_algorithm(algorithm)) {
     CUCHECK(cudaMalloc((void **)&cuda_parents, sizeof(int) * tc.tree.V));
-    CUCHECK(cudaMemcpy(cuda_parents, tc.tree.father.data(),
-                       sizeof(int) * tc.tree.V, cudaMemcpyHostToDevice));
+    CUCHECK(cudaMemcpy(cuda_parents, tc.tree.father.data(), sizeof(int) * tc.tree.V, cudaMemcpyHostToDevice));
 
     CUCHECK(cudaMalloc((void **)&cuda_queries, sizeof(int) * tc.q.N * 2));
-    CUCHECK(cudaMemcpy(cuda_queries, tc.q.tab.data(), sizeof(int) * tc.q.N * 2,
-                       cudaMemcpyHostToDevice));
+    CUCHECK(cudaMemcpy(cuda_queries, tc.q.tab.data(), sizeof(int) * tc.q.N * 2, cudaMemcpyHostToDevice));
 
     CUCHECK(cudaMalloc((void **)&cuda_answers, sizeof(int) * tc.q.N));
   }
 
   switch (algorithm) {
   case cuda_inlabel_algorithm:
-    cuda_lca_inlabel(tc.tree.V, cuda_parents, tc.q.N, cuda_queries,
-                     cuda_answers, context);
+    cuda_lca_inlabel(tc.tree.V, cuda_parents, tc.q.N, cuda_queries, cuda_answers, context);
     break;
   case cuda_naive_algorithm:
-    cuda_lca_naive(tc.tree.V, cuda_parents, tc.q.N, cuda_queries, cuda_answers,
-                   context);
+    cuda_lca_naive(tc.tree.V, cuda_parents, tc.q.N, cuda_queries, cuda_answers, context);
     break;
   case cpu_inlabel_algorithm:
-    cpu_lca_inlabel(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(),
-                    answers.data());
+    cpu_lca_inlabel(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(), answers.data());
     break;
   case cpu_rmq_algorithm:
-    cpu_lca_rmq(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(),
-                answers.data());
+    cpu_lca_rmq(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(), answers.data());
     break;
   case cpu_simple_algorithm:
-    cpu_lca_simple(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(),
-                   answers.data());
+    cpu_lca_simple(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(), answers.data());
     break;
 
   default:
@@ -152,8 +144,7 @@ void solve_lca(TestCase &tc, Algorithm algorithm, vector<int> &answers) {
   }
 
   if (is_cuda_algorithm(algorithm)) {
-    CUCHECK(cudaMemcpy(answers.data(), cuda_answers, sizeof(int) * tc.q.N,
-                       cudaMemcpyDeviceToHost));
+    CUCHECK(cudaMemcpy(answers.data(), cuda_answers, sizeof(int) * tc.q.N, cudaMemcpyDeviceToHost));
   }
 }
 

@@ -6,9 +6,8 @@
 
 #include "commons.h"
 #include "commons/commons.h"
-#include "commons/cuda_euler_tour.h"
-#include "commons/cuda_list_rank.h"
 #include "cuda_commons.h"
+#include "euler_lca.h"
 
 #define ll long long
 
@@ -19,15 +18,13 @@ inline __device__ long long CudaPackEdge(int from, int to);
 inline __device__ int CudaUnpackEdgeFrom(long long edge);
 inline __device__ int CudaUnpackEdgeTo(long long edge);
 
-inline __device__ int CudaGetEdgeStart(const int *__restrict__ father,
-                                       int edgeCode);
-inline __device__ int CudaGetEdgeEnd(const int *__restrict__ father,
-                                     int edgeCode);
+inline __device__ int CudaGetEdgeStart(const int *__restrict__ father, int edgeCode);
+inline __device__ int CudaGetEdgeEnd(const int *__restrict__ father, int edgeCode);
 inline __device__ int CudaGetEdgeCode(int a, bool toFather);
 inline __device__ bool isEdgeToFather(int edgeCode);
 
-void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
-                      int *answers, mgpu::context_t &context) {
+void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers,
+                      mgpu::context_t &context) {
   Timer timer("Parse Input");
   int root = 0;
 
@@ -64,8 +61,7 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
   int *devEdgeRankFromEulerTour;
   CUCHECK(cudaMalloc((void **)&devEdgeRankFromEulerTour, sizeof(int) * N * 2));
 
-  cuda_euler_tour(N, root, dev_edge_from, dev_edge_to, devEdgeRankFromEulerTour,
-                  context);
+  cuda_euler_tour(N, root, dev_edge_from, dev_edge_to, devEdgeRankFromEulerTour, context);
 
   int *devEdgeRank;
   CUCHECK(cudaMalloc((void **)&devEdgeRank, sizeof(int) * N * 2));
@@ -78,10 +74,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
         } else {
           int afterRoot = thid > root;
 
-          devEdgeRank[thid * 2] =
-              devEdgeRankFromEulerTour[thid + N - 1 - afterRoot];
-          devEdgeRank[thid * 2 + 1] =
-              devEdgeRankFromEulerTour[thid - afterRoot];
+          devEdgeRank[thid * 2] = devEdgeRankFromEulerTour[thid + N - 1 - afterRoot];
+          devEdgeRank[thid * 2 + 1] = devEdgeRankFromEulerTour[thid - afterRoot];
         }
       },
       N, context);
@@ -201,8 +195,7 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
           devAscendant[thid] = (1 << l);
           return;
         }
-        devAscendant[thid] =
-            (1 << l) + devW1Sum[devEdgeRank[CudaGetEdgeCode(thid, 0)]];
+        devAscendant[thid] = (1 << l) + devW1Sum[devEdgeRank[CudaGetEdgeCode(thid, 0)]];
       },
       N, context);
   CUCHECK(cudaFree(devEdgeRank));
@@ -302,6 +295,69 @@ __device__ int CudaGetEdgeEnd(const int *__restrict__ father, int edgeCode) {
   return CudaGetEdgeStart(father, edgeCode ^ 1);
 }
 __device__ bool isEdgeToFather(int edgeCode) { return edgeCode % 2; }
-__device__ int CudaGetEdgeCode(int a, bool toFather) {
-  return a * 2 + toFather;
+__device__ int CudaGetEdgeCode(int a, bool toFather) { return a * 2 + toFather; }
+
+void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *answers,
+                    mgpu::context_t &context) {
+
+  Timer timer = Timer("Parse Input");
+
+  int *devDepth;
+  int *devNext;
+
+  CUCHECK(cudaMalloc((void **)&devDepth, sizeof(int) * N));
+  CUCHECK(cudaMalloc((void **)&devNext, sizeof(int) * N));
+
+  timer.measureTime("Cuda Allocs");
+
+  int threadsPerBlockX = 1024;
+  int blockPerGridX = (N + threadsPerBlockX - 1) / threadsPerBlockX;
+
+  transform(
+      [=] MGPU_DEVICE(int thid) {
+        devNext[thid] = parents[thid];
+        devDepth[thid] = 0;
+      },
+      N, context);
+  context.synchronize();
+
+  timer.measureTime("Copy Input and Init data");
+
+  CudaSimpleListRank(devDepth, N, devNext, context);
+  context.synchronize();
+
+  timer.setPrefix("Queries");
+
+  blockPerGridX = (Q + threadsPerBlockX - 1) / threadsPerBlockX;
+
+  transform(
+      [=] MGPU_DEVICE(int thid) {
+        int p = queries[thid * 2];
+        int q = queries[thid * 2 + 1];
+
+        if (p == q)
+          answers[thid] = p;
+
+        while (devDepth[p] != devDepth[q]) {
+          if (devDepth[p] > devDepth[q])
+            p = parents[p];
+          else
+            q = parents[q];
+        }
+
+        while (p != q) {
+          p = parents[p];
+          q = parents[q];
+        }
+
+        answers[thid] = p;
+      },
+      Q, context);
+  CUCHECK(cudaDeviceSynchronize());
+
+  CUCHECK(cudaFree(devDepth));
+  CUCHECK(cudaFree(devNext));
+
+  context.synchronize();
+  timer.measureTime(Q);
 }
