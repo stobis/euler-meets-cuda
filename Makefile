@@ -15,9 +15,6 @@ NVCC=$(CUDA)/bin/nvcc
 NVCCSM=sm_50
 NVCCINC=-I $(CUDA)/include \
 		-I $(CUDA)/samples/common/inc \
-		-I ./$(3RDDIR)/cudaweijajalistrank/ \
-		-I ./$(3RDDIR)/GpuConnectedComponents/ \
-		-I ./$(3RDDIR)/cudabfs/ \
 		-I ./$(3RDDIR)/moderngpu/src \
 		-I ./$(INCDIR)/ 
 		
