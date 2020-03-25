@@ -22,49 +22,49 @@ private:
 
 using namespace lca;
 
-struct ParentsTree {
+struct LcaParentsTree {
   int V;
   int root;
   vector<int> father;
 
-  ParentsTree();
-  ParentsTree(int V, int root, const vector<int> &father);
-  ParentsTree(ifstream &in);
+  LcaParentsTree();
+  LcaParentsTree(int V, int root, const vector<int> &father);
+  LcaParentsTree(ifstream &in);
 
   void writeToStream(ofstream &out);
 };
 
-struct Queries {
+struct LcaQueries {
   int N;
   vector<int> tab;
 
-  Queries();
-  Queries(int N, const vector<int> &tab);
-  Queries(ifstream &in);
+  LcaQueries();
+  LcaQueries(int N, const vector<int> &tab);
+  LcaQueries(ifstream &in);
 
   void writeToStream(ofstream &out);
 };
 
-struct TestCase {
-  ParentsTree tree;
-  Queries q;
+struct LcaTestCase {
+  LcaParentsTree tree;
+  LcaQueries q;
 
-  TestCase();
-  TestCase(const ParentsTree &tree, const Queries &q);
-  TestCase(ifstream &in);
+  LcaTestCase();
+  LcaTestCase(const LcaParentsTree &tree, const LcaQueries &q);
+  LcaTestCase(ifstream &in);
 
   void writeToStream(ofstream &out);
 };
 
 int getEdgeCode(int a, bool toFather); // edge father[a]->a or a->father[a]
-int getEdgeStart(ParentsTree &tree, int edgeCode);
-int getEdgeEnd(ParentsTree &tree, int edgeCode);
+int getEdgeStart(LcaParentsTree &tree, int edgeCode);
+int getEdgeEnd(LcaParentsTree &tree, int edgeCode);
 
-void writeToFile(TestCase &tc, const char *filename);
-void writeToStdOut(TestCase &tc);
-TestCase readFromFile(bool isBinary, const char *filename);
-TestCase readFromStream(istream &inputStream);
-TestCase readFromStdIn();
+void writeToFile(LcaTestCase &tc, const char *filename);
+void writeToStdOut(LcaTestCase &tc);
+LcaTestCase readFromFile(bool isBinary, const char *filename);
+LcaTestCase readFromStream(istream &inputStream);
+LcaTestCase readFromStdIn();
 
 void writeAnswersToFile(bool binary, int Q, int *ans, const char *filename);
 void writeAnswersToStdOut(int Q, int *ans);

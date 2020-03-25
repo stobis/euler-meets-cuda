@@ -37,60 +37,49 @@ double Timer::resetTimer(clock_t &timer) {
 }
 } // namespace lca
 
-ParentsTree::ParentsTree() : V(0), root(0) {}
-ParentsTree::ParentsTree(int V, int root, const vector<int> &father)
+LcaParentsTree::LcaParentsTree() : V(0), root(0) {}
+LcaParentsTree::LcaParentsTree(int V, int root, const vector<int> &father)
     : V(V), root(root), father(father) {}
-ParentsTree::ParentsTree(ifstream &in) {
+LcaParentsTree::LcaParentsTree(ifstream &in) {
   in.read((char *)&V, sizeof(int));
   in.read((char *)&root, sizeof(int));
 
   father.resize(V);
   in.read((char *)father.data(), sizeof(int) * V);
 }
-void ParentsTree::writeToStream(ofstream &out) {
+void LcaParentsTree::writeToStream(ofstream &out) {
   out.write((char *)&V, sizeof(int));
   out.write((char *)&root, sizeof(int));
   out.write((char *)father.data(), sizeof(int) * V);
 }
 
-Queries::Queries() : N(0), tab(vector<int>()) {}
-Queries::Queries(int N, const vector<int> &tab) : N(N), tab(tab) {}
-Queries::Queries(ifstream &in) {
+LcaQueries::LcaQueries() : N(0), tab(vector<int>()) {}
+LcaQueries::LcaQueries(int N, const vector<int> &tab) : N(N), tab(tab) {}
+LcaQueries::LcaQueries(ifstream &in) {
   in.read((char *)&N, sizeof(int));
 
   tab.resize(N * 2);
   in.read((char *)tab.data(), sizeof(int) * N * 2);
 }
-void Queries::writeToStream(ofstream &out) {
+void LcaQueries::writeToStream(ofstream &out) {
   out.write((char *)&N, sizeof(int));
   out.write((char *)tab.data(), sizeof(int) * N * 2);
 }
 
-TestCase::TestCase() : tree(ParentsTree()), q(Queries()) {}
-TestCase::TestCase(const ParentsTree &tree, const Queries &q)
+LcaTestCase::LcaTestCase() : tree(LcaParentsTree()), q(LcaQueries()) {}
+LcaTestCase::LcaTestCase(const LcaParentsTree &tree, const LcaQueries &q)
     : tree(tree), q(q) {}
-TestCase::TestCase(ifstream &in) : tree(in), q(in) {}
-void TestCase::writeToStream(ofstream &out) {
+LcaTestCase::LcaTestCase(ifstream &in) : tree(in), q(in) {}
+void LcaTestCase::writeToStream(ofstream &out) {
   tree.writeToStream(out);
   q.writeToStream(out);
 }
 
-int getEdgeCode(int a, bool toFather) { return a * 2 + toFather; }
-int getEdgeStart(ParentsTree &tree, int edgeCode) {
-  if (edgeCode % 2)
-    return edgeCode / 2;
-  else
-    return tree.father[edgeCode / 2];
-}
-int getEdgeEnd(ParentsTree &tree, int edgeCode) {
-  return getEdgeStart(tree, edgeCode ^ 1);
-}
-
-void writeToFile(TestCase &tc, const char *filename) {
+void writeToFile(LcaTestCase &tc, const char *filename) {
   ofstream out(filename, ios::binary);
   tc.writeToStream(out);
 }
-void writeToStdOut(TestCase &tc) {
+void writeToStdOut(LcaTestCase &tc) {
   cout << tc.tree.V << " ";
   cout << tc.tree.root << endl;
   for (int i = 0; i < tc.tree.V; i++) {
@@ -105,17 +94,17 @@ void writeToStdOut(TestCase &tc) {
   cout << endl;
 }
 
-TestCase readFromFile(bool isBinary, const char *filename) {
+LcaTestCase readFromFile(bool isBinary, const char *filename) {
   if (isBinary) {
     ifstream in(filename, ios::binary);
-    return TestCase(in);
+    return LcaTestCase(in);
   } else {
     ifstream in(filename);
     return readFromStream(in);
   }
 }
-TestCase readFromStream(istream &inputStream) {
-  ParentsTree tree;
+LcaTestCase readFromStream(istream &inputStream) {
+  LcaParentsTree tree;
   inputStream >> tree.V >> tree.root;
 
   tree.father.resize(tree.V);
@@ -130,10 +119,10 @@ TestCase readFromStream(istream &inputStream) {
   for (int i = 0; i < N * 2; i++) {
     inputStream >> q[i];
   }
-  return TestCase(tree, Queries(N, q));
+  return LcaTestCase(tree, LcaQueries(N, q));
 }
 
-TestCase readFromStdIn() { return readFromStream(cin); }
+LcaTestCase readFromStdIn() { return readFromStream(cin); }
 
 void writeAnswersToStdOut(int Q, int *ans) {
   for (int i = 0; i < Q; i++) {

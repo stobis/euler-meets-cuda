@@ -34,16 +34,16 @@ int main( int argc, char* argv[] )
 
   shuffleFathers( tab, father, root );
 
-  ParentsTree tree( V, root, father );
+  LcaParentsTree tree( V, root, father );
 
   vector<int> q;
   for ( int i = 0; i < Q * 2; i++ )
   {
     q.push_back( rand() % V );
   }
-  Queries queries( Q, q );
+  LcaQueries queries( Q, q );
 
-  TestCase tc( tree, queries );
+  LcaTestCase tc( tree, queries );
   if ( argc == expectedArgc + 1 )
     writeToFile( tc, argv[expectedArgc] );
   else

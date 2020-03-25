@@ -62,7 +62,7 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
   }
 
   timer.measureTime();
-  timer.setPrefix("Queries");
+  timer.setPrefix("LcaQueries");
 
   for (int i = 0; i < Q; i++) {
     int x = queries[2 * i];
@@ -149,7 +149,7 @@ void cpu_lca_rmq(int N, const int *parents, int Q, const int *queries, int *answ
   }
 
   timer.measureTime("Dfs");
-  timer.setPrefix("Queries");
+  timer.setPrefix("LcaQueries");
 
   for (int i = 0; i < Q; i++) {
     int p = rmqPos[preorder[queries[i * 2]]];
@@ -249,7 +249,7 @@ void cpu_lca_simple(int N, const int *parents, int Q, const int *queries, int *a
   dfs(root, G, depth);
 
   timer.measureTime();
-  timer.setPrefix("Queries");
+  timer.setPrefix("LcaQueries");
 
   for (int i = 0; i < Q; i++) {
     int p = queries[i * 2];

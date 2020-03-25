@@ -26,7 +26,7 @@ enum Algorithm {
 };
 bool is_cuda_algorithm(Algorithm alg);
 
-void solve_lca(TestCase &tc, Algorithm algorithm, vector<int> &answers);
+void solve_lca(LcaTestCase &tc, Algorithm algorithm, vector<int> &answers);
 
 int main(int argc, char *argv[]) {
   std::ios_base::sync_with_stdio(false);
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     algorithm = cuda_inlabel_algorithm;
   }
 
-  TestCase tc = input_file == NULL ? readFromStdIn() : readFromFile(is_binary_input, input_file);
+  LcaTestCase tc = input_file == NULL ? readFromStdIn() : readFromFile(is_binary_input, input_file);
 
   if (is_verbose)
     cerr << "N: " << tc.tree.V << endl
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void solve_lca(TestCase &tc, Algorithm algorithm, vector<int> &answers) {
+void solve_lca(LcaTestCase &tc, Algorithm algorithm, vector<int> &answers) {
   mgpu::standard_context_t context(0);
 
   int *cuda_parents, *cuda_queries, *cuda_answers;

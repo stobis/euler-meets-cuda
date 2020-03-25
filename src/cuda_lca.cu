@@ -214,7 +214,7 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
 
   context.synchronize();
 
-  timer.setPrefix("Queries");
+  timer.setPrefix("LcaQueries");
 
   // TODO/TOREMOVE
   int batchSize = Q;
@@ -326,7 +326,7 @@ void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *a
   CudaSimpleListRank(devDepth, N, devNext, context);
   context.synchronize();
 
-  timer.setPrefix("Queries");
+  timer.setPrefix("LcaQueries");
 
   blockPerGridX = (Q + threadsPerBlockX - 1) / threadsPerBlockX;
 
