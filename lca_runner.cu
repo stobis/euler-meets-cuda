@@ -1,12 +1,9 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "lca/cuda_algorithms.h"
-#include "lca/commons.h"
-#include "lca/cuda_commons.h"
-#include "lca/cpu_lca_inlabel.h"
-#include "lca/cpu_lca_rmq.h"
-#include "lca/cpu_lca_simple.h"
+#include "commons.h"
+#include "cuda_commons.h"
+#include "euler_lca.h"
 
 #include <moderngpu/context.hxx>
 #include <moderngpu/memory.hxx>
@@ -19,8 +16,7 @@ const char *help_msg = "Command line arguments\n \
   -o $output -- sets output file to $output\n \
   -a [cuda-inlabel, cuda-naive, cpu-inlabel, cpu-rmq, cpu-simple] -- chooses algorithm to run\n";
 
-enum Algorithm
-{
+enum Algorithm {
   unspecified,
   cuda_inlabel_algorithm,
   cuda_naive_algorithm,
@@ -32,8 +28,7 @@ bool is_cuda_algorithm(Algorithm alg);
 
 void solve_lca(TestCase &tc, Algorithm algorithm, vector<int> &answers);
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   std::ios_base::sync_with_stdio(false);
 
   char opt;
@@ -42,10 +37,8 @@ int main(int argc, char *argv[])
   Algorithm algorithm = unspecified;
   bool is_verbose = false;
 
-  while ((opt = getopt(argc, argv, "hbi:o:a:v")) != EOF)
-  {
-    switch (opt)
-    {
+  while ((opt = getopt(argc, argv, "hbi:o:a:v")) != EOF) {
+    switch (opt) {
     case 'h':
       cerr << help_msg << endl;
       exit(0);
@@ -73,8 +66,7 @@ int main(int argc, char *argv[])
         algorithm = cpu_rmq_algorithm;
       else if (strcmp(optarg, "cpu-simple") == 0)
         algorithm = cpu_simple_algorithm;
-      else
-      {
+      else {
         cerr << "Unrecognized algorithm to use\n";
         exit(1);
       }
@@ -86,13 +78,13 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (algorithm == unspecified)
-  {
+  if (algorithm == unspecified) {
     cerr << "No algorithm specified, using cuda-inlabel" << endl;
     algorithm = cuda_inlabel_algorithm;
   }
 
-  TestCase tc = input_file == NULL ? readFromStdIn() : readFromFile(is_binary_input, input_file);
+  TestCase tc = input_file == NULL ? readFromStdIn()
+                                   : readFromFile(is_binary_input, input_file);
 
   if (is_verbose)
     cerr << "N: " << tc.tree.V << endl
@@ -104,70 +96,69 @@ int main(int argc, char *argv[])
 
   solve_lca(tc, algorithm, answers);
 
-  if (output_file != NULL)
-  {
+  if (output_file != NULL) {
     writeAnswersToFile(is_binary_input, tc.q.N, answers.data(), output_file);
-  }
-  else
-  {
+  } else {
     writeAnswersToStdOut(tc.q.N, answers.data());
   }
 
   return 0;
 }
 
-void solve_lca(TestCase &tc, Algorithm algorithm, vector<int> &answers)
-{
+void solve_lca(TestCase &tc, Algorithm algorithm, vector<int> &answers) {
   mgpu::standard_context_t context(0);
 
   int *cuda_parents, *cuda_queries, *cuda_answers;
 
-  if (is_cuda_algorithm(algorithm))
-  {
+  if (is_cuda_algorithm(algorithm)) {
     CUCHECK(cudaMalloc((void **)&cuda_parents, sizeof(int) * tc.tree.V));
-    CUCHECK(cudaMemcpy(cuda_parents, tc.tree.father.data(), sizeof(int) * tc.tree.V, cudaMemcpyHostToDevice));
+    CUCHECK(cudaMemcpy(cuda_parents, tc.tree.father.data(),
+                       sizeof(int) * tc.tree.V, cudaMemcpyHostToDevice));
 
     CUCHECK(cudaMalloc((void **)&cuda_queries, sizeof(int) * tc.q.N * 2));
-    CUCHECK(cudaMemcpy(cuda_queries, tc.q.tab.data(), sizeof(int) * tc.q.N * 2, cudaMemcpyHostToDevice));
+    CUCHECK(cudaMemcpy(cuda_queries, tc.q.tab.data(), sizeof(int) * tc.q.N * 2,
+                       cudaMemcpyHostToDevice));
 
     CUCHECK(cudaMalloc((void **)&cuda_answers, sizeof(int) * tc.q.N));
   }
 
-  switch (algorithm)
-  {
+  switch (algorithm) {
   case cuda_inlabel_algorithm:
-    cuda_lca_inlabel(tc.tree.V, cuda_parents, tc.q.N, cuda_queries, cuda_answers, context);
+    cuda_lca_inlabel(tc.tree.V, cuda_parents, tc.q.N, cuda_queries,
+                     cuda_answers, context);
     break;
   case cuda_naive_algorithm:
-    cuda_lca_naive(tc.tree.V, cuda_parents, tc.q.N, cuda_queries, cuda_answers, context);
+    cuda_lca_naive(tc.tree.V, cuda_parents, tc.q.N, cuda_queries, cuda_answers,
+                   context);
     break;
   case cpu_inlabel_algorithm:
-    cpu_lca_inlabel(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(), answers.data());
+    cpu_lca_inlabel(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(),
+                    answers.data());
     break;
   case cpu_rmq_algorithm:
-    cpu_lca_rmq(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(), answers.data());
+    cpu_lca_rmq(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(),
+                answers.data());
     break;
   case cpu_simple_algorithm:
-    cpu_lca_simple(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(), answers.data());
+    cpu_lca_simple(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(),
+                   answers.data());
     break;
 
   default:
-    //Should not happen
+    // Should not happen
     cerr << "Bad algorithm specified" << endl;
     exit(1);
     break;
   }
 
-  if (is_cuda_algorithm(algorithm))
-  {
-    CUCHECK(cudaMemcpy(answers.data(), cuda_answers, sizeof(int) * tc.q.N, cudaMemcpyDeviceToHost));
+  if (is_cuda_algorithm(algorithm)) {
+    CUCHECK(cudaMemcpy(answers.data(), cuda_answers, sizeof(int) * tc.q.N,
+                       cudaMemcpyDeviceToHost));
   }
 }
 
-bool is_cuda_algorithm(Algorithm alg)
-{
-  switch (alg)
-  {
+bool is_cuda_algorithm(Algorithm alg) {
+  switch (alg) {
   case cuda_inlabel_algorithm:
   case cuda_naive_algorithm:
     return true;

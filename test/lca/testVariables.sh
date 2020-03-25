@@ -28,11 +28,11 @@ validityTestsSizes=(
     9000
     100000
     500000
-    1000000
-    2000000
-    3000000
-    4000000
-    10000000
+    # 1000000
+    # 2000000
+    # 3000000
+    # 4000000
+    # 10000000
 )
 validityGraspSize=-1
 validityOutGeneratorAlgorithm="cpu-rmq"

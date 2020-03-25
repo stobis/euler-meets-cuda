@@ -2,8 +2,7 @@
 #include <iostream>
 #include <moderngpu/transform.hxx>
 
-#include "lca/cuda_commons.h"
-#include "commons/cuda_list_rank.h"
+#include "cuda_commons.h"
 
 using namespace std;
 using namespace mgpu;

@@ -4,11 +4,11 @@
 #include <moderngpu/kernel_scan.hxx>
 #include <moderngpu/transform.hxx>
 
+#include "commons.h"
 #include "commons/commons.h"
 #include "commons/cuda_euler_tour.h"
 #include "commons/cuda_list_rank.h"
-#include "lca/commons.h"
-#include "lca/cuda_commons.h"
+#include "cuda_commons.h"
 
 #define ll long long
 
@@ -27,7 +27,7 @@ inline __device__ int CudaGetEdgeCode(int a, bool toFather);
 inline __device__ bool isEdgeToFather(int edgeCode);
 
 void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries,
-                      int *answers, mgpu::context_t &context, Logger &logger) {
+                      int *answers, mgpu::context_t &context) {
   Timer timer("Parse Input");
   int root = 0;
 

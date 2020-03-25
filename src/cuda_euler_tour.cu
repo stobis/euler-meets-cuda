@@ -4,7 +4,7 @@
 #include <moderngpu/kernel_scan.hxx>
 #include <moderngpu/transform.hxx>
 
-#include "lca/cuda_commons.h"
+#include "cuda_commons.h"
 #include "commons/cuda_euler_tour.h"
 #include "commons/cuda_list_rank.h"
 

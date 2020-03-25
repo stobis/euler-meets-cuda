@@ -26,6 +26,8 @@ NVCCFLAGS=-arch $(NVCCSM) -O2 -std=c++11 --expt-extended-lambda -w $(NVCCINC)
 LDFLAGS=-L/usr/local/cuda/lib64 -lcudart
 
 OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard *.cpp)) \
+	$(patsubst %.cpp, obj/%.o, $(wildcard src/*.cpp)) \
+	$(patsubst %.cu, obj/%.o, $(wildcard src/*.cu)) \
 	$(patsubst %.cpp, obj/%.o, $(wildcard src/**/*.cpp)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard src/**/*.cu)) \
 	$(patsubst %.cu, obj/%.o, $(wildcard 3rdparty/GpuConnectedComponents/*.cu)) \
@@ -34,9 +36,8 @@ OBJFILES=$(patsubst %.cpp, obj/%.o, $(wildcard *.cpp)) \
 # $(info $(OBJFILES))
 
 # Targets
-all: runner lca_runner bridges_runner
+all: lca_runner bridges_runner
 
-runner: runner.e
 bridges_runner: bridges_runner.e
 lca_runner: lca_runner.e
 
@@ -44,9 +45,6 @@ bridges_test:
 	cd test/bridges && $(MAKE)
 
 remake: clean all
-
-runner.e: $(OBJFILES) obj/runner.o
-	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 bridges_runner.e: obj/bridges_runner.o $(OBJFILES)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
