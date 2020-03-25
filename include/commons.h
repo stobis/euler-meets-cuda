@@ -4,10 +4,8 @@
 
 using namespace std;
 
-namespace lca
-{
-struct Timer
-{
+namespace lca {
+struct Timer {
   Timer(string prefix);
   void setPrefix(string prefix);
   void measureTime(string msg = "");
@@ -24,8 +22,7 @@ private:
 
 using namespace lca;
 
-struct ParentsTree
-{
+struct ParentsTree {
   int V;
   int root;
   vector<int> father;
@@ -37,8 +34,7 @@ struct ParentsTree
   void writeToStream(ofstream &out);
 };
 
-struct Queries
-{
+struct Queries {
   int N;
   vector<int> tab;
 
@@ -49,8 +45,7 @@ struct Queries
   void writeToStream(ofstream &out);
 };
 
-struct TestCase
-{
+struct TestCase {
   ParentsTree tree;
   Queries q;
 

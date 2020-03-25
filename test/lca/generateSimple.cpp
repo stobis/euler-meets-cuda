@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <iostream>
-#include "lca/commons.h"
+#include "commons.h"
 
 using namespace std;
 

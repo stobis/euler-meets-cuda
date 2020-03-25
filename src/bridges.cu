@@ -11,7 +11,7 @@ using namespace std;
 #include <moderngpu/kernel_segreduce.hxx>
 using namespace mgpu;
 
-#include "commons/cuda_euler_tour.h"
+#include "euler_lca.h"
 #include "bfs.h"
 #include "spanning_tree.h"
 #include "timer.hpp"
