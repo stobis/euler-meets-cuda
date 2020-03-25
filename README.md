@@ -18,3 +18,14 @@ With export to csv:
     ...
     ./run_and_export.sh [naive|tarjan|hybrid] [output] # algorithm must be specified for now
 ```
+
+## Lca
+To run tests checking correctness of algorithms
+```shell
+    ./lca_test.sh -c
+```
+
+To run timed tests and export times (WIP)
+```shell
+    ./lca_test.sh -t
+```
