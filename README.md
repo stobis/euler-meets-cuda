@@ -29,3 +29,4 @@ To run timed tests and export times (WIP)
 ```shell
     ./lca_test.sh -t
 ```
+Results will be saved to ```test/lca/resultTimes```.
