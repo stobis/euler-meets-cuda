@@ -1,8 +1,6 @@
-
 #ifndef EMC_LCA_H_
 #define EMC_LCA_H_
 
-#include "commons/commons.h"
 #include <moderngpu/context.hxx>
 
 // [cuda,cpu]_lca_*:

@@ -9,16 +9,11 @@ using namespace std;
 // CPU LCA INLABEL
 
 void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers) {
-  Timer timer("Parse Input");
-
   int root = 0;
   for (int i = 0; i < N; i++) {
     if (parents[i] == -1)
       root = i;
   }
-
-  timer.measureTime();
-  timer.setPrefix("Preprocessing");
 
   vector<int> child(N, -1), neighbour(N, -1);
 
@@ -61,9 +56,6 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
     }
   }
 
-  timer.measureTime();
-  timer.setPrefix("LcaQueries");
-
   for (int i = 0; i < Q; i++) {
     int x = queries[2 * i];
     int y = queries[2 * i + 1];
@@ -86,8 +78,6 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
     }
     answers[i] = level[x] <= level[y] ? x : y;
   }
-
-  timer.measureTime(Q);
 }
 
 // CPU LCA RMQ
@@ -97,16 +87,11 @@ void dfsRmq(int starting, vector<int> son, vector<int> neighbour, int *dfsEulerP
 int rmqMin(int p, int q, int size, int *rmqTab);
 
 void cpu_lca_rmq(int N, const int *parents, int Q, const int *queries, int *answers) {
-  Timer timer("Parse Input");
-
   int root = 0;
   for (int i = 0; i < N; i++) {
     if (parents[i] == -1)
       root = i;
   }
-
-  timer.measureTime();
-  timer.setPrefix("Preprocessing");
 
   int INF = N + 10;
 
@@ -136,8 +121,6 @@ void cpu_lca_rmq(int N, const int *parents, int Q, const int *queries, int *answ
     son[parents[i]] = i;
   }
 
-  timer.measureTime("Allocs");
-
   dfsRmq(root, son, neighbour, dfsEulerPath, rmqPos, preorder, reversePreorder, preCounter, eulerCounter);
 
   for (int i = treePower + rmqTabSize - 1; i < treePower * 2 - 1; i++) {
@@ -147,9 +130,6 @@ void cpu_lca_rmq(int N, const int *parents, int Q, const int *queries, int *answ
   for (int i = treePower - 2; i >= 0; i--) {
     rmqTab[i] = min(rmqTab[i * 2 + 1], rmqTab[i * 2 + 2]);
   }
-
-  timer.measureTime("Dfs");
-  timer.setPrefix("LcaQueries");
 
   for (int i = 0; i < Q; i++) {
     int p = rmqPos[preorder[queries[i * 2]]];
@@ -165,8 +145,6 @@ void cpu_lca_rmq(int N, const int *parents, int Q, const int *queries, int *answ
   delete[] preorder;
   delete[] reversePreorder;
   delete[] rmqPos;
-
-  timer.measureTime(Q);
 }
 void dfsRmq(int starting, vector<int> son, vector<int> neighbour, int *dfsEulerPath, int *rmqPos,
             int *preorder, int *reversePreorder, int &preCounter, int &eulerCounter) {
@@ -225,7 +203,6 @@ int rmqMin(int p, int q, int size, int *rmqTab) {
 
 void dfs(int i, vector<int> *G, int *depth);
 void cpu_lca_simple(int N, const int *parents, int Q, const int *queries, int *answers) {
-  Timer timer("Parse Input");
 
   int root = 0;
   for (int i = 0; i < N; i++) {
@@ -248,9 +225,6 @@ void cpu_lca_simple(int N, const int *parents, int Q, const int *queries, int *a
   depth[root] = 0;
   dfs(root, G, depth);
 
-  timer.measureTime();
-  timer.setPrefix("LcaQueries");
-
   for (int i = 0; i < Q; i++) {
     int p = queries[i * 2];
     int q = queries[i * 2 + 1];
@@ -272,8 +246,6 @@ void cpu_lca_simple(int N, const int *parents, int Q, const int *queries, int *a
   delete[] G;
   delete[] depth;
   delete[] father;
-
-  timer.measureTime(Q);
 }
 
 void dfs(int i, vector<int> *G, int *depth) {

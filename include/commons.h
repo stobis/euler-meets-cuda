@@ -4,24 +4,6 @@
 
 using namespace std;
 
-namespace lca {
-struct Timer {
-  Timer(string prefix);
-  void setPrefix(string prefix);
-  void measureTime(string msg = "");
-  void measureTime(int i);
-
-private:
-  clock_t prevTime;
-  clock_t prefixTime;
-  string prefix;
-
-  double resetTimer(clock_t &timer);
-};
-} // namespace lca
-
-using namespace lca;
-
 struct LcaParentsTree {
   int V;
   int root;

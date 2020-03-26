@@ -5,7 +5,6 @@
 #include <moderngpu/transform.hxx>
 
 #include "commons.h"
-#include "commons/commons.h"
 #include "cuda_commons.h"
 #include "euler_lca.h"
 
@@ -25,7 +24,6 @@ inline __device__ bool isEdgeToFather(int edgeCode);
 
 void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers,
                       mgpu::context_t &context) {
-  Timer timer("Parse Input");
   int root = 0;
 
   int *devRoot;
@@ -80,8 +78,6 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
       },
       N, context);
   CUCHECK(cudaFree(devEdgeRankFromEulerTour));
-
-  timer.measureTime("List Rank");
 
   int *devSortedEdges;
   int E = N * 2 - 2;
@@ -214,8 +210,6 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
 
   context.synchronize();
 
-  timer.setPrefix("LcaQueries");
-
   // TODO/TOREMOVE
   int batchSize = Q;
 
@@ -276,8 +270,6 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
 
   context.synchronize();
 
-  timer.measureTime(Q);
-  timer.setPrefix("");
 }
 
 #define ll long long
@@ -300,15 +292,11 @@ __device__ int CudaGetEdgeCode(int a, bool toFather) { return a * 2 + toFather; 
 void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *answers,
                     mgpu::context_t &context) {
 
-  Timer timer = Timer("Parse Input");
-
   int *devDepth;
   int *devNext;
 
   CUCHECK(cudaMalloc((void **)&devDepth, sizeof(int) * N));
   CUCHECK(cudaMalloc((void **)&devNext, sizeof(int) * N));
-
-  timer.measureTime("Cuda Allocs");
 
   int threadsPerBlockX = 1024;
   int blockPerGridX = (N + threadsPerBlockX - 1) / threadsPerBlockX;
@@ -321,12 +309,8 @@ void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *a
       N, context);
   context.synchronize();
 
-  timer.measureTime("Copy Input and Init data");
-
   CudaSimpleListRank(devDepth, N, devNext, context);
   context.synchronize();
-
-  timer.setPrefix("LcaQueries");
 
   blockPerGridX = (Q + threadsPerBlockX - 1) / threadsPerBlockX;
 
@@ -359,5 +343,4 @@ void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *a
   CUCHECK(cudaFree(devNext));
 
   context.synchronize();
-  timer.measureTime(Q);
 }

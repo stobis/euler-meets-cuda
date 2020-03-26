@@ -5,38 +5,6 @@
 
 using namespace std;
 
-namespace lca {
-Timer::Timer(string prefix) : prefix(prefix) {
-  prevTime = clock();
-  prefixTime = clock();
-}
-
-void Timer::setPrefix(string prefix) {
-  double time = resetTimer(prefixTime);
-
-  cerr.precision(3);
-  cerr << this->prefix << "," << time << ","
-       << "Whole" << endl;
-
-  this->prefix = prefix;
-}
-void Timer::measureTime(string msg) {
-  double time = resetTimer(prevTime);
-
-  cerr.precision(3);
-  cerr << prefix << "," << time << "," << msg << endl;
-}
-void Timer::measureTime(int i) { measureTime("NumOfQueries:" + to_string(i)); }
-double Timer::resetTimer(clock_t &timer) {
-  clock_t now = clock();
-  double res = double(now - timer) / CLOCKS_PER_SEC;
-
-  timer = now;
-
-  return res;
-}
-} // namespace lca
-
 LcaParentsTree::LcaParentsTree() : V(0), root(0) {}
 LcaParentsTree::LcaParentsTree(int V, int root, const vector<int> &father)
     : V(V), root(root), father(father) {}
