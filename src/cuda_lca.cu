@@ -4,7 +4,7 @@
 #include <moderngpu/kernel_scan.hxx>
 #include <moderngpu/transform.hxx>
 
-#include "commons.h"
+#include "tree.h"
 #include "cuda_commons.h"
 #include "euler_lca.h"
 

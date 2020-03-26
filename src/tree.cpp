@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include "commons.h"
+#include "tree.h"
 
 using namespace std;
 
@@ -107,38 +107,4 @@ void writeAnswersToFile(bool binary, int Q, int *ans, const char *filename) {
     }
     out << endl;
   }
-}
-
-void shuffleFathers(vector<int> &in, vector<int> &out, int &root) {
-  int V = in.size();
-  vector<int> shuffle;
-  for (int i = 0; i < V; i++) {
-    shuffle.push_back(i);
-  }
-  random_shuffle(shuffle.begin(), shuffle.end());
-
-  vector<int> newPos;
-  newPos.resize(V);
-  for (int i = 0; i < V; i++) {
-    newPos[shuffle[i]] = i;
-  }
-
-  out.clear();
-  for (int i = 0; i < V; i++) {
-    if (shuffle[i] == 0) {
-      root = i;
-    }
-    out.push_back(in[shuffle[i]] == -1 ? -1 : newPos[in[shuffle[i]]]);
-  }
-}
-
-int find(int i, vector<int> &boss) {
-  if (boss[i] != i) {
-    boss[i] = find(boss[i], boss);
-  }
-  return boss[i];
-}
-void junion(int a, int b, vector<int> &boss, vector<int> &father) {
-  father[find(a, boss)] = find(b, boss);
-  boss[find(a, boss)] = find(b, boss);
 }

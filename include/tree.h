@@ -38,10 +38,6 @@ struct LcaTestCase {
   void writeToStream(ofstream &out);
 };
 
-int getEdgeCode(int a, bool toFather); // edge father[a]->a or a->father[a]
-int getEdgeStart(LcaParentsTree &tree, int edgeCode);
-int getEdgeEnd(LcaParentsTree &tree, int edgeCode);
-
 void writeToFile(LcaTestCase &tc, const char *filename);
 void writeToStdOut(LcaTestCase &tc);
 LcaTestCase readFromFile(bool isBinary, const char *filename);
@@ -50,8 +46,3 @@ LcaTestCase readFromStdIn();
 
 void writeAnswersToFile(bool binary, int Q, int *ans, const char *filename);
 void writeAnswersToStdOut(int Q, int *ans);
-
-void shuffleFathers(vector<int> &in, vector<int> &out, int &root);
-
-int find(int i, vector<int> &boss);
-void junion(int a, int b, vector<int> &boss, vector<int> &father);

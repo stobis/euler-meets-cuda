@@ -1,7 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "commons.h"
+#include "tree.h"
 #include "cuda_commons.h"
 #include "euler_lca.h"
 

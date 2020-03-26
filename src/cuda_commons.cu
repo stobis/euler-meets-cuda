@@ -1,4 +1,4 @@
-#include "commons.h"
+#include "tree.h"
 #include "cuda_commons.h"
 
 #include <cuda_runtime.h>
