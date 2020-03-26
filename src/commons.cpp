@@ -66,35 +66,15 @@ void LcaQueries::writeToStream(ofstream &out) {
   out.write((char *)tab.data(), sizeof(int) * N * 2);
 }
 
-<<<<<<< HEAD
 LcaTestCase::LcaTestCase() : tree(LcaParentsTree()), q(LcaQueries()) {}
 LcaTestCase::LcaTestCase(const LcaParentsTree &tree, const LcaQueries &q) : tree(tree), q(q) {}
 LcaTestCase::LcaTestCase(ifstream &in) : tree(in), q(in) {}
 void LcaTestCase::writeToStream(ofstream &out) {
-=======
-TestCase::TestCase() : tree(ParentsTree()), q(Queries()) {}
-TestCase::TestCase(const ParentsTree &tree, const Queries &q) : tree(tree), q(q) {}
-TestCase::TestCase(ifstream &in) : tree(in), q(in) {}
-void TestCase::writeToStream(ofstream &out) {
->>>>>>> bridges-cleanup
   tree.writeToStream(out);
   q.writeToStream(out);
 }
 
-<<<<<<< HEAD
 void writeToFile(LcaTestCase &tc, const char *filename) {
-=======
-int getEdgeCode(int a, bool toFather) { return a * 2 + toFather; }
-int getEdgeStart(ParentsTree &tree, int edgeCode) {
-  if (edgeCode % 2)
-    return edgeCode / 2;
-  else
-    return tree.father[edgeCode / 2];
-}
-int getEdgeEnd(ParentsTree &tree, int edgeCode) { return getEdgeStart(tree, edgeCode ^ 1); }
-
-void writeToFile(TestCase &tc, const char *filename) {
->>>>>>> bridges-cleanup
   ofstream out(filename, ios::binary);
   tc.writeToStream(out);
 }
