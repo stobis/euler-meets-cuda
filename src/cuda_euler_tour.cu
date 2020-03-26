@@ -5,8 +5,8 @@
 #include <moderngpu/kernel_scan.hxx>
 #include <moderngpu/transform.hxx>
 
-#include "euler_lca.h"
 #include "cuda_commons.h"
+#include "euler_lca.h"
 
 using namespace std;
 using namespace mgpu;
@@ -138,18 +138,17 @@ void cuda_euler_tour(int N, int root, const int *edges_from_input, const int *ed
 
   transform([=] MGPU_DEVICE(int thid) { index[thid] = thid; }, E, context);
 
-  mergesort(
-      index, E,
-      [=] MGPU_DEVICE(int a, int b) {
-        int fa = edges_from[a];
-        int ta = edges_to[a];
-        int fb = edges_from[b];
-        int tb = edges_to[b];
-        if (fa != fb)
-          return fa < fb;
-        return ta < tb;
-      },
-      context);
+  mergesort(index, E,
+            [=] MGPU_DEVICE(int a, int b) {
+              int fa = edges_from[a];
+              int ta = edges_to[a];
+              int fb = edges_from[b];
+              int tb = edges_to[b];
+              if (fa != fb)
+                return fa < fb;
+              return ta < tb;
+            },
+            context);
 
   int *rev_index;
   CUCHECK(cudaMalloc((void **)&rev_index, sizeof(int) * (E)));

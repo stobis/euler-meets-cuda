@@ -21,18 +21,15 @@ void CudaSimpleListRank(int *devRank, int N, int *devNext, context_t &context) {
   CUCHECK(cudaMalloc((void **)&devRankNext, sizeof(ull) * N));
   CUCHECK(cudaMalloc((void **)&devNotAllDone, sizeof(int)));
 
-  transform(
-      [] MGPU_DEVICE(int thid, ull *devRankNext, const int *devNext) {
-        devRankNext[thid] = (((ull)0) << 32) + devNext[thid] + 1;
-      },
-      N, context, devRankNext, devNext);
+  transform([] MGPU_DEVICE(int thid, ull *devRankNext,
+                           const int *devNext) { devRankNext[thid] = (((ull)0) << 32) + devNext[thid] + 1; },
+            N, context, devRankNext, devNext);
 
   const int loopsWithoutSync = 5;
 
   do {
     transform(
-        [] MGPU_DEVICE(int thid, int loopsWithoutSync, ull *devRankNext,
-                       int *devNotAllDone) {
+        [] MGPU_DEVICE(int thid, int loopsWithoutSync, ull *devRankNext, int *devNotAllDone) {
           ull rankNext = devRankNext[thid];
           for (int i = 0; i < loopsWithoutSync; i++) {
             if (thid == 0)
@@ -59,23 +56,19 @@ void CudaSimpleListRank(int *devRank, int N, int *devNext, context_t &context) {
 
     context.synchronize();
 
-    CUCHECK(cudaMemcpy(notAllDone, devNotAllDone, sizeof(int),
-                       cudaMemcpyDeviceToHost));
+    CUCHECK(cudaMemcpy(notAllDone, devNotAllDone, sizeof(int), cudaMemcpyDeviceToHost));
   } while (*notAllDone);
 
-  transform(
-      [] MGPU_DEVICE(int thid, const ull *devRankNext, int *devRank) {
-        devRank[thid] = devRankNext[thid] >> 32;
-      },
-      N, context, devRankNext, devRank);
+  transform([] MGPU_DEVICE(int thid, const ull *devRankNext,
+                           int *devRank) { devRank[thid] = devRankNext[thid] >> 32; },
+            N, context, devRankNext, devRank);
 
   cudaFree(notAllDone);
   cudaFree(devRankNext);
   CUCHECK(cudaFree(devNotAllDone));
 }
 
-void CudaAssert(cudaError_t error, const char *code, const char *file,
-                int line) {
+void CudaAssert(cudaError_t error, const char *code, const char *file, int line) {
   if (error != cudaSuccess) {
     cerr << "Cuda error :" << code << ", " << file << ":" << error << endl;
     exit(1);
