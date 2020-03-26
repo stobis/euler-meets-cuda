@@ -4,9 +4,9 @@
 #include <moderngpu/kernel_scan.hxx>
 #include <moderngpu/transform.hxx>
 
-#include "tree.h"
-#include "cuda_commons.h"
+#include "utils.h"
 #include "euler_lca.h"
+#include "tree.h"
 
 #define ll long long
 
@@ -269,13 +269,72 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
   }
 
   context.synchronize();
-
 }
 
+// CUDA LCA NAIVE
+
 #define ll long long
+#define ull unsigned long long
 ll CudaPackEdge(int from, int to) { return (((ll)from) << 32) + to; }
 int CudaUnpackEdgeFrom(ll edge) { return edge >> 32; }
 int CudaUnpackEdgeTo(ll edge) { return edge & ((1 << 32) - 1); }
+
+void CudaSimpleListRank(int *devRank, int N, int *devNext, context_t &context) {
+  int *notAllDone;
+  cudaMallocHost(&notAllDone, sizeof(int));
+
+  ull *devRankNext;
+  int *devNotAllDone;
+
+  CUCHECK(cudaMalloc((void **)&devRankNext, sizeof(ull) * N));
+  CUCHECK(cudaMalloc((void **)&devNotAllDone, sizeof(int)));
+
+  transform([] MGPU_DEVICE(int thid, ull *devRankNext,
+                           const int *devNext) { devRankNext[thid] = (((ull)0) << 32) + devNext[thid] + 1; },
+            N, context, devRankNext, devNext);
+
+  const int loopsWithoutSync = 5;
+
+  do {
+    transform(
+        [] MGPU_DEVICE(int thid, int loopsWithoutSync, ull *devRankNext, int *devNotAllDone) {
+          ull rankNext = devRankNext[thid];
+          for (int i = 0; i < loopsWithoutSync; i++) {
+            if (thid == 0)
+              *devNotAllDone = 0;
+
+            int rank = rankNext >> 32;
+            int nxt = rankNext - 1;
+
+            if (nxt != -1) {
+              ull grandNext = devRankNext[nxt];
+
+              rank += (grandNext >> 32) + 1;
+              nxt = grandNext - 1;
+
+              rankNext = (((ull)rank) << 32) + nxt + 1;
+              atomicExch(devRankNext + thid, rankNext);
+
+              if (i == loopsWithoutSync - 1)
+                *devNotAllDone = 1;
+            }
+          }
+        },
+        N, context, loopsWithoutSync, devRankNext, devNotAllDone);
+
+    context.synchronize();
+
+    CUCHECK(cudaMemcpy(notAllDone, devNotAllDone, sizeof(int), cudaMemcpyDeviceToHost));
+  } while (*notAllDone);
+
+  transform([] MGPU_DEVICE(int thid, const ull *devRankNext,
+                           int *devRank) { devRank[thid] = devRankNext[thid] >> 32; },
+            N, context, devRankNext, devRank);
+
+  cudaFree(notAllDone);
+  cudaFree(devRankNext);
+  CUCHECK(cudaFree(devNotAllDone));
+}
 
 __device__ int CudaGetEdgeStart(const int *__restrict__ father, int edgeCode) {
   if (edgeCode % 2)

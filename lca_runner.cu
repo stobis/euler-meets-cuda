@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 #include "tree.h"
-#include "cuda_commons.h"
+#include "utils.h"
 #include "euler_lca.h"
 
 #include <moderngpu/context.hxx>

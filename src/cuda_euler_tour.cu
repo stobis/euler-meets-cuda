@@ -5,7 +5,7 @@
 #include <moderngpu/kernel_scan.hxx>
 #include <moderngpu/transform.hxx>
 
-#include "cuda_commons.h"
+#include "utils.h"
 #include "euler_lca.h"
 
 using namespace std;

@@ -13,8 +13,10 @@ using namespace mgpu;
 
 #define dbg 0
 #define detailed_time true
+#define CUCHECK(x) CudaAssert(x, #x, __FILE__, __LINE__)
 
 typedef long long ll;
+typedef unsigned long long ull;
 
 namespace {
 template <typename T> void print_device_mem(mem_t<T> &device_mem) {
@@ -56,6 +58,37 @@ void _csr_to_list(int N, int M, const int *row_offsets, int *row_indices, mgpu::
 
   scan<scan_type_inc>(row_indices, M, row_indices, context);
 }
+
+void CudaAssert(cudaError_t error, const char *code, const char *file, int line) {
+  if (error != cudaSuccess) {
+    cerr << "Cuda error :" << code << ", " << file << ":" << error << endl;
+    exit(1);
+  }
 }
+
+void CudaPrintTab(const int *tab, int size) {
+  int *tmp = (int *)malloc(sizeof(int) * size);
+  CUCHECK(cudaMemcpy(tmp, tab, sizeof(int) * size, cudaMemcpyDeviceToHost));
+
+  for (int i = 0; i < size; i++) {
+    cerr << (tmp[i] < 10 && tmp[i] >= 0 ? " " : "") << tmp[i] << " ";
+  }
+  cerr << endl;
+
+  free(tmp);
+}
+
+void CudaPrintTab(const ull *tab, int size) {
+  ull *tmp = (ull *)malloc(sizeof(ull) * size);
+  CUCHECK(cudaMemcpy(tmp, tab, sizeof(ull) * size, cudaMemcpyDeviceToHost));
+
+  for (int i = 0; i < size; i++) {
+    cerr << (tmp[i] < 10 && tmp[i] >= 0 ? " " : "") << tmp[i] << " ";
+  }
+  cerr << endl;
+
+  free(tmp);
+}
+} // namespace
 
 #endif // GPUTILS_CUH
