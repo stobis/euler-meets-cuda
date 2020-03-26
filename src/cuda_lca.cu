@@ -5,7 +5,8 @@
 #include <moderngpu/transform.hxx>
 
 #include "utils.h"
-#include "euler_lca.h"
+#include "lca.h"
+#include "euler.h"
 #include "tree.h"
 
 #define ll long long

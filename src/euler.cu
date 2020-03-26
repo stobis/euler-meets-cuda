@@ -6,7 +6,7 @@
 #include <moderngpu/transform.hxx>
 
 #include "utils.h"
-#include "euler_lca.h"
+#include "euler.h"
 
 using namespace std;
 using namespace mgpu;

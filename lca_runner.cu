@@ -3,7 +3,7 @@
 
 #include "tree.h"
 #include "utils.h"
-#include "euler_lca.h"
+#include "lca.h"
 
 #include <moderngpu/context.hxx>
 #include <moderngpu/memory.hxx>

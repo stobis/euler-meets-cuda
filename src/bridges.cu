@@ -12,7 +12,7 @@ using namespace std;
 using namespace mgpu;
 
 #include "bfs.h"
-#include "euler_lca.h"
+#include "euler.h"
 #include "spanning_tree.h"
 #include "timer.hpp"
 #include "utils.h"
