@@ -3,13 +3,12 @@ OPTIND=1  # Reset in case getopts has been used previously in the shell.
 testDirectory="test/lca"
 
 __help="
-Usage: lca_test.sh [-h | -c | -t | -v]
+Usage: lca_test.sh [-h | -c | -t ]
 
 Options:
   -h      Show this help and exit
   -c      Check all algorithms. Runs all algorithms on a set of tests and checks if all outputs are same
   -t      Run timed tests
-  -v      Verbose
 "
 
 verbose=0
@@ -21,8 +20,6 @@ while getopts "hvtc" opt; do
     h)
         echo "$__help"
         exit 0
-        ;;
-    v)  verbose=1
         ;;
     c)  run_check=1
         ;;

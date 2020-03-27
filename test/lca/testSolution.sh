@@ -6,18 +6,23 @@ mkdir -p $validityTestsDir
 
 echo "Generating Tests"
 for size in ${validityTestsSizes[@]}; do
-    genTest $validityTestsDir $validityTestsEncoding $size $size $validityGraspSize 1
+    genTest $validityTestsDir b $size $size $validityGraspSize 1
 done
 echo
 
 echo "Generating Answers"
 mkdir -p $validityAnswersDir
-for test in $validityTestsDir/*.$validityTestsEncoding.in; do
+for test in $validityTestsDir/*.b.in; do
     testName=$(basename $test)
     outName=$validityAnswersDir/$testName.out
     if [ ! -f $outName ]; then
         echo "Generating $outName"
-        $runnerPath -$validityTestsEncoding -i $test -o $outName -a $validityOutGeneratorAlgorithm 2>/dev/null
+        $runnerPath -i $test -o $outName -a $validityOutGeneratorAlgorithm 2>/dev/null
+
+        if [ ! -s $outName ]; then
+            echo "Error generating answers! $outName is empty!"
+            exit 1
+        fi
     fi
     echo "$outName generated."
 done
@@ -26,7 +31,7 @@ echo
 for algorithm in ${validitySolutionsToTest[@]}; do
     echo "Testing $algorithm"
 
-    for test in $validityTestsDir/*.$validityTestsEncoding.in; do
+    for test in $validityTestsDir/*.b.in; do
         testName=$(basename $test)
         outName=$validityAnswersDir/$testName.out
 
@@ -34,7 +39,7 @@ for algorithm in ${validitySolutionsToTest[@]}; do
 
         # ./$validitySolutionToTest.e $test $validityAnswersDir/out 
         # ./$validitySolutionToTest.e $test $validityAnswersDir/out 2>/dev/null
-        $runnerPath -$validityTestsEncoding -i $test -o $validityAnswersDir/outTmp.out 2>/dev/null -a $algorithm
+        $runnerPath -i $test -o $validityAnswersDir/outTmp.out 2>/dev/null >/dev/null -a $algorithm
 
         if diff $validityAnswersDir/outTmp.out $outName >/dev/null; then
             echo -e "\t\tOK"

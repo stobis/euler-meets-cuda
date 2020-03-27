@@ -14,17 +14,17 @@ for T in ${testsToRun[@]}; do
     _numOfSeeds=E${T}DifferentSeeds
     for size in ${_testSizes[@]}; do
         for graspSize in ${_graspSizes}; do
-            genTest ${!_testsDir} $timedTestsEncoding $size $size $graspSize ${!_numOfSeeds}
+            genTest ${!_testsDir} b $size $size $graspSize ${!_numOfSeeds}
         done
     done
 
     _resultsDir=E${T}ResultsDir
-    mkdir -p ${!_resultsDir}
+    mkdir -p ${!_resultsDir} 
 
     eval _solutionsToTest=( '"${E'${T}'SolutionsToTest[@]}"' )
     for solution in ${_solutionsToTest[@]}; do
         echo "Testing $solution"
-        for test in ${!_testsDir}/*.$timedTestsEncoding.in; do
+        for test in ${!_testsDir}/*.b.in; do
             testName=$(basename $test)
             testOutName=$(echo $testName | sed 's/s[0-9][0-9]*.//g') 
             outName=${!_resultsDir}/$solution\$${testOutName::-5}\$$(date '+%Y-%m-%d-%H-%M-%S' -d @$(stat -c %Y $runnerPath)).out
@@ -32,7 +32,7 @@ for T in ${testsToRun[@]}; do
             echo -e "\tRunning $(basename $outName)"
 
             touch $outName
-            timeout $singleRunTimeout $runnerPath -$timedTestsEncoding -i $test -o /dev/null -a $solution 2>>$outName
+            timeout $singleRunTimeout $runnerPath -i $test -o /dev/null -a $solution >>$outName
             echo "" >>$outName
         done
     done

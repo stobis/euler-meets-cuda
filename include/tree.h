@@ -42,7 +42,7 @@ void writeToFile(LcaTestCase &tc, const char *filename);
 void writeToStdOut(LcaTestCase &tc);
 LcaTestCase readFromFile(const char *filename);
 LcaTestCase readFromStream(istream &inputStream);
-LcaTestCase readFromStdIn();
+LcaTestCase readFromStdIn(); 
 
 void writeAnswersToFile(int Q, int *ans, const char *filename);
 void writeAnswersToStdOut(int Q, int *ans);

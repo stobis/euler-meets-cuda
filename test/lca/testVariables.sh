@@ -11,8 +11,6 @@ validityTestsDir=$testsDir/validity
 validityAnswersDir=$testsDir/validityOut
 
 # Encoding of tests - b for binary, t for text
-validityTestsEncoding=b
-# validityTestsEncoding=t
 
 validityTestsSizes=(
     5
@@ -48,8 +46,6 @@ validitySolutionsToTest=(
 generateAnswers=true
 repeatSingleTest=10
 progressBarWidth=50
-timedTestsEncoding=b
-# timedTestsEncoding=t
 
 testsToRun=(
     1
@@ -58,7 +54,7 @@ testsToRun=(
 
 E1SolutionsToTest=(
     "cuda-inlabel"
-    "cuda-simple"
+    "cuda-naive"
     "cpu-rmq"
     "cpu-inlabel"
 )
@@ -106,8 +102,8 @@ E2DifferentSeeds=2
 # )
 
 E3SolutionsToTest=(
-    "cudaInlabelLCA"
-    "cudaSimpleLCA"
+    "cuda-inlabel"
+    "cuda-naive"
     # "cpuInlabelLCA"
 )
 E3TestsDir=$testsDir/E3
