@@ -14,8 +14,8 @@ do
     if [ "$1" != "" ]; then
         $EXEC $1 $f
     else
-        $EXEC naive $f
-        $EXEC tarjan $f
-        $EXEC hybrid $f
+        $EXEC -a naive -i $f
+        $EXEC -a tarjan -i $f
+        $EXEC -a hybrid -i $f
     fi
 done

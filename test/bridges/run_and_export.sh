@@ -25,7 +25,7 @@ do
         name="${VARIANTS[$ix]}"
         echo $name
         tmpf="$name.tmp.txt"
-        $EXEC $name $f >> $tmpf
+        $EXEC -a $name -i $f >> $tmpf
     done
 done
 
