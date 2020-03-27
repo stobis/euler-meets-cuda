@@ -11,11 +11,10 @@ Options:
   -t      Run timed tests
 "
 
-verbose=0
 run_check=0
 run_time=0
 
-while getopts "hvtc" opt; do
+while getopts "htc" opt; do
     case "$opt" in
     h)
         echo "$__help"
