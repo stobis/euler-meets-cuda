@@ -91,15 +91,7 @@ void writeAnswersToStdOut(int Q, int *ans) {
     cout << ans[i] << endl;
   }
 }
-void writeAnswersToFile(bool binary, int Q, int *ans, const char *filename) {
-  if (binary) {
-    ofstream out(filename, ios::binary);
-    out.write((char *)ans, sizeof(int) * Q);
-  } else {
-    ofstream out(filename);
-    for (int i = 0; i < Q; i++) {
-      out << ans[i] << " ";
-    }
-    out << endl;
-  }
+void writeAnswersToFile(int Q, int *ans, const char *filename) {
+  ofstream out(filename, ios::binary);
+  out.write((char *)ans, sizeof(int) * Q);
 }

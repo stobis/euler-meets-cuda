@@ -44,5 +44,5 @@ LcaTestCase readFromFile(const char *filename);
 LcaTestCase readFromStream(istream &inputStream);
 LcaTestCase readFromStdIn();
 
-void writeAnswersToFile(bool binary, int Q, int *ans, const char *filename);
+void writeAnswersToFile(int Q, int *ans, const char *filename);
 void writeAnswersToStdOut(int Q, int *ans);

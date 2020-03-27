@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 
   // Print Output
   if (output_file != NULL) {
-    writeAnswersToFile(is_binary_input, tc.q.N, answers.data(), output_file);
+    writeAnswersToFile(tc.q.N, answers.data(), output_file);
   } else {
     writeAnswersToStdOut(tc.q.N, answers.data());
   }
