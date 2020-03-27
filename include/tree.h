@@ -40,7 +40,7 @@ struct LcaTestCase {
 
 void writeToFile(LcaTestCase &tc, const char *filename);
 void writeToStdOut(LcaTestCase &tc);
-LcaTestCase readFromFile(bool isBinary, const char *filename);
+LcaTestCase readFromFile(const char *filename);
 LcaTestCase readFromStream(istream &inputStream);
 LcaTestCase readFromStdIn();
 

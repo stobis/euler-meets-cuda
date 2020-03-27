@@ -61,14 +61,9 @@ void writeToStdOut(LcaTestCase &tc) {
   cout << endl;
 }
 
-LcaTestCase readFromFile(bool isBinary, const char *filename) {
-  if (isBinary) {
-    ifstream in(filename, ios::binary);
-    return LcaTestCase(in);
-  } else {
-    ifstream in(filename);
-    return readFromStream(in);
-  }
+LcaTestCase readFromFile(const char *filename) {
+  ifstream in(filename, ios::binary);
+  return LcaTestCase(in);
 }
 LcaTestCase readFromStream(istream &inputStream) {
   LcaParentsTree tree;
