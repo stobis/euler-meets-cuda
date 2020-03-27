@@ -3,11 +3,13 @@
 #include <moderngpu/kernel_mergesort.hxx>
 #include <moderngpu/kernel_scan.hxx>
 #include <moderngpu/transform.hxx>
+#include <string>
 
-#include "utils.h"
-#include "lca.h"
 #include "euler.h"
+#include "lca.h"
+#include "timer.hpp"
 #include "tree.h"
+#include "utils.h"
 
 #define ll long long
 
@@ -25,6 +27,8 @@ inline __device__ bool isEdgeToFather(int edgeCode);
 
 void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers,
                       mgpu::context_t &context) {
+  Timer timer("CUDA Inlabel");
+
   int root = 0;
 
   int *devRoot;
@@ -210,6 +214,7 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
       N, context);
 
   context.synchronize();
+  timer.print_and_restart("Preprocessing");
 
   // TODO/TOREMOVE
   int batchSize = Q;
@@ -270,6 +275,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
   }
 
   context.synchronize();
+  timer.print_and_restart(to_string(Q) + " Queries");
+  timer.print_overall();
 }
 
 // CUDA LCA NAIVE
@@ -351,15 +358,13 @@ __device__ int CudaGetEdgeCode(int a, bool toFather) { return a * 2 + toFather; 
 
 void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *answers,
                     mgpu::context_t &context) {
+  Timer timer("CUDA Naive");
 
   int *devDepth;
   int *devNext;
 
   CUCHECK(cudaMalloc((void **)&devDepth, sizeof(int) * N));
   CUCHECK(cudaMalloc((void **)&devNext, sizeof(int) * N));
-
-  int threadsPerBlockX = 1024;
-  int blockPerGridX = (N + threadsPerBlockX - 1) / threadsPerBlockX;
 
   transform(
       [=] MGPU_DEVICE(int thid) {
@@ -372,7 +377,7 @@ void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *a
   CudaSimpleListRank(devDepth, N, devNext, context);
   context.synchronize();
 
-  blockPerGridX = (Q + threadsPerBlockX - 1) / threadsPerBlockX;
+  timer.print_and_restart("Preprocessing");
 
   transform(
       [=] MGPU_DEVICE(int thid) {
@@ -397,10 +402,11 @@ void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *a
         answers[thid] = p;
       },
       Q, context);
-  CUCHECK(cudaDeviceSynchronize());
+  context.synchronize();
 
   CUCHECK(cudaFree(devDepth));
   CUCHECK(cudaFree(devNext));
 
-  context.synchronize();
+  timer.print_and_restart(to_string(Q) + " Queries");
+  timer.print_overall();
 }

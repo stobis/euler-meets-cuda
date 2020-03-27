@@ -1,14 +1,18 @@
+#include "timer.hpp"
 #include "tree.h"
 #include <functional>
 #include <iostream>
 #include <stack>
 #include <stdint.h>
+#include <string>
 #include <vector>
 using namespace std;
 
 // CPU LCA INLABEL
 
 void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers) {
+  Timer timer("CPU Inlabel");
+
   int root = 0;
   for (int i = 0; i < N; i++) {
     if (parents[i] == -1)
@@ -56,6 +60,8 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
     }
   }
 
+  timer.print_and_restart("Preprocessing");
+
   for (int i = 0; i < Q; i++) {
     int x = queries[2 * i];
     int y = queries[2 * i + 1];
@@ -78,6 +84,9 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
     }
     answers[i] = level[x] <= level[y] ? x : y;
   }
+
+  timer.print_and_restart(to_string(Q) + " Queries");
+  timer.print_overall();
 }
 
 // CPU LCA RMQ
