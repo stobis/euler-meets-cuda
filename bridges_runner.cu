@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Print output parser header
-  std::cout << "%%% File: " << (input_file == NULL ? std::string{"stdin"} : input_file) << std::endl;
+  std::cout << "%%% Bridges: File: " << (input_file == NULL ? std::string{"stdin"} : input_file) << std::endl;
   std::cout << "%%% N: " << input_graph.get_N() << std::endl;
   std::cout << "%%% M: " << input_graph.get_M() << std::endl;
 

@@ -85,7 +85,7 @@ void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *
     answers[i] = level[x] <= level[y] ? x : y;
   }
 
-  timer.print_and_restart(to_string(Q) + " Queries");
+  timer.print_and_restart("Queries");
   timer.print_overall();
 }
 
@@ -96,6 +96,8 @@ void dfsRmq(int starting, vector<int> son, vector<int> neighbour, int *dfsEulerP
 int rmqMin(int p, int q, int size, int *rmqTab);
 
 void cpu_lca_rmq(int N, const int *parents, int Q, const int *queries, int *answers) {
+  Timer timer("CPU RMQ");
+
   int root = 0;
   for (int i = 0; i < N; i++) {
     if (parents[i] == -1)
@@ -140,6 +142,8 @@ void cpu_lca_rmq(int N, const int *parents, int Q, const int *queries, int *answ
     rmqTab[i] = min(rmqTab[i * 2 + 1], rmqTab[i * 2 + 2]);
   }
 
+  timer.print_and_restart("Preprocessing");
+
   for (int i = 0; i < Q; i++) {
     int p = rmqPos[preorder[queries[i * 2]]];
     int q = rmqPos[preorder[queries[i * 2 + 1]]];
@@ -154,6 +158,9 @@ void cpu_lca_rmq(int N, const int *parents, int Q, const int *queries, int *answ
   delete[] preorder;
   delete[] reversePreorder;
   delete[] rmqPos;
+
+  timer.print_and_restart("Queries");
+  timer.print_overall();
 }
 void dfsRmq(int starting, vector<int> son, vector<int> neighbour, int *dfsEulerPath, int *rmqPos,
             int *preorder, int *reversePreorder, int &preCounter, int &eulerCounter) {
@@ -213,6 +220,8 @@ int rmqMin(int p, int q, int size, int *rmqTab) {
 void dfs(int i, vector<int> *G, int *depth);
 void cpu_lca_simple(int N, const int *parents, int Q, const int *queries, int *answers) {
 
+  Timer timer("CPU SIMPLE");
+
   int root = 0;
   for (int i = 0; i < N; i++) {
     if (parents[i] == -1)
@@ -233,6 +242,8 @@ void cpu_lca_simple(int N, const int *parents, int Q, const int *queries, int *a
 
   depth[root] = 0;
   dfs(root, G, depth);
+
+  timer.print_and_restart("Preprocessing");
 
   for (int i = 0; i < Q; i++) {
     int p = queries[i * 2];
@@ -255,6 +266,9 @@ void cpu_lca_simple(int N, const int *parents, int Q, const int *queries, int *a
   delete[] G;
   delete[] depth;
   delete[] father;
+
+  timer.print_and_restart("Queries");
+  timer.print_overall();
 }
 
 void dfs(int i, vector<int> *G, int *depth) {

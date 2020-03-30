@@ -76,6 +76,10 @@ int main(int argc, char *argv[]) {
   LcaTestCase tc = input_file == NULL ? readFromStdIn() : readFromFile(input_file);
   vector<int> answers(tc.q.N);
 
+  // Print output parser header
+  std::cout << "%%% Lca: File: " << (input_file == NULL ? std::string{"stdin"} : input_file) << std::endl;
+  std::cout << "%%% N: " << tc.tree.V << std::endl;
+
   // Solve LCA
   if (cuda_algorithm_to_use != NULL) {
     mgpu::standard_context_t context(0);
@@ -99,6 +103,8 @@ int main(int argc, char *argv[]) {
     cerr << "No algorithm specified. Exiting." << endl;
     exit(1);
   }
+
+  cout << "%%% # Q: " << tc.q.N << endl;
 
   // Print Output
   if (output_file != NULL) {

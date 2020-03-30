@@ -4,11 +4,14 @@ import csv
 import sys
 
 data_dict = {}
+problem = "Unk"
 
 def parse_one(first, input):
     first = first[4:]
     first = first.split(':')
-    test_name = first[1][1:]
+    global problem
+    problem = first[0]
+    test_name = first[2][1:]
     data_dict[test_name] = {}
     # print(data_dict)
     while True:
@@ -52,12 +55,15 @@ with open(sys.argv[1], 'r', newline='') as datafile:
         line = line[:-1]
         # print(line)
 
-        if line.startswith('%%% File'):
+        if line.startswith('%%% Bridges: File') or line.startswith('%%% Lca: File'):
             parse_one(line, datafile)
         
 # print(data_dict)
 
 fieldnames_dict = {}
+
+if problem != "Bridges" and problem != "Lca":
+    print("Unknown Problem. Problem on first line: " + problem)
 
 for (test, test_info) in data_dict.items():
     # print('test: ' + test)
@@ -74,7 +80,10 @@ for (test, test_info) in data_dict.items():
 with open(sys.argv[2], 'w', newline='') as csvfile:
     for (algo, fieldnames) in fieldnames_dict.items():
         # print('algo: ' + algo)
-        fieldnames = ['file', 'N', 'M', '# bridges', 'algo'] + fieldnames
+        if problem == "Bridges":
+            fieldnames = ['file', 'N', 'M', '# bridges', 'algo'] + fieldnames
+        elif problem == "Lca":
+            fieldnames = ['file', 'N', '# Q', 'algo'] + fieldnames
         # print(fieldnames)
 
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -83,11 +92,17 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
 
         for (filename, fileinfo) in sorted(data_dict.items()):
             row = {}
-            row['file'] = filename
-            row['N'] = fileinfo['N']
-            row['M'] = fileinfo['M']
-            row['# bridges'] = fileinfo['# Bridges']
-            row['algo'] = algo
+            if problem == "Bridges":
+                row['file'] = filename
+                row['N'] = fileinfo['N']
+                row['M'] = fileinfo['M']
+                row['# bridges'] = fileinfo['# Bridges']
+                row['algo'] = algo
+            elif problem == "Lca":
+                row['file'] = filename
+                row['N'] = fileinfo['N']
+                row['# Q'] = fileinfo['# Q']
+                row['algo'] = algo
             # print(row)
             # print(fileinfo[algo])
             for (name, val) in fileinfo[algo]:

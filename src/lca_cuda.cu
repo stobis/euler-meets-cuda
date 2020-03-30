@@ -275,7 +275,7 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
   }
 
   context.synchronize();
-  timer.print_and_restart(to_string(Q) + " Queries");
+  timer.print_and_restart("Queries");
   timer.print_overall();
 }
 
@@ -407,6 +407,6 @@ void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *a
   CUCHECK(cudaFree(devDepth));
   CUCHECK(cudaFree(devNext));
 
-  timer.print_and_restart(to_string(Q) + " Queries");
+  timer.print_and_restart("Queries");
   timer.print_overall();
 }
