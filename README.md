@@ -1,7 +1,6 @@
 # euler-meets-cuda
 ## Bridges
-### Testing
-To run automatic tests
+To build and run automatic tests
 ```shell
     ./bridges_test.sh -t bridgesResult.csv
 ```
@@ -20,7 +19,7 @@ In case of stack overflow problems
 
 
 ## Lca
-To run automatic tests
+To build and run automatic tests
 ```shell
     ./lca_test.sh -t lcaResult.csv
 ```
