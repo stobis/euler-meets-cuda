@@ -17,9 +17,9 @@ const string help_msg = "Command line arguments\n \
   -i $input -- sets input file to $input\n \
   -o $output -- sets output file to $output\n \
   -a -- chooses algorithm to run:\n \
-    naive - BFS + naive\n \
-    tarjan - ECL-CC + Euler\n \
-    hybrid - ECL-CC + naive\n";
+     naive - BFS + naive\n \
+     tarjan - ECL-CC + Euler\n \
+     hybrid - ECL-CC + naive\n";
 
 // Configuration of implementations to choose
 typedef void (*BridgesFunction)(int, int, int const *, int const *, bool *, mgpu::context_t &);
@@ -71,7 +71,11 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  std::vector<std::string> args(argv, argv + argc);
+  if (bridges_algorithm_to_run == NULL) {
+    cerr << help_msg << endl;
+    cerr << "No algorithm specified. Exiting." << endl;
+    exit(1);
+  }
 
   // Read input
   Graph input_graph;
@@ -82,7 +86,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Print output parser header
-  std::cout << "%%% File: " << (argc > 2 ? args[2] : std::string{"stdin"}) << std::endl;
+  std::cout << "%%% File: " << (input_file == NULL ? std::string{"stdin"} : input_file) << std::endl;
   std::cout << "%%% N: " << input_graph.get_N() << std::endl;
   std::cout << "%%% M: " << input_graph.get_M() << std::endl;
 
@@ -96,7 +100,6 @@ int main(int argc, char *argv[]) {
   mgpu::mem_t<bool> is_bridge = mgpu::fill<bool>(false, M, context);
 
   (bridges_algorithm_to_run)(N, M, row_offsets.data(), col_indices.data(), is_bridge.data(), context);
-
 
   // Print Output
   print_ans(M, is_bridge.data(), false);

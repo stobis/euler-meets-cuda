@@ -95,8 +95,8 @@ int main(int argc, char *argv[]) {
   } else if (cpu_algorithm_to_use != NULL) {
     cpu_algorithm_to_use(tc.tree.V, tc.tree.father.data(), tc.q.N, tc.q.tab.data(), answers.data());
   } else {
-    // Should not happen
-    cerr << "Bad algorithm specified" << endl;
+    cerr << help_msg << endl;
+    cerr << "No algorithm specified. Exiting." << endl;
     exit(1);
   }
 
