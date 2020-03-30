@@ -2,6 +2,11 @@
 
 . generateTests.sh
 
+statsPath=../stats2csv.py
+tmpCsv=tmp.csv
+resultsFile=$1
+rm $resultsFile
+
 for T in ${testsToRun[@]}; do
     echo "Running Experiment $T"
 
@@ -32,8 +37,17 @@ for T in ${testsToRun[@]}; do
             echo -e "\tRunning $(basename $outName)"
 
             touch $outName
-            timeout $singleRunTimeout $runnerPath -i $test -o /dev/null -a $solution >>$outName
+            timeout $singleRunTimeout $runnerPath -i $test -o /dev/null -a $solution >$outName
             echo "" >>$outName
+
+            $statsPath $outName $tmpCsv
+
+            if [ ! -f "$resultsFile" ]; then
+                cat $tmpCsv >$resultsFile
+            else
+                cat $tmpCsv | tail -n +2 >>$resultsFile
+            fi
+            rm $tmpCsv
         done
     done
 

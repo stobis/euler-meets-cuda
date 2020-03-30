@@ -3,23 +3,23 @@ OPTIND=1  # Reset in case getopts has been used previously in the shell
 testDirectory="test/bridges"
 
 __help="
-Usage: lca_test.sh [-h | -o]
+Usage: lca_test.sh [-h | -t]
 
 Options:
   -h        Show this help and exit
-  -o \$out   Output file path
+  -t \$out   Run timed tests, save output to \$out.
 "
 # TODO do we want to have some tests to check correctness?
 
 run_time=1
 
-while getopts "ho:" opt; do
+while getopts "ht:" opt; do
     case "$opt" in
     h)
         echo "$__help"
         exit 0
         ;;
-    o)  outFile=$(realpath $OPTARG)
+    t)  outFile=$(realpath $OPTARG)
         ;;
     esac
 done

@@ -6,15 +6,15 @@ __help="
 Usage: lca_test.sh [-h | -c | -t ]
 
 Options:
-  -h      Show this help and exit
-  -c      Check all algorithms. Runs all algorithms on a set of tests and checks if all outputs are same
-  -t      Run timed tests
+  -h        Show this help and exit
+  -c        Check all algorithms. Runs all algorithms on a set of tests and checks if all outputs are same
+  -t \$out   Run timed tests, save output to \$out.
 "
 
 run_check=0
 run_time=0
 
-while getopts "htc" opt; do
+while getopts "ht:c" opt; do
     case "$opt" in
     h)
         echo "$__help"
@@ -23,6 +23,7 @@ while getopts "htc" opt; do
     c)  run_check=1
         ;;
     t)  run_time=1
+        resultsFile=$(realpath $OPTARG)
         ;;
     esac
 done
@@ -46,6 +47,11 @@ if [ "$run_check" = 1 ]; then
 fi
 
 if [ "$run_time" = 1 ]; then
+  if [ -z "$resultsFile" ]; then
+    echo "$__help"
+    exit
+  fi
+
   make lca_runner
   if [ $? -ne 0 ]; then
     echo "lca_runner build FAILED!"
@@ -54,6 +60,6 @@ if [ "$run_time" = 1 ]; then
   echo "Running timed tests."
   cwd=$(pwd)
   cd $testDirectory
-  ./testTime.sh
+  ./testTime.sh $resultsFile
   cd $cwd
 fi

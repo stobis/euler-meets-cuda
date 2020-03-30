@@ -34,7 +34,7 @@ do
     name="${VARIANTS[$ix]}"
     tmpf="$name.tmp.txt"
     tmpo="$name.tmp.csv"
-    ./stats2csv.py $tmpf $tmpo
+    ../stats2csv.py $tmpf $tmpo
     rm $tmpf
 done
 

@@ -3,7 +3,7 @@
 ### Testing
 To run automatic tests
 ```shell
-    ./bridges_test.sh -o bridgesResult.txt
+    ./bridges_test.sh -t bridgesResult.csv
 ```
 
 To run single test
@@ -22,9 +22,8 @@ In case of stack overflow problems
 ## Lca
 To run automatic tests
 ```shell
-    ./lca_test.sh -t
+    ./lca_test.sh -t lcaResult.csv
 ```
-Time results will be saved to ```tests/lca/resultTimes``` (WIP)
 
 To run automatic tests checking correctness
 ```shell

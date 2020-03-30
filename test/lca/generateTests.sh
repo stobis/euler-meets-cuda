@@ -10,7 +10,7 @@ function genTest {
     graspSize=$5
     repeat=$6
 
-    templName=$testDir/V:$V#Q:$Q#grasp:$graspSize
+    templName=$testDir/V_$V#Q_$Q#grasp_$graspSize
 
     for i in $(seq 1 $repeat); do
         name=$templName#s$i.$testType.in

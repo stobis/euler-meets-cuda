@@ -49,7 +49,7 @@ progressBarWidth=50
 
 testsToRun=(
     1
-    3
+    # 3
 )
 
 E1SolutionsToTest=(
@@ -63,8 +63,8 @@ E1ResultsDir=$resultTimesDir/E1
 E1TestSizes=(
     1000000
     2000000
-    # 4000000
-    # 8000000
+    4000000
+    8000000
     # 16000000
     # 32000000
     # 64000000
@@ -73,7 +73,7 @@ E1GraspSizes=( #how far up a father can be
     -1
     1000
 )
-E1DifferentSeeds=2
+E1DifferentSeeds=1
 
 E2SolutionsToTest=(
     "cudaInlabelLCA"
