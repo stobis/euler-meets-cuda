@@ -1,5 +1,4 @@
 solutionForAnswers=cpuRmqLCA.e
-# solutionForAnswers=cpuSimpleLCA.e
 
 make $solutionForAnswers
 

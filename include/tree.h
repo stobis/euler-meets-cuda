@@ -1,3 +1,6 @@
+#ifndef EMC_TREE_HPP_
+#define EMC_TREE_HPP_
+
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -46,3 +49,5 @@ LcaTestCase readFromStdIn();
 
 void writeAnswersToFile(int Q, int *ans, const char *filename);
 void writeAnswersToStdOut(int Q, int *ans);
+
+#endif // EMC_TREE_HPP_

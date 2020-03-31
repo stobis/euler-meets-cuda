@@ -33,7 +33,6 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
 
   int *devRoot;
   CUCHECK(cudaMalloc((void **)&devRoot, sizeof(int)));
-  int *rootArr = new int[1];
 
   transform(
       [=] MGPU_DEVICE(int thid) {
@@ -44,8 +43,8 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
       N, context);
   context.synchronize();
 
-  CUCHECK(cudaMemcpy(rootArr, devRoot, sizeof(int), cudaMemcpyDeviceToHost));
-  root = rootArr[0];
+  CUCHECK(cudaMemcpy(&root, devRoot, sizeof(int), cudaMemcpyDeviceToHost));
+  CUCHECK(cudaFree(devRoot));
 
   int *dev_edge_from;
   int *dev_edge_to;
@@ -65,6 +64,9 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
   CUCHECK(cudaMalloc((void **)&devEdgeRankFromEulerTour, sizeof(int) * N * 2));
 
   cuda_euler_tour(N, root, dev_edge_from, dev_edge_to, devEdgeRankFromEulerTour, context);
+
+  CUCHECK(cudaFree(dev_edge_from));
+  CUCHECK(cudaFree(dev_edge_to));
 
   int *devEdgeRank;
   CUCHECK(cudaMalloc((void **)&devEdgeRank, sizeof(int) * N * 2));
@@ -273,8 +275,13 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
         },
         queriesToProcess, context);
   }
-
   context.synchronize();
+
+  CUCHECK(cudaFree(devLevel));
+  CUCHECK(cudaFree(devInlabel));
+  CUCHECK(cudaFree(devAscendant));
+  CUCHECK(cudaFree(devHead));
+
   timer.print_and_restart("Queries");
   timer.print_overall();
 }
@@ -339,8 +346,9 @@ void CudaSimpleListRank(int *devRank, int N, int *devNext, context_t &context) {
                            int *devRank) { devRank[thid] = devRankNext[thid] >> 32; },
             N, context, devRankNext, devRank);
 
-  cudaFree(notAllDone);
-  cudaFree(devRankNext);
+  context.synchronize();
+
+  CUCHECK(cudaFree(devRankNext));
   CUCHECK(cudaFree(devNotAllDone));
 }
 
