@@ -18,10 +18,11 @@ for T in ${testsToRun[@]}; do
     eval _graspSizes=( '"${E'${T}'GraspSizes[@]}"' )
     _numOfSeeds=E${T}DifferentSeeds
     for size in ${_testSizes[@]}; do
-        for graspSize in ${_graspSizes}; do
+        for graspSize in ${_graspSizes[@]}; do
             genTest ${!_testsDir} b $size $size $graspSize ${!_numOfSeeds}
         done
     done
+
 
     _resultsDir=E${T}ResultsDir
     mkdir -p ${!_resultsDir} 
