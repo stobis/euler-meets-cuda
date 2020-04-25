@@ -1,5 +1,5 @@
 testsDir=tests
-resultTimesDir=resultTimes
+resultTimesDir=resultTimesTemporary
 defaultBatchSize=-1
 runnerPath="../../lca_runner.e"
 singleRunTimeout=60
@@ -64,21 +64,21 @@ E1TestSizes=(
     1000000
     2000000
     4000000
-    8000000
-    16000000
-    32000000
-    64000000
+    # 8000000
+    # 16000000
+    # 32000000
+    # 64000000
 )
 E1GraspSizes=( #how far up a father can be
     -1
     1000
 )
-E1DifferentSeeds=5
+E1DifferentSeeds=3
 
 E2SolutionsToTest=(
     "cudaInlabelLCA"
-    "cpuRmqLCA"
-    "cpuInlabelLCA"
+    # "cpuRmqLCA"
+    # "cpuInlabelLCA"
 )
 E2TestsDir=$testsDir/E2
 E2ResultsDir=$resultTimesDir/E2
@@ -112,16 +112,16 @@ E3TestSizes=(
     8000000
 )
 E3GraspSizes=(
-    1
-    10
-    100
-    1000
+    # 1
+    # 10
+    # 100
+    # 1000
     10000
     100000
     1000000
     10000000
 )
-E3DifferentSeeds=5
+E3DifferentSeeds=3
 
 
 # # runE4=true
