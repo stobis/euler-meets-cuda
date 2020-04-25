@@ -3,23 +3,27 @@ OPTIND=1  # Reset in case getopts has been used previously in the shell
 testDirectory="test/bridges"
 
 __help="
-Usage: lca_test.sh [-h | -t]
+Usage: bridges_test.sh [-h | -t | -r]
 
 Options:
   -h        Show this help and exit
   -t \$out   Run timed tests, save output to \$out.
+  -r \$times Repeat tests \$times times and get average results. Default value is 1.
 "
 # TODO do we want to have some tests to check correctness?
 
 run_time=1
+repeats=1
 
-while getopts "ht:" opt; do
+while getopts "ht:r:" opt; do
     case "$opt" in
     h)
         echo "$__help"
         exit 0
         ;;
     t)  outFile=$(realpath $OPTARG)
+        ;;
+    r)  repeats=$OPTARG
         ;;
     esac
 done
@@ -48,6 +52,6 @@ fi
 ./prepare.py
 
 echo "Running timed tests."
-./run_and_export.sh all $outFile
+./run_experiments.sh all $repeats $outFile
 
 cd $cwd

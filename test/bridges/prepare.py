@@ -57,6 +57,8 @@ def download_all():
     with open("config.yml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         for format in cfg:
+            if cfg[format] is None:
+                continue
             for url in cfg[format]:
                 download_one(format, url)
 

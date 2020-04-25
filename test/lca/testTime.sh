@@ -5,7 +5,6 @@
 statsPath=../stats2csv.py
 tmpCsv=tmp.csv
 resultsFile=$1
-rm $resultsFile
 
 for T in ${testsToRun[@]}; do
     echo "Running Experiment $T"
@@ -34,11 +33,11 @@ for T in ${testsToRun[@]}; do
             testName=$(basename $test)
             testOutName=$(echo $testName | sed 's/s[0-9][0-9]*.//g') 
             outName=${!_resultsDir}/$solution\$${testOutName::-5}\$$(date '+%Y-%m-%d-%H-%M-%S' -d @$(stat -c %Y $runnerPath)).out
+            mv $test $outName.test
 
             echo -e "\tRunning $(basename $outName)"
 
-            touch $outName
-            timeout $singleRunTimeout $runnerPath -i $test -o /dev/null -a $solution >$outName
+            timeout $singleRunTimeout $runnerPath -i $outName.test -o /dev/null -a $solution >$outName
             echo "" >>$outName
 
             $statsPath $outName $tmpCsv
@@ -49,7 +48,11 @@ for T in ${testsToRun[@]}; do
                 cat $tmpCsv | tail -n +2 >>$resultsFile
             fi
             rm $tmpCsv
+            rm $outName
+            mv $outName.test $test
         done
     done
+
+    mkdir -p ${!_resultsDir} 
 
 done

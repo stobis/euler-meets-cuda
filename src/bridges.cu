@@ -101,16 +101,15 @@ void cuda_bridges_naive(int N, int M, const int *row_offsets, const int *col_ind
   if (detailed_time) {
     context.synchronize();
     timer.print_and_restart("Find Bridges");
-    timer.print_overall();
-  }
 
-  if (detailed_time) {
     mem_t<int> maxd(1, context);
     reduce(distance.data(), distance.size(), maxd.data(), mgpu::maximum_t<int>(), context);
     vector<int> maxd_host = from_mem(maxd);
 
     context.synchronize();
     timer.print_and_restart("Max distance: " + to_string(maxd_host.front()));
+
+    timer.print_overall();
   }
 }
 
