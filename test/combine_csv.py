@@ -30,11 +30,6 @@ for entry in os.scandir(sys.argv[1]):
                 continue
             data[current_header_str][line[0]][line[current_header.index('algo')]].append(line)
 
-            # try:
-            #     print(float(line[5]))
-            # except Exception:
-            #     pass
-
 # pp = pprint.PrettyPrinter(indent=1)
 # pp.pprint(data)
 
@@ -42,11 +37,11 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
     fieldnames = ['first_name', 'last_name']
     writer = csv.writer(csvfile)
 
-    for header in data.keys():
+    for header in sorted(data.keys()):
         writer.writerow(header.split(',') + ['Standard deviation'])
         # print(header)
-        for file in data[header].keys():
-            for algo in data[header][file].keys():
+        for file in sorted(data[header].keys()):
+            for algo in sorted(data[header][file].keys()):
                 results = data[header][file][algo]
                 # count avg
                 row = [float(0)] * len(results[0])
