@@ -2,8 +2,8 @@
 #include <map>
 #include <vector>
 
-#include "bridges/graph.hpp"
-#include "bridges/timer.hpp"
+#include "graph.hpp"
+#include "timer.hpp"
 
 int visit_time;
 std::vector<std::vector<int>> G;

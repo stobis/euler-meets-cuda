@@ -1,8 +1,31 @@
 #include <algorithm>
 #include <iostream>
-#include "lca/commons.h"
+#include "tree.h"
 
 using namespace std;
+
+void shuffleFathers(vector<int> &in, vector<int> &out, int &root) {
+  int V = in.size();
+  vector<int> shuffle;
+  for (int i = 0; i < V; i++) {
+    shuffle.push_back(i);
+  }
+  random_shuffle(shuffle.begin(), shuffle.end());
+
+  vector<int> newPos;
+  newPos.resize(V);
+  for (int i = 0; i < V; i++) {
+    newPos[shuffle[i]] = i;
+  }
+
+  out.clear();
+  for (int i = 0; i < V; i++) {
+    if (shuffle[i] == 0) {
+      root = i;
+    }
+    out.push_back(in[shuffle[i]] == -1 ? -1 : newPos[in[shuffle[i]]]);
+  }
+}
 
 int main( int argc, char* argv[] )
 {
@@ -34,16 +57,16 @@ int main( int argc, char* argv[] )
 
   shuffleFathers( tab, father, root );
 
-  ParentsTree tree( V, root, father );
+  LcaParentsTree tree( V, root, father );
 
   vector<int> q;
   for ( int i = 0; i < Q * 2; i++ )
   {
     q.push_back( rand() % V );
   }
-  Queries queries( Q, q );
+  LcaQueries queries( Q, q );
 
-  TestCase tc( tree, queries );
+  LcaTestCase tc( tree, queries );
   if ( argc == expectedArgc + 1 )
     writeToFile( tc, argv[expectedArgc] );
   else

@@ -4,7 +4,7 @@ FILES=in/**.bin
 EXEC=../../bridges_runner.e
 
 if [ "$1" = "" ] || [ "$2" = "" ]; then
-    echo "Usage: ./run_and_export.sh [all|naive|tarjan|tarjan-kot|tarjan-bfs|hybrid] [output]"
+    echo "Usage: ./run_and_export.sh [all|naive|tarjan|hybrid] [output]"
     exit
 fi
 
@@ -12,7 +12,7 @@ if [ "$1" != "all" ]; then
     VARIANTS=($1)
     OUTPUT=($2)
 else
-    VARIANTS=(naive tarjan tarjan-kot tarjan-bfs hybrid)
+    VARIANTS=(naive tarjan hybrid)
     OUTPUT=($2)
 fi
 
@@ -25,7 +25,7 @@ do
         name="${VARIANTS[$ix]}"
         echo $name
         tmpf="$name.tmp.txt"
-        $EXEC $name $f >> $tmpf
+        $EXEC -a $name -i $f >> $tmpf
     done
 done
 
@@ -34,7 +34,7 @@ do
     name="${VARIANTS[$ix]}"
     tmpf="$name.tmp.txt"
     tmpo="$name.tmp.csv"
-    ./stats2csv.py $tmpf $tmpo
+    ../stats2csv.py $tmpf $tmpo
     rm $tmpf
 done
 

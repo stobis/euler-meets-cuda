@@ -2,7 +2,7 @@ testsDir=tests
 resultTimesDir=resultTimes
 defaultBatchSize=-1
 runnerPath="../../lca_runner.e"
-singleRunTimeout=300
+singleRunTimeout=60
 
 
 ### Validity tests
@@ -11,8 +11,6 @@ validityTestsDir=$testsDir/validity
 validityAnswersDir=$testsDir/validityOut
 
 # Encoding of tests - b for binary, t for text
-validityTestsEncoding=b
-# validityTestsEncoding=t
 
 validityTestsSizes=(
     5
@@ -30,14 +28,17 @@ validityTestsSizes=(
     500000
     1000000
     2000000
-    4000000
+    # 3000000
+    # 4000000
+    # 10000000
 )
 validityGraspSize=-1
 validityOutGeneratorAlgorithm="cpu-rmq"
 validitySolutionsToTest=(
-    cuda-inlabel
     cuda-naive
+    cuda-inlabel
     cpu-inlabel
+    cpu-simple
 )
 
 ### Time tests
@@ -45,8 +46,6 @@ validitySolutionsToTest=(
 generateAnswers=true
 repeatSingleTest=10
 progressBarWidth=50
-timedTestsEncoding=b
-# timedTestsEncoding=t
 
 testsToRun=(
     1
@@ -55,26 +54,26 @@ testsToRun=(
 
 E1SolutionsToTest=(
     "cuda-inlabel"
-    "cuda-simple"
+    "cuda-naive"
     "cpu-rmq"
-    "cpu-inlabel"
+    # "cpu-inlabel"
 )
 E1TestsDir=$testsDir/E1
 E1ResultsDir=$resultTimesDir/E1
 E1TestSizes=(
     1000000
     2000000
-    # 4000000
-    # 8000000
-    # 16000000
-    # 32000000
-    # 64000000
+    4000000
+    8000000
+    16000000
+    32000000
+    64000000
 )
 E1GraspSizes=( #how far up a father can be
     -1
     1000
 )
-E1DifferentSeeds=2
+E1DifferentSeeds=5
 
 E2SolutionsToTest=(
     "cudaInlabelLCA"
@@ -103,26 +102,26 @@ E2DifferentSeeds=2
 # )
 
 E3SolutionsToTest=(
-    "cudaInlabelLCA"
-    "cudaSimpleLCA"
+    "cuda-inlabel"
+    "cuda-naive"
     # "cpuInlabelLCA"
 )
 E3TestsDir=$testsDir/E3
 E3ResultsDir=$resultTimesDir/E3
 E3TestSizes=(
-    1000000
+    8000000
 )
 E3GraspSizes=(
-    # 1
+    1
     10
     100
     1000
     10000
     100000
     1000000
-    # 10000000
+    10000000
 )
-E3DifferentSeeds=2
+E3DifferentSeeds=5
 
 
 # # runE4=true

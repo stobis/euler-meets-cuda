@@ -19,7 +19,7 @@ OBJFILES=$(patsubst %.cpp, %.o, $(wildcard *.cpp)) \
 all: generateSimple.e
 remake: clean all
  
-generateSimple.e: generateSimple.cpp ../../src/lca/commons.cpp
+generateSimple.e: generateSimple.cpp ../../src/tree.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@ 
 
 .PHONY: all clean

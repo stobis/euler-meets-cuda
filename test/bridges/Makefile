@@ -11,7 +11,7 @@ all: dimacs2ecl.e mm2ecl.e snap2ecl.e connect.e sequential.e
 %.e: %.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-sequential.e: sequential.cpp ${SRCDIR}/bridges/graph.cpp ${SRCDIR}/bridges/timer.cpp
+sequential.e: sequential.cpp ${SRCDIR}/graph.cpp ${SRCDIR}/timer.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 .PHONY: all clean
