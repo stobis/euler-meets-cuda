@@ -23,20 +23,20 @@ mm:
   # - https://sparse.tamu.edu/MM/Pajek/internet.tar.gz
   # Kron
   - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn16.tar.gz
-  # - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn17.tar.gz
-  # - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn18.tar.gz
-  # - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn19.tar.gz
-  # - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn20.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn17.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn18.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn19.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn20.tar.gz
   # Road networks
-  # - https://sparse.tamu.edu/MM/DIMACS10/great-britain_osm.tar.gz
-  # - https://sparse.tamu.edu/MM/DIMACS10/asia_osm.tar.gz
-  # - https://sparse.tamu.edu/MM/DIMACS10/belgium_osm.tar.gz
-  # - https://sparse.tamu.edu/MM/SNAP/roadNet-CA.tar.gz
-  # - https://sparse.tamu.edu/MM/SNAP/roadNet-PA.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/great-britain_osm.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/asia_osm.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/belgium_osm.tar.gz
+  - https://sparse.tamu.edu/MM/SNAP/roadNet-CA.tar.gz
+  - https://sparse.tamu.edu/MM/SNAP/roadNet-PA.tar.gz
   # Web/social
-  # - https://sparse.tamu.edu/MM/LAW/hollywood-2009.tar.gz
-  # - https://sparse.tamu.edu/MM/SNAP/web-Stanford.tar.gz
-  # - https://sparse.tamu.edu/MM/SNAP/com-LiveJournal.tar.gz
+  - https://sparse.tamu.edu/MM/LAW/hollywood-2009.tar.gz
+  - https://sparse.tamu.edu/MM/SNAP/web-Stanford.tar.gz
+  - https://sparse.tamu.edu/MM/SNAP/com-LiveJournal.tar.gz
 
 snap:
   # gzip -d [file]
