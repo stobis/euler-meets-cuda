@@ -37,7 +37,6 @@ for T in ${testsToRun[@]}; do
 
             echo -e "\tRunning $(basename $outName)"
 
-            touch $outName
             timeout $singleRunTimeout $runnerPath -i $outName.test -o /dev/null -a $solution >$outName
             echo "" >>$outName
 
