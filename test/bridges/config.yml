@@ -11,20 +11,36 @@ dimacs:
   # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.FLA.gr.gz
   # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.COL.gr.gz
   # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.BAY.gr.gz
-  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.NY.gr.gz
+  # - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.NY.gr.gz
 mm:
   # tar --strip-components 1 -xvzf [file] --wildcards '*.mtx'
-  - https://sparse.tamu.edu/MM/DIMACS10/citationCiteseer.tar.gz
+  # - https://sparse.tamu.edu/MM/DIMACS10/citationCiteseer.tar.gz
   # - https://sparse.tamu.edu/MM/SNAP/cit-Patents.tar.gz
   # - https://sparse.tamu.edu/MM/DIMACS10/coPapersDBLP.tar.gz
   # - https://sparse.tamu.edu/MM/DIMACS10/delaunay_n24.tar.gz
   # - https://sparse.tamu.edu/MM/DIMACS10/europe_osm.tar.gz
   # - https://sparse.tamu.edu/MM/LAW/in-2004.tar.gz
   # - https://sparse.tamu.edu/MM/Pajek/internet.tar.gz
+  # Kron
   - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn16.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn17.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn18.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn19.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn20.tar.gz
+  # Road networks
+  - https://sparse.tamu.edu/MM/DIMACS10/great-britain_osm.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/asia_osm.tar.gz
+  - https://sparse.tamu.edu/MM/DIMACS10/belgium_osm.tar.gz
+  - https://sparse.tamu.edu/MM/SNAP/roadNet-CA.tar.gz
+  - https://sparse.tamu.edu/MM/SNAP/roadNet-PA.tar.gz
+  # Web/social
+  - https://sparse.tamu.edu/MM/LAW/hollywood-2009.tar.gz
+  - https://sparse.tamu.edu/MM/SNAP/web-Stanford.tar.gz
+  - https://sparse.tamu.edu/MM/SNAP/com-LiveJournal.tar.gz
+
 snap:
   # gzip -d [file]
-  - https://snap.stanford.edu/data/amazon0601.txt.gz
+  # - https://snap.stanford.edu/data/amazon0601.txt.gz
   # - https://snap.stanford.edu/data/as-skitter.txt.gz
   # - https://snap.stanford.edu/data/soc-LiveJournal1.txt.gz
 # nr:
