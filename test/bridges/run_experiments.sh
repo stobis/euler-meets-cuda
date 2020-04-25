@@ -13,11 +13,11 @@ fi
 
 mkdir $TMP_FOLDER
 
-for i in {0..$times}
+for ((i=0;i<=$2;i++))
 do
-    $SINGLE_RUN_SCRIPT $1 $i
+    $SINGLE_RUN_SCRIPT $1 "$TMP_FOLDER/$i"
 done
 
-$COMBINE_SCRIPT $pwd/$TMP_FOLDER $3 
+$COMBINE_SCRIPT $(pwd)/$TMP_FOLDER $3 
 
 rm -rf tmpcsv
