@@ -13,7 +13,7 @@ fi
 
 mkdir $TMP_FOLDER
 
-for ((i=0;i<=$2;i++))
+for ((i=0;i<$2;i++))
 do
     $SINGLE_RUN_SCRIPT $1 "$TMP_FOLDER/$i"
 done

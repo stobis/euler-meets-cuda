@@ -3,7 +3,7 @@ OPTIND=1  # Reset in case getopts has been used previously in the shell
 testDirectory="test/bridges"
 
 __help="
-Usage: lca_test.sh [-h | -t]
+Usage: bridges_test.sh [-h | -t | -r]
 
 Options:
   -h        Show this help and exit
@@ -15,7 +15,7 @@ Options:
 run_time=1
 repeats=1
 
-while getopts "ht:" opt; do
+while getopts "ht:r:" opt; do
     case "$opt" in
     h)
         echo "$__help"
