@@ -17,7 +17,7 @@ run_check=0
 run_time=0
 repeats=1
 
-while getopts "ht:c:r:" opt; do
+while getopts "ht:cr:" opt; do
     case "$opt" in
     h)
         echo "$__help"

@@ -16,10 +16,10 @@
 // queries:     3  5  0  2  4  5
 // Result:
 // answers:     3  0  1
-void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers,
+void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers, int batchSize,
                       mgpu::context_t &context);
 
-void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *answers,
+void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *answers, int batchSize,
                     mgpu::context_t &context);
 
 void cpu_lca_simple(int N, const int *parents, int Q, const int *queries, int *answers);
