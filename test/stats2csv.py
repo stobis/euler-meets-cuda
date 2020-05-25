@@ -13,6 +13,17 @@ def parse_one(first, input):
     problem = first[0]
     test_name = first[2][1:]
     data_dict[test_name] = {}
+
+    # Lca encodes test properties in test filename.
+    test_metadata = test_name.split('$')
+    if len(test_metadata) > 1:
+        test_vars = test_metadata[1].split('#')
+        for var in test_vars:
+            var = var.split('_')
+            if len(var) > 1:
+                data_dict[test_name][var[0]] = var[1]
+
+
     # print(data_dict)
     while True:
         line = input.readline()
@@ -83,7 +94,7 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
         if problem == "Bridges":
             fieldnames = ['file', 'N', 'M', '# bridges', 'algo'] + fieldnames
         elif problem == "Lca":
-            fieldnames = ['file', 'N', '# Q', 'algo'] + fieldnames
+            fieldnames = ['file', 'N', '# Q', 'algo', 'grasp', 'batch'] + fieldnames
         # print(fieldnames)
 
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -103,6 +114,8 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
                 row['N'] = fileinfo['N']
                 row['# Q'] = fileinfo['# Q']
                 row['algo'] = algo
+                row['grasp'] = fileinfo['grasp']
+                row['batch'] = fileinfo['batch']
             # print(row)
             # print(fileinfo[algo])
             for (name, val) in fileinfo[algo]:
