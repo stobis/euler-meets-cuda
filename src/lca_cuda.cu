@@ -25,7 +25,7 @@ inline __device__ int CudaGetEdgeEnd(const int *__restrict__ father, int edgeCod
 inline __device__ int CudaGetEdgeCode(int a, bool toFather);
 inline __device__ bool isEdgeToFather(int edgeCode);
 
-void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers,
+void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers, int batchSize,
                       mgpu::context_t &context) {
   Timer timer("CUDA Inlabel");
 
@@ -218,22 +218,19 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
   context.synchronize();
   timer.print_and_restart("Preprocessing");
 
-  // TODO/TOREMOVE
-  int batchSize = Q;
-
   for (int qStart = 0; qStart < Q; qStart += batchSize) {
     int queriesToProcess = min(batchSize, Q - qStart);
 
     transform(
         [=] MGPU_DEVICE(int thid) {
-          int x = queries[thid * 2];
-          int y = queries[thid * 2 + 1];
+          int x = queries[(qStart + thid) * 2];
+          int y = queries[(qStart + thid) * 2 + 1];
 
           int inlabelX = devInlabel[x];
           int inlabelY = devInlabel[y];
 
           if (inlabelX == inlabelY) {
-            answers[thid] = devLevel[x] < devLevel[y] ? x : y;
+            answers[qStart + thid] = devLevel[x] < devLevel[y] ? x : y;
             return;
           }
           int i = 31 - __clz(inlabelX ^ inlabelY);
@@ -269,9 +266,9 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
           }
 
           if (devLevel[suspects[0]] < devLevel[suspects[1]])
-            answers[thid] = suspects[0];
+            answers[qStart + thid] = suspects[0];
           else
-            answers[thid] = suspects[1];
+            answers[qStart + thid] = suspects[1];
         },
         queriesToProcess, context);
   }
@@ -364,7 +361,7 @@ __device__ int CudaGetEdgeEnd(const int *__restrict__ father, int edgeCode) {
 __device__ bool isEdgeToFather(int edgeCode) { return edgeCode % 2; }
 __device__ int CudaGetEdgeCode(int a, bool toFather) { return a * 2 + toFather; }
 
-void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *answers,
+void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *answers, int batchSize,
                     mgpu::context_t &context) {
   Timer timer("CUDA Naive");
 
