@@ -4,3 +4,18 @@
 *.ptx
 *.cubin
 *.fatbin
+obj/
+*.e
+*.o
+
+.vscode/*
+
+test/lca/tests/*
+test/lca/resultTimes/*
+
+# Adrian's uploads to miracle
+copyToStudent.sh
+
+# Test bridges
+test/bridges/in/*
+test/bridges/*.csv
