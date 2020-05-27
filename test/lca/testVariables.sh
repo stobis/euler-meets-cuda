@@ -74,7 +74,7 @@ E1GraspSizes=( #how far up a father can be
 E1BatchSizes=(
     -1
 )
-E1DifferentSeeds=5
+E1DifferentSeeds=2
 
 ## Experiment 2 - CUDA inlabel by batch size
 E2SolutionsToTest=(
@@ -100,7 +100,7 @@ E2BatchSizes=(
     # 10000000
     # 100000000
 )
-E2DifferentSeeds=5
+E2DifferentSeeds=2
 
 E3SolutionsToTest=(
     "cuda-inlabel"
@@ -127,4 +127,4 @@ E3GraspSizes=(
 E3BatchSizes=(
     -1
 )
-E3DifferentSeeds=5
+E3DifferentSeeds=2
