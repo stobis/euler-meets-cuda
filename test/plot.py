@@ -5,6 +5,7 @@ import re
 import sys
 import csv
 import matplotlib.pyplot as plt
+from matplotlib.ticker import ScalarFormatter
 import numpy as np
 
 
@@ -107,16 +108,18 @@ with open(sys.argv[1], 'r') as file:
                 for row in algo_rows:
                     for i_xval, xval in enumerate(x):
                         if row[param_to_plot_by] == xval and (additional_param == '' or row[additional_param] == a_param):
-                            y[i_xval] = row[csv_overall]
+                            y[i_xval] = row[csv_overall] / 1000
                             if experiments_use_filename[i_exp]:
                                 x[i_xval] = row[csv_filename]
 
                 if len(plots) <= i:
                     plots.append(plt.subplots())
+                    # plots.append(plt.subplots(constrained_layout=True))
                     name_sufix.append(
                         "" if additional_param == '' else additional_param + "=" + str(a_param))
                 fig, ax = plots[i]
                 ax.set_xlabel(param_to_plot_by)
+                ax.set_ylabel("Time overall (s)")
 
                 if experiments_use_filename[i_exp]:
                     width = 0.3
@@ -136,6 +139,7 @@ with open(sys.argv[1], 'r') as file:
                 fig.tight_layout()
             else:
                 ax.set_xscale("log")
-                fig.tight_layout()
+                # fig.constrained_layout()
             ax.set_yscale("log")
+            ax.yaxis.set_major_formatter(ScalarFormatter())
             fig.savefig(experiment + name_sufix[i] + ".png")
