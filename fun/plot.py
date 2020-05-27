@@ -130,7 +130,9 @@ with open(sys.argv[1], 'r') as file:
         for i, (fig, ax) in enumerate(plots):
             ax.legend()
             if experiments_use_filename[i_exp]:
-                plt.xticks(rotation=-30)
+                plt.xticks(rotation=30, ha='right')
+                # fig.subplots_adjust(bottom=0.2)
+                fig.tight_layout()
             else:
                 plt.xscale("log")
             plt.yscale("log")
