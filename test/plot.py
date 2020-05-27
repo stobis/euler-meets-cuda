@@ -115,17 +115,18 @@ with open(sys.argv[1], 'r') as file:
                     plots.append(plt.subplots())
                     name_sufix.append(
                         "" if additional_param == '' else additional_param + "=" + str(a_param))
-                fig, ax = plots[-1]
+                fig, ax = plots[i]
+                ax.set_xlabel(param_to_plot_by)
 
-            if experiments_use_filename[i_exp]:
-                width = 0.3
-                real_x = np.arange(len(x))
-                bar_shift = (i_algo + 0.5 - (len(algos) / 2.0))*width
-                ax.bar(real_x + bar_shift, y, width, label = algo)
-                ax.set_xticklabels(x)
-                ax.set_xticks(real_x)
-            else:
-                ax.plot(x, y, label=algo)
+                if experiments_use_filename[i_exp]:
+                    width = 0.3
+                    real_x = np.arange(len(x))
+                    bar_shift = (i_algo + 0.5 - (len(algos) / 2.0))*width
+                    ax.bar(real_x + bar_shift, y, width, label = algo)
+                    ax.set_xticklabels(x)
+                    ax.set_xticks(real_x)
+                else:
+                    ax.plot(x, y, label=algo)
 
         for i, (fig, ax) in enumerate(plots):
             ax.legend()
@@ -134,6 +135,7 @@ with open(sys.argv[1], 'r') as file:
                 # fig.subplots_adjust(bottom=0.2)
                 fig.tight_layout()
             else:
-                plt.xscale("log")
-            plt.yscale("log")
+                ax.set_xscale("log")
+                fig.tight_layout()
+            ax.set_yscale("log")
             fig.savefig(experiment + name_sufix[i] + ".png")

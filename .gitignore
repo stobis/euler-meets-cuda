@@ -13,6 +13,10 @@ obj/
 test/lca/tests/*
 test/lca/resultTimesTemporary/*
 
+# Test Results
+*.csv
+*.png
+
 # Adrian's uploads to miracle
 copyToStudent.sh
 
