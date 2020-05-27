@@ -1,13 +1,18 @@
 import matplotlib as mpl
 mpl.use('Agg')
 
+import re
 import sys
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-experiments = ['E1', 'E2', 'E3']
+# Here we declare what tests consist an experiment.
+# An experiment is described by a regex that should be contained in input's filename
+experiments = ['E1', 'E2', 'E3', 'road|osm', 'kron',
+               'citationCiteseer|com-LiveJournal|hollywood|Stanford']
+experiments_use_filename = [False, False, False, True, True, True]
 
 csv_filename = "file"
 csv_N = 'N'
@@ -27,29 +32,38 @@ with open(sys.argv[1], 'r') as file:
     for line in csv_reader:
         csv_file.append(line)
 
-    for experiment in experiments:
+    for i_exp, experiment in enumerate(experiments):
         plots = []
         name_sufix = []
 
-        print(experiment + ": ")
         current_rows = []
-        for row in filter((lambda x: True if experiment in x[csv_filename] else False), csv_file):
-            current_rows.append(row)
+        for row in csv_file:
+            if bool(re.search(experiment, row[csv_filename])):
+                current_rows.append(row)
+
+        if not current_rows:
+            continue
+
+        # print(experiment)
+        # print(len(current_rows))
+        # continue
 
         algos = set()
         for row in current_rows:
             if row[csv_algo] not in algos:
                 algos.add(row[csv_algo])
 
-        for algo in algos:
+        for i_algo, algo in enumerate(algos):
             algo_rows = filter(
                 lambda row: True if row[csv_algo] == algo else False, current_rows)
 
             for i, row in enumerate(algo_rows):
                 for param in csv_ints:
-                    row[param] = int(float(row[param]))
+                    if param in row:
+                        row[param] = int(float(row[param]))
                 for param in csv_floats:
-                    row[param] = float(row[param])
+                    if param in row:
+                        row[param] = float(row[param])
                 algo_rows[i] = row
 
             parameter_values = {}
@@ -58,9 +72,10 @@ with open(sys.argv[1], 'r') as file:
 
             for row in algo_rows:
                 for param in csv_parameters:
-                    val = row[param]
-                    if val not in parameter_values[param]:
-                        parameter_values[param].add(val)
+                    if param in row:
+                        val = row[param]
+                        if val not in parameter_values[param]:
+                            parameter_values[param].add(val)
 
             print(parameter_values)
 
@@ -93,6 +108,8 @@ with open(sys.argv[1], 'r') as file:
                     for i_xval, xval in enumerate(x):
                         if row[param_to_plot_by] == xval and (additional_param == '' or row[additional_param] == a_param):
                             y[i_xval] = row[csv_overall]
+                            if experiments_use_filename[i_exp]:
+                                x[i_xval] = row[csv_filename]
 
                 if len(plots) <= i:
                     plots.append(plt.subplots())
@@ -100,28 +117,21 @@ with open(sys.argv[1], 'r') as file:
                         "" if additional_param == '' else additional_param + "=" + str(a_param))
                 fig, ax = plots[-1]
 
-            ax.plot(x, y, label=algo)
+            if experiments_use_filename[i_exp]:
+                width = 0.3
+                real_x = np.arange(len(x))
+                bar_shift = (i_algo + 0.5 - (len(algos) / 2.0))*width
+                ax.bar(real_x + bar_shift, y, width, label = algo)
+                ax.set_xticklabels(x)
+                ax.set_xticks(real_x)
+            else:
+                ax.plot(x, y, label=algo)
 
         for i, (fig, ax) in enumerate(plots):
             ax.legend()
-            plt.xscale("log")
+            if experiments_use_filename[i_exp]:
+                plt.xticks(rotation=-30)
+            else:
+                plt.xscale("log")
             plt.yscale("log")
             fig.savefig(experiment + name_sufix[i] + ".png")
-
-        #     x = []
-        #     y = []
-        #     for row in algo_rows:
-        #         x.append(float(row[csv_N]))
-        #         y.append(float(row[csv_overall]))
-        #     ax.plot(x, y, label=algo)
-
-        # fig.savefig(experiment + ".png")
-
-
-# for line in fileinput.input():
-#   print("AAA: " + line)
-
-# fig, ax = plt.subplots()  # Create a figure containing a single axes.
-# ax.plot([1, 2, 3, 4], [1, 4, 2, 3])
-
-# fig.savefig('foo.png')
