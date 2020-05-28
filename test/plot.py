@@ -11,9 +11,18 @@ import numpy as np
 
 # Here we declare what tests consist an experiment.
 # An experiment is described by a regex that should be contained in input's filename
-experiments = ['E1', 'E2', 'E3', 'road|osm', 'kron',
-               'citationCiteseer|com-LiveJournal|hollywood|Stanford']
-experiments_use_filename = [False, False, False, True, True, True]
+experiments = ['E1', 'E2', 'E3',
+               'USA-road', 'citationCiteseer|Patents|coPapersDBLP|delaunay_n24|in-2004|internet',
+               'kron', 'roadNet|osm', 'com-LiveJournal|hollywood|Stanford',
+               'road-g|road-a|road-r|road-b|roadNet', 'soc|wikipedia2009|ca-hollywood-2009',
+               'amazon0601|as-skitter|soc-LiveJournal1'
+               ]
+experiments_use_filename = [False, False, False,
+                            True, True,
+                            True, True, True,
+                            True, True,
+                            True
+                            ]
 
 csv_filename = "file"
 csv_N = 'N'
@@ -124,8 +133,8 @@ with open(sys.argv[1], 'r') as file:
                 if experiments_use_filename[i_exp]:
                     width = 0.3
                     real_x = np.arange(len(x))
-                    bar_shift = (i_algo + 0.5 - (len(algos) / 2.0))*width
-                    ax.bar(real_x + bar_shift, y, width, label = algo)
+                    bar_shift = (i_algo + 0.5 - (len(algos) / 2.0)) * width
+                    ax.bar(real_x + bar_shift, y, width, label=algo)
                     ax.set_xticklabels(x)
                     ax.set_xticks(real_x)
                 else:

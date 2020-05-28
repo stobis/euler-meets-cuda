@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
 
     vector<pii> in_edges;
 
+
     ifstream in(argv[1], ios::binary);
     assert(in.is_open());
 
