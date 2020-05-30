@@ -1,5 +1,10 @@
+usePgf = True
+
 import matplotlib as mpl
-mpl.use('Agg')
+if usePgf:
+    mpl.use('pgf')
+else:
+    mpl.use('Agg')
 
 import re
 import os
@@ -44,7 +49,7 @@ with open(sys.argv[1], 'r') as file:
     csv_reader = csv.DictReader(file)
     csv_file = []
     for line in csv_reader:
-        if line[csv_filename] == 'file': #headers outside first line
+        if line[csv_filename] == 'file':  # headers outside first line
             continue
         for param in csv_ints:
             if param in line:
@@ -105,8 +110,8 @@ with open(sys.argv[1], 'r') as file:
                         y[i_xval] = row[csv_overall] / 1000
                         x[i_xval] = row[experiment["x_show"]]
                         if experiment["x_show"] == csv_filename:
-                            x[i_xval] = os.path.basename(x[i_xval]).split('.')[0]
-
+                            x[i_xval] = os.path.basename(
+                                x[i_xval]).split('.')[0]
 
             ax.set_xlabel(param_to_plot_by)
             ax.set_ylabel("Time overall (s)")
@@ -135,4 +140,12 @@ with open(sys.argv[1], 'r') as file:
             # fig.constrained_layout()
         ax.set_yscale("log")
         ax.yaxis.set_major_formatter(ScalarFormatter())
-        fig.savefig(suffix + ".png")
+
+        if usePgf:
+            plt.rcParams.update(
+                {'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
+            plt.gcf().set_size_inches(w=3.34, h=2.6)
+            plt.gcf().tight_layout()
+            fig.savefig(suffix + ".pgf")
+        else:
+            fig.savefig(suffix + ".png")
