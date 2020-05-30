@@ -45,6 +45,18 @@ experiments = [
      "x_param": csv_N, "x_show": csv_N, "type": "lines"},
     {"restrictions": [(csv_filename, "road-g|road-a|road-r|road-b|roadNet")],
      "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    {"restrictions": [(csv_filename, "USA-road")],
+     "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    {"restrictions": [(csv_filename, "citationCiteseer|Patents|coPapersDBLP|delaunay_n24|in-2004|internet")],
+     "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    {"restrictions": [(csv_filename, "roadNet|osm")],
+     "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    {"restrictions": [(csv_filename, "com-LiveJournal|hollywood|Stanford")],
+     "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    {"restrictions": [(csv_filename, "soc|wikipedia2009|ca-hollywood-2009")],
+     "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    {"restrictions": [(csv_filename, "amazon0601|as-skitter|soc-LiveJournal1")],
+     "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
 ]
 
 csv_input = []
@@ -120,8 +132,7 @@ for i_exp, experiment in enumerate(experiments):
                     y[i_xval] = row[csv_overall] / 1000
                     x[i_xval] = row[experiment["x_show"]]
                     if experiment["x_show"] == csv_filename:
-                        x[i_xval] = os.path.basename(
-                            x[i_xval]).split('.')[0]
+                        x[i_xval] = os.path.basename(x[i_xval])
 
         ax.set_xlabel(param_to_plot_by)
         ax.set_ylabel("Time overall (s)")
