@@ -1,4 +1,5 @@
-usePgf = True
+# usePgf = True
+usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -7,6 +8,7 @@ else:
     mpl.use('Agg')
 
 import re
+import io
 import os
 import sys
 import csv
@@ -45,9 +47,17 @@ experiments = [
      "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
 ]
 
-with open(sys.argv[1], 'r') as file:
-    csv_reader = csv.DictReader(file)
-    csv_file = []
+csv_input = []
+with open(sys.argv[1], 'r') as input:
+    for line in input:
+        if line.split(',')[0] == 'file':
+            csv_input.append("")
+        csv_input[-1] += line
+
+
+csv_file = []
+for input in csv_input:
+    csv_reader = csv.DictReader(input.splitlines())
     for line in csv_reader:
         if line[csv_filename] == 'file':  # headers outside first line
             continue
@@ -59,93 +69,93 @@ with open(sys.argv[1], 'r') as file:
                 line[param] = float(line[param])
         csv_file.append(line)
 
-    for i_exp, experiment in enumerate(experiments):
-        fig, ax = plt.subplots()
-        current_rows = []
-        for row in csv_file:
-            isOk = True
-            for res_name, res_val in experiment["restrictions"]:
-                if isinstance(res_val, str):
-                    if not bool(re.search(res_val, row[res_name])):
-                        isOk = False
-                        break
-                else:
-                    if not res_val == row[res_name]:
-                        isOk = False
-                        break
-            if isOk:
-                current_rows.append(row)
-
-        if not current_rows:
-            continue
-
-        # print(experiment)
-        # print(len(current_rows))
-        # continue
-
-        algos = set()
-        for row in current_rows:
-            if row[csv_algo] not in algos:
-                algos.add(row[csv_algo])
-
-        for i_algo, algo in enumerate(algos):
-            algo_rows = filter(
-                lambda row: True if row[csv_algo] == algo else False, current_rows)
-
-            param_to_plot_by = experiment["x_param"]
-            plot_by_values = set()
-
-            for row in algo_rows:
-                if param_to_plot_by in row:
-                    val = row[param_to_plot_by]
-                    if val not in plot_by_values:
-                        plot_by_values.add(val)
-
-            x = sorted(plot_by_values)
-            y = [''] * len(x)
-
-            for row in algo_rows:
-                for i_xval, xval in enumerate(x):
-                    if row[param_to_plot_by] == xval:
-                        y[i_xval] = row[csv_overall] / 1000
-                        x[i_xval] = row[experiment["x_show"]]
-                        if experiment["x_show"] == csv_filename:
-                            x[i_xval] = os.path.basename(
-                                x[i_xval]).split('.')[0]
-
-            ax.set_xlabel(param_to_plot_by)
-            ax.set_ylabel("Time overall (s)")
-
-            if experiment["type"] == "bars":
-                width = 0.3
-                real_x = np.arange(len(x))
-                bar_shift = (i_algo + 0.5 - (len(algos) / 2.0)) * width
-                ax.bar(real_x + bar_shift, y, width, label=algo)
-                ax.set_xticklabels(x)
-                ax.set_xticks(real_x)
-            else:
-                ax.plot(x, y, label=algo)
-
-        suffix = ""
+for i_exp, experiment in enumerate(experiments):
+    fig, ax = plt.subplots()
+    current_rows = []
+    for row in csv_file:
+        isOk = True
         for res_name, res_val in experiment["restrictions"]:
-            suffix += "#" + res_name + ":" + str(res_val)
+            if isinstance(res_val, str):
+                if not bool(re.search(res_val, row[res_name])):
+                    isOk = False
+                    break
+            else:
+                if not res_val == row[res_name]:
+                    isOk = False
+                    break
+        if isOk:
+            current_rows.append(row)
 
-        ax.legend()
+    if not current_rows:
+        continue
+
+    # print(experiment)
+    # print(len(current_rows))
+    # continue
+
+    algos = set()
+    for row in current_rows:
+        if row[csv_algo] not in algos:
+            algos.add(row[csv_algo])
+
+    for i_algo, algo in enumerate(algos):
+        algo_rows = filter(
+            lambda row: True if row[csv_algo] == algo else False, current_rows)
+
+        param_to_plot_by = experiment["x_param"]
+        plot_by_values = set()
+
+        for row in algo_rows:
+            if param_to_plot_by in row:
+                val = row[param_to_plot_by]
+                if val not in plot_by_values:
+                    plot_by_values.add(val)
+
+        x = sorted(plot_by_values)
+        y = [''] * len(x)
+
+        for row in algo_rows:
+            for i_xval, xval in enumerate(x):
+                if row[param_to_plot_by] == xval:
+                    y[i_xval] = row[csv_overall] / 1000
+                    x[i_xval] = row[experiment["x_show"]]
+                    if experiment["x_show"] == csv_filename:
+                        x[i_xval] = os.path.basename(
+                            x[i_xval]).split('.')[0]
+
+        ax.set_xlabel(param_to_plot_by)
+        ax.set_ylabel("Time overall (s)")
+
         if experiment["type"] == "bars":
-            plt.xticks(rotation=30, ha='right')
-            # fig.subplots_adjust(bottom=0.2)
-            fig.tight_layout()
+            width = 0.3
+            real_x = np.arange(len(x))
+            bar_shift = (i_algo + 0.5 - (len(algos) / 2.0)) * width
+            ax.bar(real_x + bar_shift, y, width, label=algo)
+            ax.set_xticklabels(x)
+            ax.set_xticks(real_x)
         else:
-            ax.set_xscale("log")
-            # fig.constrained_layout()
-        ax.set_yscale("log")
-        ax.yaxis.set_major_formatter(ScalarFormatter())
+            ax.plot(x, y, label=algo)
 
-        if usePgf:
-            plt.rcParams.update(
-                {'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
-            plt.gcf().set_size_inches(w=3.34, h=2.6)
-            plt.gcf().tight_layout()
-            fig.savefig(suffix + ".pgf")
-        else:
-            fig.savefig(suffix + ".png")
+    suffix = ""
+    for res_name, res_val in experiment["restrictions"]:
+        suffix += "_" + res_name + "-" + str(res_val)
+
+    ax.legend()
+    if experiment["type"] == "bars":
+        plt.xticks(rotation=30, ha='right')
+        # fig.subplots_adjust(bottom=0.2)
+        fig.tight_layout()
+    else:
+        ax.set_xscale("log")
+        # fig.constrained_layout()
+    ax.set_yscale("log")
+    ax.yaxis.set_major_formatter(ScalarFormatter())
+
+    if usePgf:
+        plt.rcParams.update(
+            {'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
+        plt.gcf().set_size_inches(w=3.34, h=2.6)
+        plt.gcf().tight_layout()
+        fig.savefig(suffix + ".pgf")
+    else:
+        fig.savefig(suffix + ".png")
