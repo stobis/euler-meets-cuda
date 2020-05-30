@@ -25,7 +25,7 @@ csv_floats.append(csv_overall)
 
 # Here we declare what tests consist an experiment.
 # An experiment is described by a regex that should be contained in input's filename
-experiments2 = [
+experiments = [
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, -1)],
      "x_param": csv_N, "x_show": csv_N, "type": "lines"},
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, 1000)],
@@ -39,20 +39,6 @@ experiments2 = [
     {"restrictions": [(csv_filename, "road-g|road-a|road-r|road-b|roadNet")],
      "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
 ]
-
-experiments = ['E1', 'E2', 'E3',
-               'USA-road', 'citationCiteseer|Patents|coPapersDBLP|delaunay_n24|in-2004|internet',
-               'kron', 'roadNet|osm', 'com-LiveJournal|hollywood|Stanford',
-               'road-g|road-a|road-r|road-b|roadNet', 'soc|wikipedia2009|ca-hollywood-2009',
-               'amazon0601|as-skitter|soc-LiveJournal1'
-               ]
-experiments_use_filename = [False, False, False,
-                            True, True,
-                            True, True, True,
-                            True, True,
-                            True
-                            ]
-
 
 with open(sys.argv[1], 'r') as file:
     csv_reader = csv.DictReader(file)
@@ -68,7 +54,7 @@ with open(sys.argv[1], 'r') as file:
                 line[param] = float(line[param])
         csv_file.append(line)
 
-    for i_exp, experiment in enumerate(experiments2):
+    for i_exp, experiment in enumerate(experiments):
         fig, ax = plt.subplots()
         current_rows = []
         for row in csv_file:
@@ -111,13 +97,6 @@ with open(sys.argv[1], 'r') as file:
                         plot_by_values.add(val)
 
             x = sorted(plot_by_values)
-            print(x)
-
-            # For each test there are different params (N, batch, grasp). On X axis will be param with most values
-            print(param_to_plot_by)
-
-            # For now we allow one additional parameter to plot (we produce a plot for each of its values)
-
             y = [''] * len(x)
 
             for row in algo_rows:
