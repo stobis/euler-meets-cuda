@@ -464,4 +464,4 @@ void cuda_bridges_hybrid(int N, int M, int const *row_offsets, int const *col_in
   timer.print_overall();
 }
 
-} // namespace
+} // namespace emc

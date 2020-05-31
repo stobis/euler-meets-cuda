@@ -14,6 +14,6 @@ void cuda_bridges_tarjan(int N, int M, const int *row_offsets, const int *col_in
 void cuda_bridges_hybrid(int N, int M, const int *row_offsets, const int *col_indices, bool *is_bridge,
                          mgpu::context_t &context);
 
-} // namespace
+} // namespace emc
 
 #endif // EMC_BRIDGES_H_

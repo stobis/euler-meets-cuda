@@ -23,6 +23,8 @@ public:
 
   static Graph read_from_file(const char *);
   static Graph read_from_stdin();
+
+  void print_stats() const;
 };
 
 #endif // GRAPH_HPP
