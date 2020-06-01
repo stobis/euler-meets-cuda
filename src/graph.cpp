@@ -1,6 +1,6 @@
 #include <iostream>
+#include <vector>
 
-#include "bridges_cpu.h"
 #include "graph.hpp"
 
 Graph::Graph() : n(0), m(0) {}
@@ -51,18 +51,4 @@ Graph Graph::read_from_stdin() {
     col_indices.push_back(b);
   }
   return Graph(n, m, row_offsets, col_indices);
-}
-
-void Graph::print_stats() const {
-  std::cerr << "N: " << n << std::endl;
-  std::cerr << "M: " << m << std::endl;
-
-  bool *is_bridge = new bool[m];
-  cpu_bridges(n, m, get_row_offsets().data(), get_col_indices().data(), is_bridge);
-  int num_bridges = 0;
-  for (int i = 0; i < m; i++) {
-    if (is_bridge[i])
-      num_bridges++;
-  }
-  std::cerr << "Num bridges: " << num_bridges << std::endl;
 }

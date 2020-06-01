@@ -8,6 +8,7 @@
 #include "bridges.h"
 #include "bridges_cpu.h"
 #include "graph.hpp"
+#include "graph_stats.hpp"
 
 using namespace emc;
 using namespace std;
@@ -96,7 +97,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (print_graph_stats) {
-    input_graph.print_stats();
+    print_stats(input_graph);
     return 0;
   }
 
