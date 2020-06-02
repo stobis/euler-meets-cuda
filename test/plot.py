@@ -26,7 +26,7 @@ csv_BFS = "BFS"
 csv_find_bridges = "Find bridges"
 csv_spanning_tree = "Spanning Tree"
 csv_list_rank = "List rank"
-csv_distance_parent = "Distance & parent"
+csv_distance_parent = "Distance and parent"
 
 csv_ints = []
 csv_ints.extend([csv_N, csv_grasp, csv_batch])
@@ -37,36 +37,41 @@ csv_floats.extend([csv_overall, csv_BFS, csv_spanning_tree,
 csv_detailed_fields = [csv_BFS, csv_spanning_tree,
                        csv_list_rank, csv_distance_parent, csv_find_bridges]
 
+hatches = ['xx', '++', '//', 'oo', '\\\\']
+colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+
+sizes_in_inches = {"regular": (3.34, 2.6), "wide": (6.68, 2.6)}
+
 
 # Here we declare what tests consist an experiment.
 # An experiment is described by a regex that should be contained in input's filename
 experiments = [
     # {"restrictions": [(csv_filename, "E1"), (csv_grasp, -1)],
-    #  "x_param": csv_N, "x_show": csv_N, "type": "lines"},
+    #  "x_param": csv_N, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "E1"), (csv_grasp, 1000)],
-    #  "x_param": csv_N, "x_show": csv_N, "type": "lines"},
+    #  "x_param": csv_N, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "E2")],
-    #  "x_param": csv_batch, "x_show": csv_batch, "type": "lines"},
+    #  "x_param": csv_batch, "x_show": csv_batch, "type": "lines", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "E3")],
-    #  "x_param": csv_grasp, "x_show": csv_grasp, "type": "lines"},
-    # {"restrictions": [(csv_filename, "kron")],
-    #  "x_param": csv_N, "x_show": csv_N, "type": "lines"},
+    #  "x_param": csv_grasp, "x_show": csv_grasp, "type": "lines", "size": sizes_in_inches["regular"]},
+    {"restrictions": [(csv_filename, "kron")],
+     "x_param": csv_N, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "road-g|road-a|road-r|road-b|roadNet")],
-    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "USA-road")],
-    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "citationCiteseer|Patents|coPapersDBLP|delaunay_n24|in-2004|internet")],
-    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "roadNet|osm")],
-    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "com-LiveJournal|hollywood|Stanford")],
-    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "soc|wikipedia2009|ca-hollywood-2009")],
-    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
-    # {"restrictions": [(csv_filename, "amazon0601|as-skitter|soc-LiveJournal1")],
-    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars"},
+    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
+    {"restrictions": [(csv_filename, "amazon0601|as-skitter|soc-LiveJournal1")],
+     "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     {"restrictions": [(csv_filename, "kron_g500-logn21|USA-road-d.USA")],
-     "x_param": csv_N, "x_show": csv_filename, "type": "detailed"},
+     "x_param": csv_N, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["wide"]},
 ]
 
 csv_input = []
@@ -93,6 +98,17 @@ for input in csv_input:
 
 for i_exp, experiment in enumerate(experiments):
     fig, ax = plt.subplots()
+    xSize, ySize = experiment["size"]
+    fig.set_size_inches(xSize, ySize, forward=True)
+    font_size = 8
+    plt.rcParams.update({'font.size': font_size})
+    # plt.rc('font', size=font_size)
+    # plt.rc('axes', titlesize=font_size)     # fontsize of the axes title
+    # plt.rc('axes', labelsize=font_size)    # fontsize of the x and y labels
+    # plt.rc('xtick', labelsize=font_size)    # fontsize of the tick labels
+    # plt.rc('ytick', labelsize=font_size)    # fontsize of the tick labels
+    # plt.rc('legend', fontsize=font_size)    # legend fontsize
+    # plt.rc('figure', titlesize=font_size)
     current_rows = []
     for row in csv_file:
         isOk = True
@@ -111,16 +127,12 @@ for i_exp, experiment in enumerate(experiments):
     if not current_rows:
         continue
 
-    # print(experiment)
-    # print(len(current_rows))
-    # continue
-
     algos = set()
     for row in current_rows:
         if row[csv_algo] not in algos:
             algos.add(row[csv_algo])
 
-    for i_algo, algo in enumerate(algos):
+    for i_algo, algo in reversed(list(enumerate(algos))):
         algo_rows = filter(
             lambda row: True if row[csv_algo] == algo else False, current_rows)
 
@@ -139,6 +151,7 @@ for i_exp, experiment in enumerate(experiments):
         else:
             y = [''] * len(x)
 
+        # Prepare data
         for row in algo_rows:
             for i_xval, xval in enumerate(x):
                 if row[param_to_plot_by] == xval:
@@ -149,16 +162,15 @@ for i_exp, experiment in enumerate(experiments):
                             else:
                                 y[i_xval].append(0)
                     else:
-                        y[i_xval] = row[csv_overall] / 1000.0
+                        y[i_xval] = row[csv_overall]
                     x[i_xval] = row[experiment["x_show"]]
                     if experiment["x_show"] == csv_filename:
                         x[i_xval] = os.path.basename(x[i_xval])
 
-        print(y)
-
-        ax.set_xlabel(param_to_plot_by)
-        ax.set_ylabel("Time overall (s)")
+        # Plot data
         if experiment["type"] == "detailed":
+            ax.set_ylabel(experiment["x_show"])
+            ax.set_xlabel("Time overall (ms)")
             height = 0.3
             real_x = np.arange(len(x))
             y_sum = [sum(i) for i in y]
@@ -168,48 +180,70 @@ for i_exp, experiment in enumerate(experiments):
                     alg_label = None
                 else:
                     alg_label = algo + "-" + field
-                ax.barh(real_x + bar_shift, y_sum, height, label=alg_label)
+                ax.barh(real_x + bar_shift, y_sum, height, label=alg_label,
+                        color='white', edgecolor=colors[i_algo], hatch=hatches[i_field])
 
                 for i_xval, xval in enumerate(x):
                     y_sum[i_xval] -= y[i_xval][i_field]
-            ax.set_yticklabels(x)
+
             ax.set_yticks(real_x)
-            # ax.barh(real_x + bar_shift, y, height, label=algo)
-            # ax.barh(real_x + bar_shift, [i-0.2 for i in y], height, label=(algo + "aaa"))
+            ax.set_yticklabels(x)
+            ax.invert_yaxis()
         elif experiment["type"] == "bars":
+            ax.set_xlabel(experiment["x_show"])
+            ax.set_ylabel("Time overall (ms)")
             width = 0.3
             real_x = np.arange(len(x))
             bar_shift = (i_algo + 0.5 - (len(algos) / 2.0)) * width
-            ax.bar(real_x + bar_shift, y, width, label=algo)
+            ax.bar(real_x + bar_shift, y, width,
+                   label=algo, color=colors[i_algo], bottom=10)
             ax.set_xticklabels(x)
             ax.set_xticks(real_x)
         else:
-            ax.plot(x, y, label=algo)
+            ax.set_xlabel(experiment["x_show"], fontsize=font_size)
+            ax.set_ylabel("Time overall (ms)", fontsize=font_size)
+            ax.plot(x, y, label=algo, color=colors[i_algo])
 
     suffix = ""
     for res_name, res_val in experiment["restrictions"]:
         suffix += "_" + res_name + "-" + str(res_val)
 
-    ax.legend()
+    # Format plot 
     if experiment["type"] == "bars":
         plt.xticks(rotation=30, ha='right')
         # fig.subplots_adjust(bottom=0.2)
         fig.tight_layout()
         ax.set_yscale("log")
+        ax.yaxis.set_major_formatter(ScalarFormatter())
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles[::-1], labels[::-1])
     elif experiment["type"] == "detailed":
-        pass
+        fig.tight_layout(rect=[0,0.2,1,1])
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.3, -0.45),
+                  fancybox=True, shadow=True, ncol=3)
     else:
+        plt.xticks(fontsize=font_size)
+        plt.yticks(fontsize=font_size)
+        fig.tight_layout()
         ax.set_xscale("log")
         ax.set_yscale("log")
+        ax.yaxis.set_major_formatter(ScalarFormatter())
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles[::-1], labels[::-1])
         # fig.constrained_layout()
-    ax.yaxis.set_major_formatter(ScalarFormatter())
     # plt.ylim(bottom=0)
 
+    # Save
     if usePgf:
         plt.rcParams.update(
             {'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
-        plt.gcf().set_size_inches(w=3.34, h=2.6)
+        plt.gcf().set_size_inches(w=xSize, h=ySize)
         plt.gcf().tight_layout()
         fig.savefig(suffix + ".pgf")
     else:
-        fig.savefig(suffix + ".png")
+        # fig.set_size_inches(10,5, forward=True)
+        if experiment["type"] == "detailed":
+            fig.savefig(suffix + ".png")
+        else:
+            fig.savefig(suffix + ".png")

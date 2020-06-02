@@ -454,7 +454,7 @@ void cuda_bridges_hybrid(int N, int M, int const *row_offsets, int const *col_in
   count_distance_and_parent(N, 2 * (N - 1), tree_directed.data(), tree_directed_rev.data(), distance.data(),
                             parent.data(), context);
 
-  show_time("Distance & parent", timer, context);
+  show_time("Distance and parent", timer, context);
 
   // Naive part
   _mark_bridges(N, M, row_offsets, col_indices, distance.data(), parent.data(), is_bridge, context);
