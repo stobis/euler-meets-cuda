@@ -18,6 +18,7 @@ import numpy as np
 
 csv_filename = "file"
 csv_N = 'N'
+csv_M = 'M'
 csv_algo = 'algo'
 csv_overall = 'Overall'
 csv_grasp = 'grasp'
@@ -29,7 +30,7 @@ csv_list_rank = "List rank"
 csv_distance_parent = "Distance and parent"
 
 csv_ints = []
-csv_ints.extend([csv_N, csv_grasp, csv_batch])
+csv_ints.extend([csv_N, csv_M, csv_grasp, csv_batch])
 csv_floats = []
 csv_floats.extend([csv_overall, csv_BFS, csv_spanning_tree,
                    csv_list_rank, csv_distance_parent, csv_find_bridges])
@@ -41,21 +42,26 @@ hatches = ['xx', '++', '//', 'oo', '\\\\']
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
 
 sizes_in_inches = {"regular": (3.34, 2.6), "wide": (6.68, 2.6)}
+# sizes_in_inches = {"regular": (5, 3), "wide": (8, 3)}
 
 
 # Here we declare what tests consist an experiment.
 # An experiment is described by a regex that should be contained in input's filename
 experiments = [
-    # {"restrictions": [(csv_filename, "E1"), (csv_grasp, -1)],
-    #  "x_param": csv_N, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"]},
-    # {"restrictions": [(csv_filename, "E1"), (csv_grasp, 1000)],
-    #  "x_param": csv_N, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"]},
-    # {"restrictions": [(csv_filename, "E2")],
-    #  "x_param": csv_batch, "x_show": csv_batch, "type": "lines", "size": sizes_in_inches["regular"]},
-    # {"restrictions": [(csv_filename, "E3")],
-    #  "x_param": csv_grasp, "x_show": csv_grasp, "type": "lines", "size": sizes_in_inches["regular"]},
+    {"restrictions": [(csv_filename, "E1"), (csv_grasp, -1)],
+     "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"]},
+    {"restrictions": [(csv_filename, "E1"), (csv_grasp, 1000)],
+     "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"]},
+    {"restrictions": [(csv_filename, "E2")],
+     "x_param": csv_batch, "x_show": csv_batch, "type": "lines", "size": sizes_in_inches["regular"]},
+    {"restrictions": [(csv_filename, "E3")],
+     "x_param": csv_grasp, "x_show": csv_grasp, "type": "lines", "size": sizes_in_inches["regular"]},
     {"restrictions": [(csv_filename, "kron")],
      "x_param": csv_N, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"]},
+    {"restrictions": [(csv_filename, "road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
+     "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
+    {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia")],
+     "x_param": csv_M, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "road-g|road-a|road-r|road-b|roadNet")],
     #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "USA-road")],
@@ -68,9 +74,9 @@ experiments = [
     #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "soc|wikipedia2009|ca-hollywood-2009")],
     #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
-    {"restrictions": [(csv_filename, "amazon0601|as-skitter|soc-LiveJournal1")],
-     "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
-    {"restrictions": [(csv_filename, "kron_g500-logn21|USA-road-d.USA")],
+    # {"restrictions": [(csv_filename, "amazon0601|as-skitter|soc-LiveJournal1")],
+    #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
+    {"restrictions": [(csv_filename, "kron_g500-logn21|USA-road-d.USA|cit-Patents")],
      "x_param": csv_N, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["wide"]},
 ]
 
@@ -146,6 +152,9 @@ for i_exp, experiment in enumerate(experiments):
                     plot_by_values.add(val)
 
         x = sorted(plot_by_values)
+
+        print(x)
+
         if experiment["type"] == "detailed":
             y = [[] for _ in range(len(x))]
         else:
@@ -166,10 +175,13 @@ for i_exp, experiment in enumerate(experiments):
                     x[i_xval] = row[experiment["x_show"]]
                     if experiment["x_show"] == csv_filename:
                         x[i_xval] = os.path.basename(x[i_xval])
+                        x[i_xval] = x[i_xval].replace(".gr.bin", "")
+                        x[i_xval] = x[i_xval].replace(".mtx.bin", "")
+                        x[i_xval] = x[i_xval].replace(".txt.bin", "")
 
         # Plot data
         if experiment["type"] == "detailed":
-            ax.set_ylabel(experiment["x_show"])
+            # ax.set_ylabel(experiment["x_show"])
             ax.set_xlabel("Time overall (ms)")
             height = 0.3
             real_x = np.arange(len(x))
@@ -190,7 +202,7 @@ for i_exp, experiment in enumerate(experiments):
             ax.set_yticklabels(x)
             ax.invert_yaxis()
         elif experiment["type"] == "bars":
-            ax.set_xlabel(experiment["x_show"])
+            # ax.set_xlabel(experiment["x_show"])
             ax.set_ylabel("Time overall (ms)")
             width = 0.3
             real_x = np.arange(len(x))
@@ -199,10 +211,18 @@ for i_exp, experiment in enumerate(experiments):
                    label=algo, color=colors[i_algo], bottom=10)
             ax.set_xticklabels(x)
             ax.set_xticks(real_x)
+        elif experiment["type"] == "lines_xM":
+            ax.set_xlabel(experiment["x_show"], fontsize=font_size)
+            ax.set_ylabel("Time overall (ms)", fontsize=font_size)
+            real_x = np.arange(len(x))
+            string_x = [str(val/1000000) + "M" for val in x]
+            ax.plot(real_x, y, label=algo, color=colors[i_algo], marker=".")
+            ax.set_xticklabels(string_x)
+            ax.set_xticks(real_x)
         else:
             ax.set_xlabel(experiment["x_show"], fontsize=font_size)
             ax.set_ylabel("Time overall (ms)", fontsize=font_size)
-            ax.plot(x, y, label=algo, color=colors[i_algo])
+            ax.plot(x, y, label=algo, color=colors[i_algo], marker=".")
 
     suffix = ""
     for res_name, res_val in experiment["restrictions"]:
@@ -220,9 +240,19 @@ for i_exp, experiment in enumerate(experiments):
     elif experiment["type"] == "detailed":
         fig.tight_layout(rect=[0,0.2,1,1])
         handles, labels = ax.get_legend_handles_labels()
-        ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.3, -0.45),
+        legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.45),
                   fancybox=True, shadow=True, ncol=3)
-    else:
+    elif experiment["type"] == "lines_xM":
+        plt.xticks(fontsize=font_size)
+        plt.yticks(fontsize=font_size)
+        fig.tight_layout()
+        # ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.yaxis.set_major_formatter(ScalarFormatter())
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles[::-1], labels[::-1])
+        # fig.constrained_layout()
+    else: #lines
         plt.xticks(fontsize=font_size)
         plt.yticks(fontsize=font_size)
         fig.tight_layout()
@@ -239,11 +269,16 @@ for i_exp, experiment in enumerate(experiments):
         plt.rcParams.update(
             {'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
         plt.gcf().set_size_inches(w=xSize, h=ySize)
-        plt.gcf().tight_layout()
-        fig.savefig(suffix + ".pgf")
+        if experiment["type"] == "detailed":
+            fig.savefig(suffix + ".pgf", bbox_extra_artists=(legend))
+        else:
+            fig.savefig(suffix + ".pgf")
     else:
         # fig.set_size_inches(10,5, forward=True)
+        plt.rcParams.update(
+            {'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
+        plt.gcf().set_size_inches(w=xSize, h=ySize)
         if experiment["type"] == "detailed":
-            fig.savefig(suffix + ".png")
+            fig.savefig(suffix + ".png", bbox_extra_artists=(legend))
         else:
             fig.savefig(suffix + ".png")
