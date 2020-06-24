@@ -94,15 +94,16 @@ experiments = [
 
     {"restrictions": [(csv_filename, "E3")],
      "x_param": csv_grasp, "x_show": csv_grasp, "type": "lines", "size": sizes_in_inches["regular"]},
+
     {"restrictions": [(csv_filename, "kron")],
-     "x_param": csv_N, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"]},
+     "x_param": csv_filename, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"]},
     {"restrictions": [(csv_filename, "road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
-     "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
+     "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia")],
-     "x_param": csv_M, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
+     "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
 
     {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
-     "x_param": csv_M, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["wide"]},
+     "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["wide"]},
     # {"restrictions": [(csv_filename, "road-g|road-a|road-r|road-b|roadNet")],
     #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "USA-road")],
@@ -118,15 +119,34 @@ experiments = [
     # {"restrictions": [(csv_filename, "amazon0601|as-skitter|soc-LiveJournal1")],
     #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     {"restrictions": [(csv_filename, "kron_g500-logn21|USA-road-d.CTR|cit-Patents")],
-     "x_param": csv_N, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["wide"]},
+     "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["wide"]},
 
     {"restrictions": [(csv_filename, "kron")],
-     "x_param": csv_N, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
+     "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
     {"restrictions": [(csv_filename, "road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
-     "x_param": csv_N, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
+     "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
     {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia")],
-     "x_param": csv_N, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]}
+     "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]}
 ]
+
+filename_order = [
+    "kron_g500-logn16",
+    "kron_g500-logn17",
+    "kron_g500-logn18",
+    "kron_g500-logn19",
+    "kron_g500-logn20",
+    "kron_g500-logn21",
+    "web-wikipedia2009",
+    "cit-Patents",
+    "socfb-A-anon",
+    "soc-LiveJournal1",
+    "ca-hollywood-2009",
+    "USA-road-d.E",
+    "USA-road-d.W",
+    "great-britain-osm",
+    "asia-osm",
+    "USA-road-d.CTR",
+    "USA-road-d.USA"]
 
 csv_input = []
 with open(sys.argv[1], 'r') as input:
@@ -191,7 +211,7 @@ for i_exp, experiment in enumerate(experiments):
 
     if "tarjan" in algos:
         algos = ["naive", "tarjan", "hybrid"]
-    
+
     for i_algo, algo in reversed(list(enumerate(algos))):
         algo_rows = filter(
             lambda row: True if row[csv_algo] == algo else False, current_rows)
@@ -205,7 +225,16 @@ for i_exp, experiment in enumerate(experiments):
                 if val not in plot_by_values:
                     plot_by_values.add(val)
 
-        x = sorted(plot_by_values)
+        if param_to_plot_by == csv_filename:
+            positions = {}
+            for var in plot_by_values:
+                for i_fn, fn in enumerate(filename_order):
+                    if fn in var:
+                        positions[var] = i_fn
+                        break
+            x = sorted(plot_by_values, key=lambda val: positions[val])
+        else:
+            x = sorted(plot_by_values)
 
         print(x)
 
