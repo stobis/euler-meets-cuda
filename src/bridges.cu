@@ -100,7 +100,7 @@ void cuda_bridges_naive(int N, int M, const int *row_offsets, const int *col_ind
 
   if (detailed_time) {
     context.synchronize();
-    timer.print_and_restart("Find bridges");
+    timer.print_and_restart("Naive bridges");
 
     mem_t<int> maxd(1, context);
     reduce(distance.data(), distance.size(), maxd.data(), mgpu::maximum_t<int>(), context);
@@ -460,7 +460,7 @@ void cuda_bridges_hybrid(int N, int M, int const *row_offsets, int const *col_in
   _mark_bridges(N, M, row_offsets, col_indices, distance.data(), parent.data(), is_bridge, context);
 
   // Print exec time
-  show_time("Find bridges", timer, context);
+  show_time("Naive bridges", timer, context);
   timer.print_overall();
 }
 

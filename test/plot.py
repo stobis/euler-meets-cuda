@@ -1,5 +1,5 @@
-usePgf = True
-# usePgf = False
+# usePgf = True
+usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -26,6 +26,7 @@ csv_grasp = 'grasp'
 csv_batch = 'batch'
 csv_BFS = "BFS"
 csv_find_bridges = "Find bridges"
+csv_naive_bridges = "Naive bridges"
 csv_spanning_tree = "Spanning Tree"
 csv_list_rank = "List rank"
 csv_distance_parent = "Distance and parent"
@@ -36,15 +37,16 @@ csv_ints = []
 csv_ints.extend([csv_N, csv_M, csv_grasp, csv_batch])
 csv_floats = []
 csv_floats.extend([csv_overall, csv_BFS, csv_spanning_tree,
-                   csv_list_rank, csv_distance_parent, csv_find_bridges, csv_preprocessing, csv_queries, csv_Q])
+                   csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges, csv_preprocessing, csv_queries, csv_Q])
 
 csv_detailed_fields = [csv_BFS, csv_spanning_tree,
-                       csv_list_rank, csv_distance_parent, csv_find_bridges]
+                       csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges]
 
-hatches = ['xxx', '+++', '**', '---', '\\\\\\']
+hatches = ['++', '**', 'oo', '----', '||', '..']
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
 
-sizes_in_inches = {"regular": (3.34, 2.6), "wide": (6.68, 2.6), "huge": (6.68, 6)}
+sizes_in_inches = {"regular": (3.34, 2.6), "wide": (
+    6.68, 2.6), "huge": (6.68, 6)}
 # sizes_in_inches = {"regular": (5, 3), "wide": (8, 3)}
 
 
@@ -82,8 +84,8 @@ experiments = [
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, -1)],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_Q, "y_divide": csv_queries},
-    
-     
+
+
     {"restrictions": [(csv_filename, "E2")],
      "x_param": csv_batch, "x_show": csv_batch, "type": "lines", "size": sizes_in_inches["regular"]},
     {"restrictions": [(csv_filename, "E2")],
@@ -100,7 +102,7 @@ experiments = [
      "x_param": csv_M, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
 
     {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
-     "x_param": csv_M, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["wide"]}, 
+     "x_param": csv_M, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["wide"]},
     # {"restrictions": [(csv_filename, "road-g|road-a|road-r|road-b|roadNet")],
     #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "USA-road")],
@@ -115,14 +117,14 @@ experiments = [
     #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
     # {"restrictions": [(csv_filename, "amazon0601|as-skitter|soc-LiveJournal1")],
     #  "x_param": csv_N, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
-    {"restrictions": [(csv_filename, "kron_g500-logn21|USA-road-d.USA|cit-Patents")],
+    {"restrictions": [(csv_filename, "kron_g500-logn21|USA-road-d.CTR|cit-Patents")],
      "x_param": csv_N, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["wide"]},
 
-     {"restrictions": [(csv_filename, "kron")],
+    {"restrictions": [(csv_filename, "kron")],
      "x_param": csv_N, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
-     {"restrictions": [(csv_filename, "road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
+    {"restrictions": [(csv_filename, "road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
      "x_param": csv_N, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
-     {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia")],
+    {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia")],
      "x_param": csv_N, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]}
 ]
 
@@ -151,7 +153,6 @@ for input in csv_input:
 for i_exp, experiment in enumerate(experiments):
     if "y_param" not in experiment:
         experiment["y_param"] = csv_overall
-
 
     fig, ax = plt.subplots()
     xSize, ySize = experiment["size"]
@@ -188,6 +189,9 @@ for i_exp, experiment in enumerate(experiments):
         if row[csv_algo] not in algos:
             algos.add(row[csv_algo])
 
+    if "tarjan" in algos:
+        algos = ["naive", "tarjan", "hybrid"]
+    
     for i_algo, algo in reversed(list(enumerate(algos))):
         algo_rows = filter(
             lambda row: True if row[csv_algo] == algo else False, current_rows)
@@ -265,34 +269,38 @@ for i_exp, experiment in enumerate(experiments):
             ax.set_xticks(real_x)
         elif experiment["type"] == "lines_xM":
             ax.set_xlabel(experiment["x_show"], fontsize=font_size)
-            ax.set_ylabel("Time " + experiment["y_param"] + " (ms)", fontsize=font_size)
+            ax.set_ylabel(
+                "Time " + experiment["y_param"] + " (ms)", fontsize=font_size)
             if "y_divide" in experiment:
-                ax.set_ylabel("Million " + experiment["y_divide"] + "/s", fontsize=font_size)
+                ax.set_ylabel(
+                    "Million " + experiment["y_divide"] + "/s", fontsize=font_size)
             real_x = np.arange(len(x))
             string_x = [str(val/1000000) + "M" for val in x]
             ax.plot(real_x, y, label=algo, color=colors[i_algo], marker=".")
             if "y_divide" in experiment:
-                ax.set_ylim(0.1,1000)
+                ax.set_ylim(0.1, 1000)
             ax.set_xticklabels(string_x)
             ax.set_xticks(real_x)
         else:
             ax.set_xlabel(experiment["x_show"], fontsize=font_size)
-            ax.set_ylabel("Time " + experiment["y_param"] + " (ms)", fontsize=font_size)
+            ax.set_ylabel(
+                "Time " + experiment["y_param"] + " (ms)", fontsize=font_size)
             if "y_divide" in experiment:
-                ax.set_ylabel("Million " + experiment["y_divide"] + "/s", fontsize=font_size)
+                ax.set_ylabel(
+                    "Million " + experiment["y_divide"] + "/s", fontsize=font_size)
             ax.plot(x, y, label=algo, color=colors[i_algo], marker=".")
 
     suffix = ""
     for res_name, res_val in experiment["restrictions"]:
         suffix += "_" + res_name + "-" + str(res_val)
-    
+
     suffix += "x=" + experiment["x_param"]
     suffix += "y=" + experiment["y_param"]
     if "y_divide" in experiment:
         suffix += "%" + experiment["y_divide"]
     suffix += experiment["type"]
 
-    # Format plot 
+    # Format plot
     if experiment["type"] == "bars":
         plt.xticks(rotation=30, ha='right')
         # fig.subplots_adjust(bottom=0.2)
@@ -302,13 +310,13 @@ for i_exp, experiment in enumerate(experiments):
         handles, labels = ax.get_legend_handles_labels()
         ax.legend(handles[::-1], labels[::-1])
     elif experiment["type"] == "detailed":
-        fig.tight_layout(rect=[0,0.2,1,1])
+        fig.tight_layout(rect=[0, 0.2, 1, 1])
         handles, labels = ax.get_legend_handles_labels()
         legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.45),
-                  fancybox=True, shadow=True, ncol=3)
+                           fancybox=True, shadow=True, ncol=3)
         if experiment["size"] == (6.68, 6):
-           legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4,-0.3),
-                  fancybox=True, shadow=True, ncol=3) 
+            legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.3),
+                               fancybox=True, shadow=True, ncol=3)
     elif experiment["type"] == "lines_xM":
         plt.xticks(fontsize=font_size)
         plt.yticks(fontsize=font_size)
@@ -320,7 +328,7 @@ for i_exp, experiment in enumerate(experiments):
         handles, labels = ax.get_legend_handles_labels()
         ax.legend(handles[::-1], labels[::-1])
         # fig.constrained_layout()
-    else: #lines
+    else:  # lines
         plt.xticks(fontsize=font_size)
         plt.yticks(fontsize=font_size)
         fig.tight_layout()
