@@ -1,5 +1,5 @@
-# usePgf = True
-usePgf = False
+usePgf = True
+# usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -46,7 +46,7 @@ hatches = ['++', '**', 'oo', '----', '||', '..']
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
 
 sizes_in_inches = {"regular": (3.34, 2.6), "wide": (
-    6.68, 2.6), "huge": (6.68, 6)}
+    6.68, 2.6), "huge": (6.68, 7), "allGraphs": (10, 25)}
 # sizes_in_inches = {"regular": (5, 3), "wide": (8, 3)}
 
 
@@ -121,12 +121,14 @@ experiments = [
     {"restrictions": [(csv_filename, "kron_g500-logn21|USA-road-d.CTR|cit-Patents")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["wide"]},
 
-    {"restrictions": [(csv_filename, "kron")],
+    # {"restrictions": [(csv_filename, "road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
+    #  "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
+    # {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia")],
+    #  "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]}
+    {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
-    {"restrictions": [(csv_filename, "road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
-     "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
-    {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia")],
-     "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]}
+    {"restrictions": [(csv_filename, "")],
+     "x_param": csv_M, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["allGraphs"]},
 ]
 
 filename_order = [
@@ -339,12 +341,20 @@ for i_exp, experiment in enumerate(experiments):
         handles, labels = ax.get_legend_handles_labels()
         ax.legend(handles[::-1], labels[::-1])
     elif experiment["type"] == "detailed":
-        fig.tight_layout(rect=[0, 0.2, 1, 1])
-        handles, labels = ax.get_legend_handles_labels()
-        legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.45),
-                           fancybox=True, shadow=True, ncol=3)
-        if experiment["size"] == (6.68, 6):
-            legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.3),
+        if experiment["size"] == sizes_in_inches["huge"]:
+            fig.tight_layout(rect=[0, 0.1, 1, 1])
+            handles, labels = ax.get_legend_handles_labels()
+            legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.15),
+                               fancybox=True, shadow=True, ncol=3)
+        elif experiment["size"] == sizes_in_inches["allGraphs"]:
+            fig.tight_layout(rect=[0, 0.05, 1, 1])
+            handles, labels = ax.get_legend_handles_labels()
+            legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.05),
+                               fancybox=True, shadow=True, ncol=3)
+        else:
+            fig.tight_layout(rect=[0, 0.2, 1, 1])
+            handles, labels = ax.get_legend_handles_labels()
+            legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.45),
                                fancybox=True, shadow=True, ncol=3)
     elif experiment["type"] == "lines_xM":
         plt.xticks(fontsize=font_size)
