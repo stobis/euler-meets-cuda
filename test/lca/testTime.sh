@@ -16,14 +16,21 @@ for T in ${testsToRun[@]}; do
     eval _testSizes=( '"${E'${T}'TestSizes[@]}"' )
     eval _graspSizes=( '"${E'${T}'GraspSizes[@]}"' )
     eval _batchSizes=( '"${E'${T}'BatchSizes[@]}"' )
+    eval _numQueries=( '"${E'${T}'NumQueries[@]}"' )
+
 
     _numOfSeeds=E${T}DifferentSeeds
     for size in ${_testSizes[@]}; do
         for graspSize in ${_graspSizes[@]}; do
-            genTest ${!_testsDir} b $size $size $graspSize ${!_numOfSeeds}
+            if [ -z "$_numQueries" ]; then
+                genTest ${!_testsDir} b $size $size $graspSize ${!_numOfSeeds}
+            else
+                for queries in ${_numQueries[@]}; do
+                    genTest ${!_testsDir} b $size $queries $graspSize ${!_numOfSeeds}
+                done
+            fi
         done
     done
-
 
     _resultsDir=E${T}ResultsDir
     mkdir -p ${!_resultsDir} 
