@@ -1,5 +1,5 @@
-usePgf = True
-# usePgf = False
+# usePgf = True
+usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -14,6 +14,7 @@ import sys
 import csv
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
+import matplotlib.ticker as ticker
 import numpy as np
 
 csv_filename = "file"
@@ -46,7 +47,7 @@ hatches = ['++', '**', 'oo', '----', '||', '..']
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
 
 sizes_in_inches = {"regular": (3.34, 2.6), "wide": (
-    6.68, 2.6), "huge": (6.68, 7), "allGraphs": (10, 25)}
+    6.68, 2.6), "huge": (6.68, 8), "allGraphs": (10, 25)}
 # sizes_in_inches = {"regular": (5, 3), "wide": (8, 3)}
 
 
@@ -97,10 +98,10 @@ experiments = [
 
     {"restrictions": [(csv_filename, "kron")],
      "x_param": csv_filename, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"]},
-    {"restrictions": [(csv_filename, "road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
-     "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
-    {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia")],
-     "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
+    # {"restrictions": [(csv_filename, "road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
+    #  "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
+    # {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia")],
+    #  "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["regular"]},
 
     {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["wide"]},
@@ -125,9 +126,9 @@ experiments = [
     #  "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
     # {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia")],
     #  "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]}
-    {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
+    {"restrictions": [(csv_filename, "kron_g500-logn19|kron_g500-logn2|cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
-    {"restrictions": [(csv_filename, "")],
+    {"restrictions": [(csv_filename, ".bin")],
      "x_param": csv_M, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["allGraphs"]},
 ]
 
@@ -149,6 +150,8 @@ filename_order = [
     "asia-osm",
     "USA-road-d.CTR",
     "USA-road-d.USA"]
+
+# TODO(Adrian) Print usage when argc < 3
 
 csv_input = []
 with open(sys.argv[1], 'r') as input:
@@ -258,7 +261,9 @@ for i_exp, experiment in enumerate(experiments):
                     else:
                         y[i_xval] = row[experiment["y_param"]]
                         if "y_divide" in experiment:
-                            y[i_xval] /= row[experiment["y_divide"]] * 1000
+                            y[i_xval] /= row[experiment["y_divide"]] / 1000.0
+                        elif experiment["type"] == "lines_xM":
+                            y[i_xval] /= 1000
                     x[i_xval] = row[experiment["x_show"]]
                     if experiment["x_show"] == csv_filename:
                         x[i_xval] = os.path.basename(x[i_xval])
@@ -270,7 +275,7 @@ for i_exp, experiment in enumerate(experiments):
         if experiment["type"] == "detailed":
             # ax.set_ylabel(experiment["x_show"])
             ax.set_xlabel("Time overall (ms)")
-            height = 0.3
+            height = 0.28
             real_x = np.arange(len(x))
             y_sum = [sum(i) for i in y]
             bar_shift = (i_algo + 0.5 - (len(algos) / 2.0)) * height
@@ -293,6 +298,7 @@ for i_exp, experiment in enumerate(experiments):
             ax.set_ylabel("Time " + experiment["y_param"] + " (ms)")
             width = 0.3
             real_x = np.arange(len(x))
+            ax.set_ylim(10, 5000)
             bar_shift = (i_algo + 0.5 - (len(algos) / 2.0)) * width
             ax.bar(real_x + bar_shift, y, width,
                    label=algo, color=colors[i_algo], bottom=10)
@@ -301,15 +307,19 @@ for i_exp, experiment in enumerate(experiments):
         elif experiment["type"] == "lines_xM":
             ax.set_xlabel(experiment["x_show"], fontsize=font_size)
             ax.set_ylabel(
-                "Time " + experiment["y_param"] + " (ms)", fontsize=font_size)
+                "Time " + experiment["y_param"] + " (s)", fontsize=font_size)
             if "y_divide" in experiment:
                 ax.set_ylabel(
-                    "Million " + experiment["y_divide"] + "/s", fontsize=font_size)
+                    experiment["y_divide"] + "/s", fontsize=font_size)
             real_x = np.arange(len(x))
             string_x = [str(val/1000000) + "M" for val in x]
             ax.plot(real_x, y, label=algo, color=colors[i_algo], marker=".")
             if "y_divide" in experiment:
-                ax.set_ylim(0.1, 1000)
+                ax.set_ylim(100000, 1000000000)
+            else:
+                ax.set_ylim(0.002,200)
+            ax.yaxis.grid(which="major")
+            # ax.yaxis.grid(which="minor", linestyle='--', linewidth=.3)
             ax.set_xticklabels(string_x)
             ax.set_xticks(real_x)
         else:
@@ -328,8 +338,10 @@ for i_exp, experiment in enumerate(experiments):
     suffix += "x=" + experiment["x_param"]
     suffix += "y=" + experiment["y_param"]
     if "y_divide" in experiment:
-        suffix += "%" + experiment["y_divide"]
+        suffix += "div" + experiment["y_divide"]
     suffix += experiment["type"]
+
+    suffix = suffix.replace("# ", "num")
 
     # Format plot
     if experiment["type"] == "bars":
@@ -342,9 +354,9 @@ for i_exp, experiment in enumerate(experiments):
         ax.legend(handles[::-1], labels[::-1])
     elif experiment["type"] == "detailed":
         if experiment["size"] == sizes_in_inches["huge"]:
-            fig.tight_layout(rect=[0, 0.1, 1, 1])
+            fig.tight_layout(rect=[0, 0.08, 1, 1])
             handles, labels = ax.get_legend_handles_labels()
-            legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.15),
+            legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.11),
                                fancybox=True, shadow=True, ncol=3)
         elif experiment["size"] == sizes_in_inches["allGraphs"]:
             fig.tight_layout(rect=[0, 0.05, 1, 1])
@@ -362,8 +374,8 @@ for i_exp, experiment in enumerate(experiments):
         fig.tight_layout()
         # ax.set_xscale("log")
         ax.set_yscale("log")
-        if "y_divide" in experiment:
-            ax.yaxis.set_major_formatter(ScalarFormatter())
+        if "y_divide" not in experiment:
+            ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: '{:g}'.format(y)))
         handles, labels = ax.get_legend_handles_labels()
         ax.legend(handles[::-1], labels[::-1])
         # fig.constrained_layout()
@@ -373,11 +385,19 @@ for i_exp, experiment in enumerate(experiments):
         fig.tight_layout()
         ax.set_xscale("log")
         ax.set_yscale("log")
-        ax.yaxis.set_major_formatter(ScalarFormatter())
+        # ax.yaxis.set_major_formatter(ScalarFormatter())
         handles, labels = ax.get_legend_handles_labels()
         ax.legend(handles[::-1], labels[::-1])
         # fig.constrained_layout()
     # plt.ylim(bottom=0)
+
+    if len(sys.argv) <= 2:
+        dirToSaveTo = os.path.join("testResults", "plots")
+    else:
+        dirToSaveTo = sys.argv[2]
+
+    if not os.path.exists(dirToSaveTo):
+        os.makedirs(dirToSaveTo)
 
     # Save
     if usePgf:
@@ -385,15 +405,17 @@ for i_exp, experiment in enumerate(experiments):
             {'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
         plt.gcf().set_size_inches(w=xSize, h=ySize)
         if experiment["type"] == "detailed":
-            fig.savefig(suffix + ".pgf", bbox_extra_artists=(legend))
+            fig.savefig(os.path.join(dirToSaveTo, suffix + ".pgf"),
+                        bbox_extra_artists=(legend))
         else:
-            fig.savefig(suffix + ".pgf")
+            fig.savefig(os.path.join(dirToSaveTo, suffix + ".pgf"))
     else:
         # fig.set_size_inches(10,5, forward=True)
         plt.rcParams.update(
             {'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
         plt.gcf().set_size_inches(w=xSize, h=ySize)
         if experiment["type"] == "detailed":
-            fig.savefig(suffix + ".png", bbox_extra_artists=(legend))
+            fig.savefig(os.path.join(dirToSaveTo, suffix + ".png"),
+                        bbox_extra_artists=(legend))
         else:
-            fig.savefig(suffix + ".png")
+            fig.savefig(os.path.join(dirToSaveTo, suffix + ".png"))
