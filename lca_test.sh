@@ -75,8 +75,9 @@ if [ "$run_time" = 1 ]; then
   do
       ./testTime.sh $tmpCsvFolder/$i
   done
-  ../combine_csv.py $(pwd)/$tmpCsvFolder $resultsFile
-  rm -rf $tmpCsvFolder
+  if ../combine_csv.py $(pwd)/$tmpCsvFolder $resultsFile; then
+    rm -rf $tmpCsvFolder
+  fi
   
   cd $cwd
 

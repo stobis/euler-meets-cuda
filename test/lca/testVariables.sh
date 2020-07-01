@@ -148,7 +148,7 @@ E4GraspSizes=(
 E4BatchSizes=(
     -1
 )
-E4DifferentSeeds=5
+E4DifferentSeeds=2
 E4NumQueries=(
     1000000
     2000000
