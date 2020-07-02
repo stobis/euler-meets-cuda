@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  cout << "%%% # Q: " << tc.q.N << endl;
+  cout << "%%% numQ: " << tc.q.N << endl;
 
   pair<int, double> height = getHeight(tc.tree);
   cout << "%%% MaxHeight: " << height.first << endl;

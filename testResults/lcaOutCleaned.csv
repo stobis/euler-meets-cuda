@@ -1,4 +1,4 @@
-file,N,# Q,algo,grasp,batch,Preprocessing,Queries,Overall,Standard deviation,AvgHeight,MaxHeight
+file,N,numQ,algo,grasp,batch,Preprocessing,Queries,Overall,Standard deviation,AvgHeight,MaxHeight
 resultTimesTemporary/E1/cpu-inlabel$V_1000000#Q_1000000#grasp_-1#batch_-1#$2020-06-03-08-34-44.out.test,1000000.0,1000000.0,CPU Inlabel,-1.0,-1.0,238.9302,69.3924,308.32259999999997,17.220305625626967
 resultTimesTemporary/E1/cpu-inlabel$V_1000000#Q_1000000#grasp_1000#batch_-1#$2020-06-03-08-34-44.out.test,1000000.0,1000000.0,CPU Inlabel,1000.0,-1.0,225.3268,70.0204,295.34720000000004,4.947413764786601
 resultTimesTemporary/E1/cpu-inlabel$V_16000000#Q_16000000#grasp_-1#batch_-1#$2020-06-03-08-34-44.out.test,16000000.0,16000000.0,CPU Inlabel,-1.0,-1.0,7482.429000000001,3034.8162,10517.2452,235.29806503700763

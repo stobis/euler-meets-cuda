@@ -1,5 +1,5 @@
-# usePgf = True
-usePgf = False
+usePgf = True
+# usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -21,7 +21,7 @@ import numpy as np
 csv_filename = "file"
 csv_N = 'N'
 csv_M = 'M'
-csv_Q = "# Q"
+csv_Q = "numQ"
 csv_algo = 'algo'
 csv_overall = 'Overall'
 csv_grasp = 'grasp'

@@ -101,7 +101,7 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
         if problem == "Bridges":
             fieldnames = ['file', 'N', 'M', '# bridges', 'algo'] + fieldnames
         elif problem == "Lca":
-            fieldnames = ['file', 'N', '# Q', 'algo',
+            fieldnames = ['file', 'N', 'numQ', 'algo',
                           'grasp', 'batch', 'AvgHeight', 'MaxHeight'] + fieldnames
         # print(fieldnames)
 
@@ -120,7 +120,7 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
             elif problem == "Lca":
                 row['file'] = filename
                 row['N'] = fileinfo['N']
-                row['# Q'] = fileinfo['# Q']
+                row['numQ'] = fileinfo['numQ']
                 row['algo'] = algo
                 row['grasp'] = fileinfo['grasp']
                 row['batch'] = fileinfo['batch']
