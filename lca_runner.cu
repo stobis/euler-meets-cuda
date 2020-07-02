@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
       else if (cuda_algorithms.count(alg) > 0)
         cuda_algorithm_to_use = cuda_algorithms[alg];
       else {
-        cerr << "Unrecognized algorithm to use: "<<optarg <<"\n";
+        cerr << "Unrecognized algorithm to use: " << optarg << "\n";
         exit(1);
       }
       break;
@@ -114,6 +114,10 @@ int main(int argc, char *argv[]) {
   }
 
   cout << "%%% # Q: " << tc.q.N << endl;
+
+  pair<int, double> height = getHeight(tc.tree);
+  cout << "%%% MaxHeight: " << height.first << endl;
+  cout << "%%% AvgHeight: " << height.second << endl;
 
   // Print Output
   if (output_file != NULL) {

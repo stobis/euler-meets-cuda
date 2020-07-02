@@ -46,8 +46,8 @@ generateAnswers=true
 testsToRun=(
     # 1
     # 2
-    # 3
-    4
+    3
+    # 4
 )
 
 ## Experiment 1 - all algos, different graph sizes, shallow (grasp -1) and mid-deep (grasp 1000)
@@ -106,7 +106,7 @@ E2DifferentSeeds=5
 
 ## Experiment 3 - CUDA inlabel vs naive by grasp size
 E3SolutionsToTest=(
-    "cuda-inlabel"
+    # "cuda-inlabel"
     "cuda-naive"
     # "cpuInlabelLCA"
 )
@@ -116,16 +116,22 @@ E3TestSizes=(
     8000000
 )
 E3GraspSizes=(
-    1
-    10
-    100
+    # 1
+    # 3
+    # 10
+    # 33
+    # 100
+    # 333
     1000
+    3333
     10000
+    33333
     100000
+    333333
     1000000
     10000000
 )
-E3BatchSizes=(
+E3BatchSizes=( 
     -1
 )
 E3DifferentSeeds=5
@@ -150,12 +156,13 @@ E4BatchSizes=(
 )
 E4DifferentSeeds=2
 E4NumQueries=(
-    1000000
-    2000000
-    4000000
-    8000000
-    16000000
-    32000000
-    64000000
-    128000000
+    # 1000000
+    # 2000000
+    # 4000000
+    # 8000000
+    # 16000000
+    # 32000000
+    # 64000000
+    # 128000000
+    256000000
 )

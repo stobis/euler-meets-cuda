@@ -95,3 +95,34 @@ void writeAnswersToFile(int Q, int *ans, const char *filename) {
   ofstream out(filename, ios::binary);
   out.write((char *)ans, sizeof(int) * Q);
 }
+
+void dfs_height(int node, int currentHeight, const vector<vector<int>> &children, vector<int> &height) {
+  height[node] = currentHeight;
+
+  for (int i : children[node]) {
+    dfs_height(i, currentHeight + 1, children, height);
+  }
+}
+
+pair<int, double> getHeight(const LcaParentsTree &tree) {
+  vector<int> height(tree.V);
+
+  vector<vector<int>> children(tree.V);
+  for (int i = 0; i < tree.V; i++) {
+    if (i != tree.root) {
+      children[tree.father[i]].push_back(i);
+    }
+  }
+
+  dfs_height(tree.root, 1, children, height);
+
+  int maxHeight = 0;
+  long long sumHeight = 0;
+
+  for (int i = 0; i < tree.V; i++) {
+    maxHeight = max(maxHeight, height[i]);
+    sumHeight += height[i];
+  }
+
+  return {maxHeight, (double)sumHeight / tree.V};
+}
