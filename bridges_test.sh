@@ -68,6 +68,7 @@ if [ "$run_graph_stats" = 1 ]; then
 else
   echo "Running timed tests."
   ./run_experiments.sh all $repeats $outFile
+  # ./run_experiments.sh cpu $repeats $outFile
 
   cd $cwd
 

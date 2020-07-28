@@ -1,24 +1,22 @@
 dimacs:
   # gzip -d [file]
-  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.USA.gr.gz
-  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.CTR.gr.gz
-  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.W.gr.gz
-  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.E.gr.gz
-  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.LKS.gr.gz
+  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.BAY.gr.gz
   - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.CAL.gr.gz
+  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.COL.gr.gz
+  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.CTR.gr.gz
+  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.E.gr.gz
+  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.FLA.gr.gz
+  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.LKS.gr.gz
   - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.NE.gr.gz
   - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.NW.gr.gz
-  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.FLA.gr.gz
-  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.COL.gr.gz
-  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.BAY.gr.gz
   - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.NY.gr.gz
+  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.USA.gr.gz
+  - http://users.diag.uniroma1.it/challenge9/data/USA-road-d/USA-road-d.W.gr.gz
 mm:
   # tar --strip-components 1 -xvzf [file] --wildcards '*.mtx'
   - https://sparse.tamu.edu/MM/DIMACS10/citationCiteseer.tar.gz
   - https://sparse.tamu.edu/MM/SNAP/cit-Patents.tar.gz
   - https://sparse.tamu.edu/MM/DIMACS10/coPapersDBLP.tar.gz
-  - https://sparse.tamu.edu/MM/DIMACS10/delaunay_n24.tar.gz
-  - https://sparse.tamu.edu/MM/DIMACS10/europe_osm.tar.gz
   - https://sparse.tamu.edu/MM/LAW/in-2004.tar.gz
   - https://sparse.tamu.edu/MM/Pajek/internet.tar.gz
   # Kron
@@ -30,7 +28,6 @@ mm:
   - https://sparse.tamu.edu/MM/DIMACS10/kron_g500-logn21.tar.gz
   # Road networks
   - https://sparse.tamu.edu/MM/DIMACS10/great-britain_osm.tar.gz
-  - https://sparse.tamu.edu/MM/DIMACS10/asia_osm.tar.gz
   - https://sparse.tamu.edu/MM/DIMACS10/belgium_osm.tar.gz
   - https://sparse.tamu.edu/MM/SNAP/roadNet-CA.tar.gz
   - https://sparse.tamu.edu/MM/SNAP/roadNet-PA.tar.gz
@@ -41,7 +38,6 @@ mm:
   # unzip [file] '*.mtx'
   # Road networks
   - http://nrvis.com/download/data/road/road-great-britain-osm.zip
-  - http://nrvis.com/download/data/road/road-asia-osm.zip
   - http://nrvis.com/download/data/road/road-roadNet-CA.zip
   - http://nrvis.com/download/data/road/road-belgium-osm.zip
   - http://nrvis.com/download/data/misc/roadNet-PA.zip

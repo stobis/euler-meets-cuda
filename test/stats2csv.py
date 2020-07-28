@@ -8,6 +8,7 @@ problem = "Unk"
 
 
 def parse_one(first, input):
+    print("new ONE")
     first = first[4:]
     first = first.split(':')
     global problem
@@ -27,6 +28,7 @@ def parse_one(first, input):
     # print(data_dict)
     while True:
         line = input.readline()
+        print("Parsing: " + line)
         if not line:
             # print('WARN: Last dataset is incomplete')
             return
@@ -44,15 +46,17 @@ def parse_one(first, input):
             data_dict[test_name][var] = int(line[1])
             continue
         elif line.startswith('%%%'):
+            print("Skipping: " + line)
+            continue
             print('WARN: Invalid dataset ' + test_name +
                   ' (num of bridges is unknown)')
             del data_dict[test_name]
             line = line[:-1]
-            # print(line)
+            print(line)
             parse_one(line, input)
             return
         if line.isspace():
-            continue
+            return
         line = line.split(':')
         algo = line[0].strip()
         param = line[1].strip()

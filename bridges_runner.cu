@@ -107,8 +107,6 @@ int main(int argc, char *argv[]) {
   std::cout << "%%% M: " << input_graph.get_M() << std::endl;
 
   // Solve Bridges
-  mgpu::standard_context_t context(false);
-
   int const N = input_graph.get_N();
   int const M = input_graph.get_M();
 
@@ -118,6 +116,7 @@ int main(int argc, char *argv[]) {
     cpu_bridges(N, M, input_graph.get_row_offsets().data(), input_graph.get_col_indices().data(),
                 is_bridge_host);
   } else {
+    mgpu::standard_context_t context(false);
 
     mgpu::mem_t<int> row_offsets = mgpu::to_mem(input_graph.get_row_offsets(), context);
     mgpu::mem_t<int> col_indices = mgpu::to_mem(input_graph.get_col_indices(), context);
@@ -130,6 +129,8 @@ int main(int argc, char *argv[]) {
 
   // Print Output
   print_ans(M, is_bridge_host, false);
+
+  std::cout<<endl;
 
   delete[] is_bridge_host;
 

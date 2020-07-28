@@ -1,11 +1,12 @@
-usePgf = True
-# usePgf = False
+# usePgf = True
+usePgf = False
 
 import matplotlib as mpl
 if usePgf:
     mpl.use('pgf')
 else:
     mpl.use('Agg')
+
 
 from cycler import cycler
 import re
@@ -17,6 +18,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 import matplotlib.ticker as ticker
 import numpy as np
+
+plt.rcParams.update({'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
 
 csv_filename = "file"
 csv_N = 'N'
@@ -48,9 +51,9 @@ csv_detailed_fields = [csv_BFS, csv_spanning_tree,
 
 hatches = ['++', '**', 'oo', '----', '||', '..']
 algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a",
-               "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#4daf4a"}
+               "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#4daf4a", "cpu": "#000000"}
 algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*",
-               "tarjan": ".", "naive": "x", "hybrid": "*"}
+               "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "."}
 
 sizes_in_inches = {"regular": (3.34, 2.6), "wide": (
     6.68, 2.6), "huge": (6.68, 8), "allGraphs": (10, 25)}
@@ -94,19 +97,19 @@ experiments = [
      "x_param": csv_max_height, "x_show": csv_max_height, "type": "lines", "size": sizes_in_inches["regular"],
      "yformatter": func_formatter, "ylim": E3_ylim},
 
-    {"restrictions": [(csv_filename, "E4"), (csv_grasp, 1000)],
-     "x_param": csv_Q, "x_show": csv_Q, "type": "lines_xM", "size": sizes_in_inches["regular"],
-     "y_param": csv_overall, "ylim": E4_ylim, "yformatter": func_formatter},
+    # {"restrictions": [(csv_filename, "E4"), (csv_grasp, 1000)],
+    #  "x_param": csv_Q, "x_show": csv_Q, "type": "lines_xM", "size": sizes_in_inches["regular"],
+    #  "y_param": csv_overall, "ylim": E4_ylim, "yformatter": func_formatter},
     {"restrictions": [(csv_filename, "E4"), (csv_grasp, -1)],
-     "x_param": csv_Q, "x_show": csv_Q, "type": "lines_xM", "size": sizes_in_inches["regular"],
+     "x_param": csv_Q, "x_show": csv_Q, "x_div": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_overall, "ylim": E4_ylim, "yformatter": func_formatter},
 
-    {"restrictions": [(csv_filename, "E4"), (csv_grasp, 1000)],
-     "x_param": csv_Q, "x_show": csv_Q, "type": "lines_xM", "size": sizes_in_inches["regular"],
-     "y_param": csv_Q, "y_divide": csv_queries, "ylim": E4_ylim_div},
-    {"restrictions": [(csv_filename, "E4"), (csv_grasp, -1)],
-     "x_param": csv_Q, "x_show": csv_Q, "type": "lines_xM", "size": sizes_in_inches["regular"],
-     "y_param": csv_Q, "y_divide": csv_queries, "ylim": E4_ylim_div},
+    # {"restrictions": [(csv_filename, "E4"), (csv_grasp, 1000)],
+    #  "x_param": csv_Q, "x_show": csv_Q, "type": "lines_xM", "size": sizes_in_inches["regular"],
+    #  "y_param": csv_Q, "y_divide": csv_queries, "ylim": E4_ylim_div},
+    # {"restrictions": [(csv_filename, "E4"), (csv_grasp, -1)],
+    #  "x_param": csv_Q, "x_show": csv_Q, "type": "lines_xM", "size": sizes_in_inches["regular"],
+    #  "y_param": csv_Q, "y_divide": csv_queries, "ylim": E4_ylim_div},
 
     #Bridges
     {"restrictions": [(csv_filename, "kron")],
@@ -147,7 +150,7 @@ filename_order = [
     "USA-road-d.CTR",
     "USA-road-d.USA"]
 
-bridges_algo_order = ["naive", "tarjan", "hybrid"]
+bridges_algo_order = ["cpu", "naive", "tarjan", "hybrid"]
 
 # TODO(Adrian python3?)
 if len(sys.argv) < 2:
@@ -299,21 +302,25 @@ for i_exp, experiment in enumerate(experiments):
             ax.set_ylabel("Time " + experiment["y_param"] + " (s)")
             width = 0.3
             apparent_x = np.arange(len(x))
-            ax.set_ylim(0.05, 2)
+            ax.set_ylim(0.02, 3)
             bar_shift = (i_algo + 0.5 - (len(algos) / 2.0)) * width
             ax.bar(apparent_x + bar_shift, y, width,
-                   label=algo, color=algo_colors[algo], zorder=3)
+                   label=algo, color=algo_colors[algo], zorder=1.99, bottom=0.02)
             ax.set_xticklabels(x)
             ax.set_xticks(apparent_x)
         elif experiment["type"] == "lines_xM":
-            ax.set_xlabel(experiment["x_show"], fontsize=font_size)
             ax.set_ylabel(
                 "Time " + experiment["y_param"] + " (s)", fontsize=font_size)
             if "y_divide" in experiment:
                 ax.set_ylabel(
                     experiment["y_divide"] + "/s", fontsize=font_size)
             apparent_x = np.arange(len(x))
-            string_x = [str(val/1000000) + "M" for val in x]
+            if "x_div" in experiment:
+                string_x = [val/8000000.0 for val in x]
+                ax.set_xlabel("Queries/N")
+            else:
+                string_x = [str(val/1000000) + "M" for val in x]
+                ax.set_xlabel(experiment["x_show"], fontsize=font_size)
             ax.plot(apparent_x, y, label=algo, color=algo_colors[algo], marker=algo_markers[algo])
             # ax.yaxis.grid(which="minor", linestyle='--', linewidth=.3)
             ax.set_xticklabels(string_x)
@@ -401,10 +408,9 @@ for i_exp, experiment in enumerate(experiments):
 
 
     # Save
+    plt.gcf().set_size_inches(w=xSize, h=ySize)
+
     if usePgf:
-        plt.rcParams.update(
-            {'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
-        plt.gcf().set_size_inches(w=xSize, h=ySize)
         if experiment["type"] == "detailed":
             fig.savefig(os.path.join(dir_to_save_to, filename_to_save + ".pgf"),
                         bbox_extra_artists=(legend))
@@ -412,11 +418,9 @@ for i_exp, experiment in enumerate(experiments):
             fig.savefig(os.path.join(dir_to_save_to, filename_to_save + ".pgf"))
     else:
         # fig.set_size_inches(10,5, forward=True)
-        plt.rcParams.update(
-            {'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
-        plt.gcf().set_size_inches(w=xSize, h=ySize)
         if experiment["type"] == "detailed":
             fig.savefig(os.path.join(dir_to_save_to, filename_to_save + ".png"),
                         bbox_extra_artists=(legend))
         else:
             fig.savefig(os.path.join(dir_to_save_to, filename_to_save + ".png"))
+            print(os.path.join(dir_to_save_to, filename_to_save + ".png"))
