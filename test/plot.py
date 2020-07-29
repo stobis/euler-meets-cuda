@@ -1,5 +1,5 @@
-# usePgf = True
-usePgf = False
+usePgf = True
+# usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -51,12 +51,12 @@ csv_detailed_fields = [csv_BFS, csv_spanning_tree,
 
 hatches = ['++', '**', 'oo', '----', '||', '..']
 algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a",
-               "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#4daf4a", "cpu": "#000000"}
+               "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#4daf4a", "cpu": "#999999"}
 algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*",
-               "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "."}
+               "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "|"}
 
-sizes_in_inches = {"regular": (3.34, 2.6), "wide": (
-    6.68, 2.6), "huge": (6.68, 8), "allGraphs": (10, 25)}
+sizes_in_inches = {"regular": (3.33, 2.49), "wide": (
+    6.66, 2.49), "huge": (6.63, 8), "allGraphs": (10, 25)}
 # sizes_in_inches = {"regular": (5, 3), "wide": (8, 3)}
 
 E1_div_ylim = (100000,1000000000)
@@ -277,12 +277,14 @@ for i_exp, experiment in enumerate(experiments):
 
         # Plot data
         if experiment["type"] == "detailed":
+            if algo == "cpu":
+                continue
             # ax.set_ylabel(experiment["x_show"])
             ax.set_xlabel("Time overall (ms)")
             height = 0.28
             apparent_x = np.arange(len(x))
             y_sum = [sum(i) for i in y]
-            bar_shift = (i_algo + 0.5 - (len(algos) / 2.0)) * height
+            bar_shift = (i_algo -0.5 - ((len(algos) -1) / 2.0)) * height
             for i_field, field in reversed(list(enumerate(csv_detailed_fields))):
                 if y[0][i_field] == 0:
                     alg_label = None
@@ -300,9 +302,9 @@ for i_exp, experiment in enumerate(experiments):
         elif experiment["type"] == "bars":
             # ax.set_xlabel(experiment["x_show"])
             ax.set_ylabel("Time " + experiment["y_param"] + " (s)")
-            width = 0.3
+            width = 0.22
             apparent_x = np.arange(len(x))
-            ax.set_ylim(0.02, 3)
+            ax.set_ylim(0.04, 3.5)
             bar_shift = (i_algo + 0.5 - (len(algos) / 2.0)) * width
             ax.bar(apparent_x + bar_shift, y, width,
                    label=algo, color=algo_colors[algo], zorder=1.99, bottom=0.02)
