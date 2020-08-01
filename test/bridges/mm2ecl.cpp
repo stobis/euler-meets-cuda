@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
   int cnt = getline(&ptr, &linesize, fin);
 
   if (cnt < 30) {fprintf(stderr, "ERROR: could not read first line\n\n");  exit(-1);}
-  if (strstr(line, "%%MatrixMarket") == 0) {fprintf(stderr, "ERROR: first line does not contain \"%%%%MatrixMarket\"\n\n");  exit(-1);}
+  if (strstr(line, "%MatrixMarket") == 0) {fprintf(stderr, "ERROR: first line does not contain \"%%MatrixMarket\"\n\n");  exit(-1);}
   if (strstr(line, "matrix") == 0) {fprintf(stderr, "ERROR: first line does not contain \"matrix\"\n\n");  exit(-1);}
   if (strstr(line, "coordinate") == 0) {fprintf(stderr, "ERROR: first line does not contain \"coordinate\"\n\n");  exit(-1);}
   if ((strstr(line, "general") == 0) && (strstr(line, "symmetric") == 0)) {fprintf(stderr, "ERROR: first line does not contain \"general\" or \"symmetric\"\n\n");  exit(-1);}

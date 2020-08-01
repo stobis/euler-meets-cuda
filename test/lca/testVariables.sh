@@ -2,7 +2,7 @@ testsDir=tests
 resultTimesDir=resultTimesTemporary
 defaultBatchSize=-1
 runnerPath="../../lca_runner.e"
-singleRunTimeout=60
+singleRunTimeout=120
 
 
 ### Validity tests
@@ -47,6 +47,7 @@ testsToRun=(
     1
     2
     3
+    4
 )
 
 ## Experiment 1 - all algos, different graph sizes, shallow (grasp -1) and mid-deep (grasp 1000)
@@ -63,9 +64,8 @@ E1TestSizes=(
     2000000
     4000000
     8000000
-    # 16000000
-    # 32000000
-    # 64000000
+    16000000
+    32000000
 )
 E1GraspSizes=( #how far up a father can be
     -1
@@ -74,7 +74,7 @@ E1GraspSizes=( #how far up a father can be
 E1BatchSizes=(
     -1
 )
-E1DifferentSeeds=2
+E1DifferentSeeds=5
 
 ## Experiment 2 - CUDA inlabel by batch size
 E2SolutionsToTest=(
@@ -84,7 +84,7 @@ E2SolutionsToTest=(
 E2TestsDir=$testsDir/E2
 E2ResultsDir=$resultTimesDir/E2
 E2TestSizes=(
-    1000000
+    8000000
 )
 E2GraspSizes=(
     -1
@@ -97,34 +97,68 @@ E2BatchSizes=(
     10000
     100000
     1000000
-    # 10000000
-    # 100000000
+    10000000
 )
-E2DifferentSeeds=2
+E2DifferentSeeds=5
 
+
+
+## Experiment 3 - CUDA inlabel vs naive by grasp size
 E3SolutionsToTest=(
     "cuda-inlabel"
     "cuda-naive"
-    # "cpuInlabelLCA"
 )
-
-## Experiment 3 - CUDA inlabel vs naive by grasp size
 E3TestsDir=$testsDir/E3
 E3ResultsDir=$resultTimesDir/E3
 E3TestSizes=(
     8000000
 )
 E3GraspSizes=(
-    # 1
-    # 10
-    # 100
+    1
+    3
+    10
+    33
+    100
+    333
     1000
+    3333
     10000
+    33333
     100000
+    333333
     1000000
     10000000
 )
-E3BatchSizes=(
+E3BatchSizes=( 
     -1
 )
-E3DifferentSeeds=2
+E3DifferentSeeds=5
+
+## Experiment 4 - CUDA inlabel vs naive by num of queries
+E4SolutionsToTest=(
+    "cuda-inlabel"
+    "cuda-naive"
+)
+E4TestsDir=$testsDir/E4
+E4ResultsDir=$resultTimesDir/E4
+E4TestSizes=(
+    8000000
+)
+E4GraspSizes=(
+   -1
+   1000
+)
+E4BatchSizes=(
+    -1
+)
+E4DifferentSeeds=1
+E4NumQueries=(
+    1000000
+    2000000
+    4000000
+    8000000
+    16000000
+    32000000
+    64000000
+    128000000
+)

@@ -6,7 +6,9 @@
 #include <moderngpu/memory.hxx>
 
 #include "bridges.h"
+#include "bridges_cpu.h"
 #include "graph.hpp"
+#include "graph_stats.hpp"
 
 using namespace emc;
 using namespace std;
@@ -19,7 +21,9 @@ const string help_msg = "Command line arguments\n \
   -a -- chooses algorithm to run:\n \
      naive - BFS + naive\n \
      tarjan - ECL-CC + Euler\n \
-     hybrid - ECL-CC + naive\n";
+     hybrid - ECL-CC + naive\n \
+     cpu - dfs on cpu\n \
+  -s -- print stats of the input graph and exit\n";
 
 // Configuration of implementations to choose
 typedef void (*BridgesFunction)(int, int, int const *, int const *, bool *, mgpu::context_t &);
@@ -36,6 +40,8 @@ int main(int argc, char *argv[]) {
   char *input_file = NULL;
   char *output_file = NULL;
   BridgesFunction bridges_algorithm_to_run = NULL;
+  bool run_cpu_alg = false;
+  bool print_graph_stats = false;
 
   // Print help
   if (argc == 1) {
@@ -44,7 +50,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Parse args
-  while ((opt = getopt(argc, argv, "hbi:o:a:")) != EOF) {
+  while ((opt = getopt(argc, argv, "hbi:o:a:s")) != EOF) {
     switch (opt) {
     case 'h':
       cerr << help_msg << endl;
@@ -62,16 +68,21 @@ int main(int argc, char *argv[]) {
       string alg = optarg;
       if (bridges_algorithms.count(alg) > 0)
         bridges_algorithm_to_run = bridges_algorithms[alg];
-      else {
+      else if (alg == "cpu") {
+        run_cpu_alg = true;
+      } else {
         cerr << "Unrecognized algorithm to use\n";
         exit(1);
       }
       break;
     }
+
+    case 's':
+      print_graph_stats = true;
     }
   }
 
-  if (bridges_algorithm_to_run == NULL) {
+  if (bridges_algorithm_to_run == NULL && run_cpu_alg == false && print_graph_stats == false) {
     cerr << help_msg << endl;
     cerr << "No algorithm specified. Exiting." << endl;
     exit(1);
@@ -85,33 +96,51 @@ int main(int argc, char *argv[]) {
     input_graph = Graph::read_from_file(input_file);
   }
 
+  if (print_graph_stats) {
+    print_stats(input_graph);
+    return 0;
+  }
+
   // Print output parser header
   std::cout << "%%% Bridges: File: " << (input_file == NULL ? std::string{"stdin"} : input_file) << std::endl;
   std::cout << "%%% N: " << input_graph.get_N() << std::endl;
   std::cout << "%%% M: " << input_graph.get_M() << std::endl;
 
   // Solve Bridges
-  mgpu::standard_context_t context(false);
-
   int const N = input_graph.get_N();
   int const M = input_graph.get_M();
-  mgpu::mem_t<int> row_offsets = mgpu::to_mem(input_graph.get_row_offsets(), context);
-  mgpu::mem_t<int> col_indices = mgpu::to_mem(input_graph.get_col_indices(), context);
-  mgpu::mem_t<bool> is_bridge = mgpu::fill<bool>(false, M, context);
 
-  (bridges_algorithm_to_run)(N, M, row_offsets.data(), col_indices.data(), is_bridge.data(), context);
+  bool *is_bridge_host = new bool[M];
+
+  if (run_cpu_alg) {
+    cpu_bridges(N, M, input_graph.get_row_offsets().data(), input_graph.get_col_indices().data(),
+                is_bridge_host);
+  } else {
+    mgpu::standard_context_t context(false);
+
+    mgpu::mem_t<int> row_offsets = mgpu::to_mem(input_graph.get_row_offsets(), context);
+    mgpu::mem_t<int> col_indices = mgpu::to_mem(input_graph.get_col_indices(), context);
+    mgpu::mem_t<bool> is_bridge = mgpu::fill<bool>(false, M, context);
+
+    (bridges_algorithm_to_run)(N, M, row_offsets.data(), col_indices.data(), is_bridge.data(), context);
+
+    mgpu::dtoh(is_bridge_host, is_bridge.data(), M);
+  }
 
   // Print Output
-  print_ans(M, is_bridge.data(), false);
+  print_ans(M, is_bridge_host, false);
+
+  std::cout<<endl;
+
+  delete[] is_bridge_host;
 
   return 0;
 }
 
 // Helpers
-void print_ans(int const M, bool *is_bridge, bool verbose) {
+void print_ans(int const M, bool *ib, bool verbose) {
   int amount = 0;
-  bool *ib = new bool[M];
-  mgpu::dtoh(ib, is_bridge, M);
+
   for (int i = 0; i < M; ++i) {
     if (verbose)
       std::cout << ib[i] << " ";

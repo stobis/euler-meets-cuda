@@ -6,7 +6,9 @@ import sys
 data_dict = {}
 problem = "Unk"
 
+
 def parse_one(first, input):
+    print("new ONE")
     first = first[4:]
     first = first.split(':')
     global problem
@@ -23,29 +25,37 @@ def parse_one(first, input):
             if len(var) > 1:
                 data_dict[test_name][var[0]] = var[1]
 
-
     # print(data_dict)
     while True:
         line = input.readline()
+        print("Parsing: " + line)
         if not line:
-            print('WARN: Last dataset is incomplete')
-            del data_dict[test_name]
+            # print('WARN: Last dataset is incomplete')
             return
-        elif line.startswith('%%% #'):
+        elif line.startswith('%%% #') or line.startswith('%%% MaxHeight') or line.startswith("%%% numQ"):
             line = line.split(':')
             data_dict[test_name][line[0][4:]] = int(line[1])
-            return
+            continue
+        elif line.startswith('%%% AvgHeight'):
+            line = line.split(':')
+            data_dict[test_name][line[0][4:]] = float(line[1])
+            continue
         elif line.startswith('%%% N') or line.startswith('%%% M'):
             line = line.split(':')
             var = line[0][-1:]
             data_dict[test_name][var] = int(line[1])
             continue
         elif line.startswith('%%%'):
-            print('WARN: Invalid dataset ' + test_name + ' (num of bridges is unknown)')
+            print("Skipping: " + line)
+            continue
+            print('WARN: Invalid dataset ' + test_name +
+                  ' (num of bridges is unknown)')
             del data_dict[test_name]
-            line  = line[:-1]
-            # print(line)
+            line = line[:-1]
+            print(line)
             parse_one(line, input)
+            return
+        if line.isspace():
             return
         line = line.split(':')
         algo = line[0].strip()
@@ -56,11 +66,12 @@ def parse_one(first, input):
         # print(algo, param, time)
         if algo not in data_dict[test_name]:
             data_dict[test_name][algo] = []
-        data_dict[test_name][algo].append((param,time))
+        data_dict[test_name][algo].append((param, time))
+
 
 with open(sys.argv[1], 'r', newline='') as datafile:
     while True:
-        line = datafile.readline() 
+        line = datafile.readline()
         if not line:
             break
         line = line[:-1]
@@ -68,7 +79,7 @@ with open(sys.argv[1], 'r', newline='') as datafile:
 
         if line.startswith('%%% Bridges: File') or line.startswith('%%% Lca: File'):
             parse_one(line, datafile)
-        
+
 # print(data_dict)
 
 fieldnames_dict = {}
@@ -94,7 +105,8 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
         if problem == "Bridges":
             fieldnames = ['file', 'N', 'M', '# bridges', 'algo'] + fieldnames
         elif problem == "Lca":
-            fieldnames = ['file', 'N', '# Q', 'algo', 'grasp', 'batch'] + fieldnames
+            fieldnames = ['file', 'N', 'numQ', 'algo',
+                          'grasp', 'batch', 'AvgHeight', 'MaxHeight'] + fieldnames
         # print(fieldnames)
 
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -112,10 +124,12 @@ with open(sys.argv[2], 'w', newline='') as csvfile:
             elif problem == "Lca":
                 row['file'] = filename
                 row['N'] = fileinfo['N']
-                row['# Q'] = fileinfo['# Q']
+                row['numQ'] = fileinfo['numQ']
                 row['algo'] = algo
                 row['grasp'] = fileinfo['grasp']
                 row['batch'] = fileinfo['batch']
+                row['AvgHeight'] = fileinfo['AvgHeight']
+                row['MaxHeight'] = fileinfo['MaxHeight']
             # print(row)
             # print(fileinfo[algo])
             for (name, val) in fileinfo[algo]:

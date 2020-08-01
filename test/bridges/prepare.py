@@ -23,6 +23,7 @@ def download_one(format, url):
     filename = os.path.basename(url) # url[url.rfind('/')+1:] # TODO
     testfilename = re.sub('.gz', '', filename)
     testfilename = re.sub('.tar', '.mtx', testfilename)
+    testfilename = re.sub('.zip', '.mtx', testfilename)
 
     print('=== Source: {0} ==='.format(url), flush=True)
     # print(filename,testfilename)
@@ -37,9 +38,14 @@ def download_one(format, url):
     print('2. Extract')
     if filename.endswith('.tar.gz'):
         subprocess.run(["tar", "--strip-components=1", "-xzf", "in/" + filename, "-C", "in/", "--wildcards", "*.mtx"])
-    else:
+    elif filename.endswith('gz'):
         subprocess.run(["gzip", "-d", "in/" + filename])
+    else:
+        subprocess.run(["unzip", "in/" + filename, "-d", "in/"])
     subprocess.run(["rm", "-f", "in/" + filename])
+
+    subprocess.run(["rm", "-f", "in/readme.html"])
+    subprocess.run(["rm", "-f", "in/readme.txt"])
     
     print('3. Convert to proper input format')
     os.chmod(os.getcwd() + "/in/" + testfilename, stat.S_IRUSR|stat.S_IWUSR|stat.S_IRGRP|stat.S_IROTH)
