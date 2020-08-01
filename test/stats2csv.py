@@ -32,7 +32,7 @@ def parse_one(first, input):
         if not line:
             # print('WARN: Last dataset is incomplete')
             return
-        elif line.startswith('%%% #') or line.startswith('%%% MaxHeight') :
+        elif line.startswith('%%% #') or line.startswith('%%% MaxHeight') or line.startswith("%%% numQ"):
             line = line.split(':')
             data_dict[test_name][line[0][4:]] = int(line[1])
             continue

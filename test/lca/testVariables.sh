@@ -66,7 +66,6 @@ E1TestSizes=(
     8000000
     16000000
     32000000
-    64000000
 )
 E1GraspSizes=( #how far up a father can be
     -1
@@ -75,7 +74,7 @@ E1GraspSizes=( #how far up a father can be
 E1BatchSizes=(
     -1
 )
-E1DifferentSeeds=1
+E1DifferentSeeds=5
 
 ## Experiment 2 - CUDA inlabel by batch size
 E2SolutionsToTest=(
@@ -100,7 +99,7 @@ E2BatchSizes=(
     1000000
     10000000
 )
-E2DifferentSeeds=1
+E2DifferentSeeds=5
 
 
 
@@ -133,13 +132,12 @@ E3GraspSizes=(
 E3BatchSizes=( 
     -1
 )
-E3DifferentSeeds=1
+E3DifferentSeeds=5
 
 ## Experiment 4 - CUDA inlabel vs naive by num of queries
 E4SolutionsToTest=(
     "cuda-inlabel"
     "cuda-naive"
-    # "cpuInlabelLCA"
 )
 E4TestsDir=$testsDir/E4
 E4ResultsDir=$resultTimesDir/E4

@@ -56,7 +56,7 @@ algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*",
                "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "|"}
 
 sizes_in_inches = {"regular": (3.33, 2.49), "wide": (
-    6.66, 2.49), "huge": (6.63, 8), "allGraphs": (10, 25)}
+    6.8, 2.49), "huge": (6.8, 8), "allGraphs": (10, 25), "wideDetailed":(6.8, 3)}
 # sizes_in_inches = {"regular": (5, 3), "wide": (8, 3)}
 
 E1_div_ylim = (100000,1000000000)
@@ -114,20 +114,21 @@ experiments = [
     #Bridges
     {"restrictions": [(csv_filename, "kron")],
      "x_param": csv_filename, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"],
-     "yformatter": func_formatter},
+     "yformatter": func_formatter, "skipHybrid": True},
     
     {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["wide"],
-     "yformatter": func_formatter},
+     "yformatter": func_formatter, "skipHybrid": True},
 
-    {"restrictions": [(csv_filename, "kron_g500-logn21|USA-road-d.CTR|cit-Patents")],
-     "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["wide"]},
+    {"restrictions": [(csv_filename, "kron_g500-logn21|soc-LiveJ|cit-Patents|road-great-britain|USA-road-d.CTR")],
+     "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["wideDetailed"],
+     "skipHybrid": True},
 
     {"restrictions": [(csv_filename, "kron_g500-logn19|kron_g500-logn2|cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"]},
 
-    {"restrictions": [(csv_filename, ".bin")],
-     "x_param": csv_M, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["allGraphs"]},
+    # {"restrictions": [(csv_filename, ".bin")],
+    #  "x_param": csv_M, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["allGraphs"]},
 ]
 
 # Order of filenames on X in bridges
@@ -220,6 +221,11 @@ for i_exp, experiment in enumerate(experiments):
         algos = bridges_algo_order
 
     for i_algo, algo in reversed(list(enumerate(algos))):
+
+        if algo == "hybrid" and "skipHybrid" in experiment and experiment["skipHybrid"]:
+            if experiment["type"] == "detailed":
+                ax.invert_yaxis()
+            continue
         # Filter data of a given algorithm
         algo_rows = filter(
             lambda row: True if row[csv_algo] == algo else False, current_rows)
@@ -245,7 +251,7 @@ for i_exp, experiment in enumerate(experiments):
         else: 
             x = sorted(plot_by_values)
 
-        # print(x)
+        print(x)
 
         if experiment["type"] == "detailed":
             y = [[] for _ in range(len(x))]
@@ -281,10 +287,18 @@ for i_exp, experiment in enumerate(experiments):
                 continue
             # ax.set_ylabel(experiment["x_show"])
             ax.set_xlabel("Time overall (ms)")
-            height = 0.28
+            if "skipHybrid" in experiment and experiment["skipHybrid"]:
+                height = 0.4
+            else:
+                height = 0.28
             apparent_x = np.arange(len(x))
             y_sum = [sum(i) for i in y]
-            bar_shift = (i_algo -0.5 - ((len(algos) -1) / 2.0)) * height
+            if "skipHybrid" in experiment and experiment["skipHybrid"]:
+                bar_shift = (i_algo -0.5 - ((len(algos) -2) / 2.0)) * height
+            else:
+                bar_shift = (i_algo -0.5 - ((len(algos) -1) / 2.0)) * height
+
+            ax.invert_yaxis()
             for i_field, field in reversed(list(enumerate(csv_detailed_fields))):
                 if y[0][i_field] == 0:
                     alg_label = None
@@ -298,14 +312,13 @@ for i_exp, experiment in enumerate(experiments):
 
             ax.set_yticks(apparent_x)
             ax.set_yticklabels(x)
-            ax.invert_yaxis()
         elif experiment["type"] == "bars":
             # ax.set_xlabel(experiment["x_show"])
             ax.set_ylabel("Time " + experiment["y_param"] + " (s)")
-            width = 0.22
+            width = 0.3
             apparent_x = np.arange(len(x))
             ax.set_ylim(0.04, 3.5)
-            bar_shift = (i_algo + 0.5 - (len(algos) / 2.0)) * width
+            bar_shift = (i_algo + 0.5 - ((len(algos) - 1) / 2.0)) * width
             ax.bar(apparent_x + bar_shift, y, width,
                    label=algo, color=algo_colors[algo], zorder=1.99, bottom=0.02)
             ax.set_xticklabels(x)
@@ -357,6 +370,11 @@ for i_exp, experiment in enumerate(experiments):
             fig.tight_layout(rect=[0, 0.05, 1, 1])
             handles, labels = ax.get_legend_handles_labels()
             legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.05),
+                               fancybox=True, shadow=True, ncol=3)
+        elif experiment["size"] == sizes_in_inches["wideDetailed"]:
+            fig.tight_layout(rect=[0, 0.13, 1, 1])
+            handles, labels = ax.get_legend_handles_labels()
+            legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.3),
                                fancybox=True, shadow=True, ncol=3)
         else:
             fig.tight_layout(rect=[0, 0.2, 1, 1])
