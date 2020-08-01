@@ -1,5 +1,5 @@
-usePgf = True
-# usePgf = False
+# usePgf = True
+usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -251,7 +251,7 @@ for i_exp, experiment in enumerate(experiments):
         else: 
             x = sorted(plot_by_values)
 
-        print(x)
+        # print(x)
 
         if experiment["type"] == "detailed":
             y = [[] for _ in range(len(x))]
@@ -443,4 +443,3 @@ for i_exp, experiment in enumerate(experiments):
                         bbox_extra_artists=(legend))
         else:
             fig.savefig(os.path.join(dir_to_save_to, filename_to_save + ".png"))
-            print(os.path.join(dir_to_save_to, filename_to_save + ".png"))
