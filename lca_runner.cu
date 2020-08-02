@@ -19,7 +19,7 @@ const string help_msg = "Command line arguments\n \
 
 typedef void (*CpuLcaFunction)(int N, const int *parents, int Q, const int *queries, int *answers);
 typedef void (*CudaLcaFunction)(int N, const int *parents, int Q, const int *queries, int *answers,
-                                mgpu::context_t &context);
+                                int batchSize, mgpu::context_t &context);
 
 unordered_map<string, CpuLcaFunction> cpu_algorithms = {
     {"cpu-inlabel", &cpu_lca_inlabel}, {"cpu-rmq", &cpu_lca_rmq}, {"cpu-simple", &cpu_lca_simple}};
@@ -35,6 +35,7 @@ int main(int argc, char *argv[]) {
   char *output_file = NULL;
   CpuLcaFunction cpu_algorithm_to_use = NULL;
   CudaLcaFunction cuda_algorithm_to_use = NULL;
+  int batchSize = -1;
 
   // Print help
   if (argc == 1) {
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Parse args
-  while ((opt = getopt(argc, argv, "hbi:o:a:")) != EOF) {
+  while ((opt = getopt(argc, argv, "hb:i:o:a:")) != EOF) {
     switch (opt) {
     case 'h':
       cerr << help_msg << endl;
@@ -64,17 +65,25 @@ int main(int argc, char *argv[]) {
       else if (cuda_algorithms.count(alg) > 0)
         cuda_algorithm_to_use = cuda_algorithms[alg];
       else {
-        cerr << "Unrecognized algorithm to use\n";
+        cerr << "Unrecognized algorithm to use: " << optarg << "\n";
         exit(1);
       }
       break;
     }
+
+    case 'b':
+      batchSize = atoi(optarg);
+      break;
     }
   }
 
   // Read input
   LcaTestCase tc = input_file == NULL ? readFromStdIn() : readFromFile(input_file);
   vector<int> answers(tc.q.N);
+
+  // Default batch size
+  if (batchSize == -1)
+    batchSize = tc.q.N;
 
   // Print output parser header
   std::cout << "%%% Lca: File: " << (input_file == NULL ? std::string{"stdin"} : input_file) << std::endl;
@@ -93,7 +102,7 @@ int main(int argc, char *argv[]) {
 
     CUCHECK(cudaMalloc((void **)&cuda_answers, sizeof(int) * tc.q.N));
 
-    cuda_algorithm_to_use(tc.tree.V, cuda_parents, tc.q.N, cuda_queries, cuda_answers, context);
+    cuda_algorithm_to_use(tc.tree.V, cuda_parents, tc.q.N, cuda_queries, cuda_answers, batchSize, context);
 
     CUCHECK(cudaMemcpy(answers.data(), cuda_answers, sizeof(int) * tc.q.N, cudaMemcpyDeviceToHost));
   } else if (cpu_algorithm_to_use != NULL) {
@@ -104,7 +113,11 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  cout << "%%% # Q: " << tc.q.N << endl;
+  cout << "%%% numQ: " << tc.q.N << endl;
+
+  pair<int, double> height = getHeight(tc.tree);
+  cout << "%%% MaxHeight: " << height.first << endl;
+  cout << "%%% AvgHeight: " << height.second << endl;
 
   // Print Output
   if (output_file != NULL) {

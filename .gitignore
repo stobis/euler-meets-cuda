@@ -11,7 +11,12 @@ obj/
 .vscode/*
 
 test/lca/tests/*
-test/lca/resultTimes/*
+test/lca/resultTimesTemporary/*
+
+# Test Results
+*.csv
+*.png
+*.pgf
 
 # Adrian's uploads to miracle
 copyToStudent.sh

@@ -1,8 +1,19 @@
 # euler-meets-cuda
-## Bridges
-To build and run automatic tests
+
+In case of stack overflow problems (e.g. segfaults when generating tests)
 ```shell
-    ./bridges_test.sh -t bridgesResult.csv
+    ulimit -s unlimited
+```
+
+## Bridges
+To build, run automatic tests and generate plots
+```shell
+    ./bridges_test.sh -t bridgesResult.csv -p
+```
+
+To generate plots from csv with results
+```shell
+    python2 test/plot.py testResults/bridgesResult.csv
 ```
 
 To run single test
@@ -12,16 +23,18 @@ To run single test
 ```
 For help run ```./bridges_runner.e -h```
 
-In case of stack overflow problems
-```shell
-    ulimit -s unlimited
-```
+
 
 
 ## Lca
-To build and run automatic tests
+To build, run automatic tests and generate plots (be advised that default tests take a couple of hours to complete, modify ```test/lca/testVariables.sh``` to run a subset)
 ```shell
-    ./lca_test.sh -t lcaResult.csv
+    ./lca_test.sh -t lcaResult.csv -p
+```
+
+To generate plots from csv with results
+```shell
+    python2 test/plot.py testResults/lcaResult.csv
 ```
 
 To run automatic tests checking correctness

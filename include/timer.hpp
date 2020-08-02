@@ -16,6 +16,7 @@ public:
   void start();
   void stop();
   long double get_ms();
+  long double stop_and_get_ms();
   void print_info(std::string);
   void print_and_restart(std::string);
   void print_overall();

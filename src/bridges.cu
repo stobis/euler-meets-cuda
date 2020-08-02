@@ -100,7 +100,7 @@ void cuda_bridges_naive(int N, int M, const int *row_offsets, const int *col_ind
 
   if (detailed_time) {
     context.synchronize();
-    timer.print_and_restart("Find Bridges");
+    timer.print_and_restart("Naive bridges");
 
     mem_t<int> maxd(1, context);
     reduce(distance.data(), distance.size(), maxd.data(), mgpu::maximum_t<int>(), context);
@@ -353,7 +353,7 @@ void cuda_bridges_tarjan(int N, int M, int const *row_offsets, int const *col_in
   mem_t<int> parent = mgpu::fill<int>(-1, N, context);
   count_subtree_size_and_parent(N, 2 * (N - 1), subtree.data(), parent.data(), preorder.data(),
                                 tree_directed.data(), tree_directed_rev.data(), context);
-  show_time("Preorder & Subtree size", timer, context);
+  // show_time("Preorder & Subtree size", timer, context);
 
   // Find local min/max from outgoing edges for every vertex
   mem_t<int> minima(N, context); // = mgpu::fill<int>(N + 1, N, context);
@@ -365,7 +365,7 @@ void cuda_bridges_tarjan(int N, int M, int const *row_offsets, int const *col_in
   reduce_outgoing(N, M, row_offsets, col_indices, row_indices.data(), preorder.data(), parent.data(),
                   mgpu::maximum_t<int>(), -1, maxima.data(), context);
 
-  show_time("Local min/max for vertices", timer, context);
+  // show_time("Local min/max for vertices", timer, context);
 
   // Segment tree to find min/max for each subtree
   int const SEGTREE_SIZE = segtree_size(N);
@@ -454,14 +454,14 @@ void cuda_bridges_hybrid(int N, int M, int const *row_offsets, int const *col_in
   count_distance_and_parent(N, 2 * (N - 1), tree_directed.data(), tree_directed_rev.data(), distance.data(),
                             parent.data(), context);
 
-  show_time("Distance & parent", timer, context);
+  show_time("Distance and parent", timer, context);
 
   // Naive part
   _mark_bridges(N, M, row_offsets, col_indices, distance.data(), parent.data(), is_bridge, context);
 
   // Print exec time
-  show_time("Find bridges", timer, context);
+  show_time("Naive bridges", timer, context);
   timer.print_overall();
 }
 
-} // namespace
+} // namespace emc

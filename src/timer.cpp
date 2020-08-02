@@ -9,6 +9,11 @@ void Timer::stop() { c_end = std::clock(); }
 
 long double Timer::get_ms() { return 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC; }
 
+long double Timer::stop_and_get_ms() {
+  stop();
+  return get_ms();
+}
+
 void Timer::print_info(std::string desc) {
   std::cout.precision(3);
   std::cout << std::fixed << slug << ": " << desc << ": " << get_ms() << " ms." << std::endl;

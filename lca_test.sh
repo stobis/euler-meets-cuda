@@ -11,13 +11,15 @@ Options:
   -c        Check all algorithms. Runs all algorithms on a set of tests and checks if all outputs are same
   -t \$out   Run timed tests, save output to \$out.
   -r \$times Repeat tests \$times times and get average results. Default value is 1.
+  -p        Generate plots in addition to .csv file.
 "
 
 run_check=0
 run_time=0
 repeats=1
+gen_plot=0
 
-while getopts "ht:c:r:" opt; do
+while getopts "ht:cr:p" opt; do
     case "$opt" in
     h)
         echo "$__help"
@@ -29,6 +31,8 @@ while getopts "ht:c:r:" opt; do
         resultsFile=$(realpath $OPTARG)
         ;;
     r)  repeats=$OPTARG
+        ;;
+    p)  gen_plot=1
         ;;
     esac
 done
@@ -71,8 +75,13 @@ if [ "$run_time" = 1 ]; then
   do
       ./testTime.sh $tmpCsvFolder/$i
   done
-  ../combine_csv.py $(pwd)/$tmpCsvFolder $resultsFile
-  rm -rf $tmpCsvFolder
+  if ../combine_csv.py $(pwd)/$tmpCsvFolder $resultsFile; then
+    rm -rf $tmpCsvFolder
+  fi
   
   cd $cwd
+
+  if [ "$gen_plot" = 1 ]; then
+    python ./test/plot.py $resultsFile
+  fi
 fi
