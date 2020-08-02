@@ -27,7 +27,7 @@ For help run ```./bridges_runner.e -h```
 
 
 ## Lca
-To build, run automatic tests and generate plots (be advised that default tests take about 10h to complete, modify ```test/lca/testVariables.sh``` to run a subset)
+To build, run automatic tests and generate plots (be advised that default tests take a couple of hours to complete, modify ```test/lca/testVariables.sh``` to run a subset)
 ```shell
     ./lca_test.sh -t lcaResult.csv -p
 ```
