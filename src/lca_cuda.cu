@@ -16,6 +16,8 @@
 using namespace std;
 using namespace mgpu;
 
+namespace emc {
+
 inline __device__ long long CudaPackEdge(int from, int to);
 inline __device__ int CudaUnpackEdgeFrom(long long edge);
 inline __device__ int CudaUnpackEdgeTo(long long edge);
@@ -415,3 +417,5 @@ void cuda_lca_naive(int N, const int *parents, int Q, const int *queries, int *a
   timer.print_and_restart("Queries");
   timer.print_overall();
 }
+
+} // namespace emc

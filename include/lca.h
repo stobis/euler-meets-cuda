@@ -3,6 +3,8 @@
 
 #include <moderngpu/context.hxx>
 
+namespace emc {
+
 // [cuda,cpu]_lca_*:
 // Input:   A tree of N nodes, parents[i] is a parent of i-ts node.
 //          Q queries, (queries[i*2], queries[i*2+1]) is a i-th query
@@ -27,5 +29,7 @@ void cpu_lca_simple(int N, const int *parents, int Q, const int *queries, int *a
 void cpu_lca_rmq(int N, const int *parents, int Q, const int *queries, int *answers);
 
 void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers);
+
+} // namespace emc
 
 #endif // EMC_LCA_H_

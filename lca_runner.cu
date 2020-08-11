@@ -10,6 +10,7 @@
 #include "utils.h"
 
 using namespace std;
+using namespace emc;
 
 const string help_msg = "Command line arguments\n \
   -h -- print this help and exit\n \

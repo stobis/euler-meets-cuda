@@ -34,6 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Authors: Jayadharini Jaiganesh and Martin Burtscher
 */
+
+// The authors of euler-meets-cuda repository have made some changes to the source code
+// that allow for retrieving a spanning tree. You can see the original source code at:
+// https://userweb.cs.txstate.edu/~burtscher/research/ECL-CC/
+
 #pragma once
 
 #include "ecl_cc.h"

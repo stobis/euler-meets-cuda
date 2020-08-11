@@ -8,8 +8,9 @@
 #include <vector>
 using namespace std;
 
-// CPU LCA INLABEL
+namespace emc {
 
+// CPU LCA INLABEL
 void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers) {
   Timer timer("CPU Inlabel");
 
@@ -279,3 +280,5 @@ void dfs(int i, vector<int> *G, int *depth) {
     }
   }
 }
+
+} // namespace emc
