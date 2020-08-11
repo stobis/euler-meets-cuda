@@ -1,5 +1,16 @@
 # euler-meets-cuda
 
+## Contents
+Headers are located in ```include/``` with sources in ```src/```
+- ```include/euler.h``` and ```src/euler.cu``` contain implementation of the Euler Tour and list rank algorithm.
+- ```include/bridges.h``` and ```src/bridges.cu``` contain implementation of bridges.
+- ```include/lca.h``` and ```src/lca.cu``` contain implementation of lca.
+
+Header files of all the above contain an explanation of input parameters along with a simple input and output.
+
+```./bridges_runner.cu``` and ```./lca_runner.cu``` are working examples use of how to use the methods above in a project.
+
+
 ## Cloning and building instructions
 If you are cloning this from the anonymized github link, you may use [clone-anonymous4open](https://github.com/ShoufaChen/clone-anonymous4open):
 - ```git clone https://github.com/ShoufaChen/clone-anonymous4open```
