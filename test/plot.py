@@ -57,8 +57,8 @@ algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel"
 algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*",
                "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "|"}
 
-sizes_in_inches = {"regular": (3.33, 2.49), "wide": (
-    6.8, 2.49), "huge": (6.8, 8), "allGraphs": (10, 25), "wideDetailed":(6.8, 3)}
+sizes_in_inches = {"regular": (3.33, 2.4), "wide": (
+    6.8, 2.4), "huge": (6.8, 8), "allGraphs": (10, 25), "wideDetailed":(6.8, 3)}
 # sizes_in_inches = {"regular": (5, 3), "wide": (8, 3)}
 
 E1_div_ylim = (100000,1000000000)
@@ -69,18 +69,18 @@ E4_ylim_div = (100000,1000000000)
 func_formatter = ticker.FuncFormatter(lambda y, _: '{:g}'.format(y))
 
 #labels for plot axes
-label_lca_N = "N"
-label_lca_preprocessing_over_s = "Preprocessing nodes/s"
-label_lca_queries_over_s = "Queries/s"
-label_lca_queries_over_N = "Queries/N"
-label_lca_avg_depth = "Averate node depth"
+label_lca_N = "Number of nodes"
+label_lca_preprocessing_over_s = "Nodes preprocessed per second"
+label_lca_queries_over_s = "Queries answered per second"
+label_lca_queries_over_N = "Queries-to-nodes ratio"
+label_lca_avg_depth = "Average node depth"
 label_lca_batch_size = "Batch size"
-label_time_overall_ms = "Time overall (ms)"
-label_time_overall_s = "Time overall (s)"
+label_time_overall_ms = "Total time [ms]"
+label_time_overall_s = "Total time [s]"
 
 #labels for algorithms
-algo_labels = {"CUDA Inlabel": "Inlabel", "CUDA Naive": u"Naïve", "CPU Inlabel": "CPU",
-               "tarjan": "T-V", "naive": "W-K", "cpu": "CPU", "hybrid": "Hybrid"}
+algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "CPU Inlabel",
+               "tarjan": "GPU TV", "naive": "GPU CK", "cpu": "CPU DFS", "hybrid": "GPU Hybrid"}
 
 algo_field_labels = {"Find bridges" : "Find bridges", "Naive bridges": u"Naïve bridges", 
                      "Spanning Tree" : "Spanning tree", "List rank" : "List rank",
