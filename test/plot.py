@@ -19,6 +19,7 @@ import csv
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 import matplotlib.ticker as ticker
+import matplotlib.patches as patches
 import numpy as np
 
 plt.rcParams.update({'pgf.texsystem': 'pdflatex', 'font.family': 'serif', 'pgf.rcfonts': False, })
@@ -52,8 +53,11 @@ csv_detailed_fields = [csv_BFS, csv_spanning_tree,
                        csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges]
 
 hatches = ['++', '**', 'oo', '----', '||', '..']
+field_colors = {"tarjan": {"Spanning Tree": "#0f2231", "List rank": "#2c6593", "Find bridges": "#6ca5d3"},
+                "naive": {"BFS": "#cc6600", "Naive bridges": "#ff9933"},
+                "hybrid": { "Spanning Tree": "#3d3d3d", "List rank": "#7a7a7a", "Distance and parent": "#a3a3a3", "Naive bridges": "#cccccc"} }
 algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a",
-               "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#4daf4a", "cpu": "#999999"}
+               "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#999999", "cpu": "#4daf4a"}
 algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*",
                "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "|"}
 
@@ -141,7 +145,8 @@ experiments = [
     #Bridges
     {"restrictions": [(csv_filename, "kron")],
      "x_param": csv_filename, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"],
-     "yformatter": func_formatter, "skipHybrid": True, "y_label" : label_time_overall_s},
+     "yformatter": func_formatter, "skipHybrid": True, "y_label" : label_time_overall_s,
+     "x_label": label_lca_N},
     
     {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["wide"],
@@ -149,7 +154,7 @@ experiments = [
 
     {"restrictions": [(csv_filename, "kron_g500-logn21|soc-LiveJ|cit-Patents|road-great-britain|USA-road-d.CTR")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["wideDetailed"],
-     "skipHybrid": True, "x_mabel": label_time_overall_ms},
+     "skipHybrid": True, "x_label": label_time_overall_ms},
 
     {"restrictions": [(csv_filename, "kron_g500-logn19|kron_g500-logn2|cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "detailed", "size": sizes_in_inches["huge"],
@@ -332,8 +337,10 @@ for i_exp, experiment in enumerate(experiments):
                     alg_label = None
                 else:
                     alg_label = algo_labels[algo] + " " + algo_field_labels[field]
-                ax.barh(apparent_x + bar_shift, y_sum, height, label=alg_label,
-                        color='white', edgecolor=algo_colors[algo], hatch=hatches[i_field], zorder=3)
+                    # ax.barh(apparent_x + bar_shift, y_sum, height, label=alg_label,
+                        # color='white', edgecolor=algo_colors[algo], hatch=hatches[i_field], zorder=3)
+                    ax.barh(apparent_x + bar_shift, y_sum, height, label=alg_label,
+                        color=field_colors[algo][field], zorder=3)
 
                 for i_xval, xval in enumerate(x):
                     y_sum[i_xval] -= y[i_xval][i_field]
@@ -406,14 +413,38 @@ for i_exp, experiment in enumerate(experiments):
                                fancybox=True, shadow=True, ncol=3)
         elif experiment["size"] == sizes_in_inches["wideDetailed"]:
             fig.tight_layout(rect=[0, 0.13, 1, 1])
-            handles, labels = ax.get_legend_handles_labels()
-            legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.3),
-                               fancybox=True, shadow=True, ncol=3)
+
+            rect = patches.Rectangle((-40,5.65),730,1,linewidth=1,edgecolor='black',facecolor='white', clip_on=False)
+            shadow = patches.Rectangle((-35,5.7),730,1,linewidth=1,edgecolor='grey',facecolor='grey', clip_on=False)
+            ax.add_patch(shadow)
+            ax.add_patch(rect)
+
+            handles_and_labels = zip(ax.get_legend_handles_labels()[0], ax.get_legend_handles_labels()[1])
+
+            hl_ck = [hl for hl in handles_and_labels if "CK" in hl[1]]
+            handles_ck, labels_ck = zip(*hl_ck)
+
+            hl_tv = [hl for hl in handles_and_labels if "TV" in hl[1]]
+            handles_tv, labels_tv = zip(*hl_tv)
+
+            r = mpl.patches.Rectangle((0,0), 1, 1.5, fill=False, edgecolor='none',
+                                 visible=False)
+            labels_ck = [l[7::] for l in labels_ck] + ["GPU CK"]
+            handles_ck = handles_ck + (r,)
+
+            labels_tv = [l[7::] for l in labels_tv] + ["GPU TV"]
+            handles_tv = handles_tv + (r,)
+
+            legend = ax.legend(handles_ck[::-1], labels_ck[::-1], loc='lower left', bbox_to_anchor=(-.1,-0.33),
+                               fancybox=True, shadow=False, ncol=3, frameon=False)
+            legend1 = ax.legend(handles_tv[::-1], labels_tv[::-1], loc='lower left', bbox_to_anchor=(-.1,-0.41),
+                               fancybox=True, shadow=False, ncol=4, frameon=False)
+            plt.gca().add_artist(legend)
         else:
             fig.tight_layout(rect=[0, 0.2, 1, 1])
             handles, labels = ax.get_legend_handles_labels()
             legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.45),
-                               fancybox=True, shadow=True, ncol=3)
+                               fancybox=True, shadow=True, ncol=2)
     else:  # lines
         plt.xticks(fontsize=font_size)
         plt.yticks(fontsize=font_size)
