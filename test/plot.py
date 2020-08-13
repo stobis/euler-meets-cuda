@@ -86,9 +86,9 @@ label_time_overall_s = "Total time [s]"
 algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "CPU Inlabel",
                "tarjan": "GPU TV", "naive": "GPU CK", "cpu": "CPU DFS", "hybrid": "GPU Hybrid"}
 
-algo_field_labels = {"Find bridges" : "Find bridges", "Naive bridges": u"Naïve bridges", 
-                     "Spanning Tree" : "Spanning tree", "List rank" : "List rank",
-                     "Distance and parent" : "Distance and parent", "BFS" : "BFS"}
+algo_field_labels = {"Find bridges" : "Detect bridges", "Naive bridges": "Mark non-bridges",
+                     "Spanning Tree" : "Spanning tree", "List rank" : "Euler tour",
+                     "Distance and parent" : "Levels and parents", "BFS" : "BFS"}
 
 # Here we declare what tests consist an experiment.
 experiments = [
