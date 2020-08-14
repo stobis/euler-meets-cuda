@@ -55,7 +55,7 @@ csv_detailed_fields = [csv_BFS, csv_spanning_tree,
 hatches = ['++', '**', 'oo', '----', '||', '..']
 field_colors = {"tarjan": {"Spanning Tree": "#0f2231", "List rank": "#2c6593", "Find bridges": "#6ca5d3"},
                 "naive": {"BFS": "#cc6600", "Naive bridges": "#ff9933"},
-                "hybrid": { "Spanning Tree": "#3d3d3d", "List rank": "#7a7a7a", "Distance and parent": "#a3a3a3", "Naive bridges": "#cccccc"} }
+                "hybrid": { "Spanning Tree": "#1a1a1a", "List rank": "#4d4d4d", "Distance and parent": "#808080", "Naive bridges": "#b3b3b3"} }
 algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a",
                "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#999999", "cpu": "#4daf4a"}
 algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*",
@@ -69,6 +69,7 @@ E1_div_ylim = (100000,1000000000)
 E3_ylim = (0.1, 60)
 E4_ylim = (0.01, 100)
 E4_ylim_div = (100000,1000000000)
+bridges_bars_ylim = (0.04, 10)
 
 func_formatter = ticker.FuncFormatter(lambda y, _: '{:g}'.format(y))
 
@@ -352,7 +353,7 @@ for i_exp, experiment in enumerate(experiments):
             ax.set_ylabel("Time " + experiment["y_param"] + " (s)")
             width = 0.3
             apparent_x = np.arange(len(x))
-            ax.set_ylim(0.04, 3.5)
+            ax.set_ylim(bridges_bars_ylim[0], bridges_bars_ylim[1])
             bar_shift = (i_algo + 0.5 - ((len(algos) - 1) / 2.0)) * width
             ax.bar(apparent_x + bar_shift, y, width,
                    label=algo_labels[algo], color=algo_colors[algo], zorder=1.99, bottom=0.02)
@@ -399,13 +400,47 @@ for i_exp, experiment in enumerate(experiments):
         fig.tight_layout()
         ax.set_yscale("log")
         handles, labels = ax.get_legend_handles_labels()
-        ax.legend(handles[::-1], labels[::-1])
+        ax.legend(handles[::-1], labels[::-1], ncol=3)
     elif experiment["type"] == "detailed":
         if experiment["size"] == sizes_in_inches["huge"]:
             fig.tight_layout(rect=[0, 0.08, 1, 1])
-            handles, labels = ax.get_legend_handles_labels()
-            legend = ax.legend(handles[::-1], labels[::-1], loc='center', bbox_to_anchor=(0.4, -0.11),
-                               fancybox=True, shadow=True, ncol=3)
+
+            rect = patches.Rectangle((-240,13.96),1342,1.2,linewidth=1,edgecolor='black',facecolor='white', clip_on=False)
+            shadow = patches.Rectangle((-235,14.00),1342,1.2,linewidth=1,edgecolor='grey',facecolor='grey', clip_on=False)
+            ax.add_patch(shadow)
+            ax.add_patch(rect)
+
+            handles_and_labels = zip(ax.get_legend_handles_labels()[0], ax.get_legend_handles_labels()[1])
+            hl_ck = [hl for hl in handles_and_labels if "CK" in hl[1]]
+            handles_ck, labels_ck = zip(*hl_ck)
+
+            hl_tv = [hl for hl in handles_and_labels if "TV" in hl[1]]
+            handles_tv, labels_tv = zip(*hl_tv)
+
+            hl_hy = [hl for hl in handles_and_labels if "Hybrid" in hl[1]]
+            handles_hy, labels_hy = zip(*hl_hy)
+
+            r = mpl.patches.Rectangle((0,0), 1, 1.5, fill=False, edgecolor='none', visible=False)
+
+            labels_ck = [l[7::] for l in labels_ck] + ["GPU CK\hspace{13.15pt}"]
+            handles_ck = handles_ck + (r,)
+
+            labels_tv = [l[7::] for l in labels_tv] + ["GPU TV\hspace{13.3pt}"]
+            handles_tv = handles_tv + (r,)
+
+            labels_hy = [l[11::] for l in labels_hy] + ["GPU Hybrid"]
+            handles_hy = handles_hy + (r,)
+
+            legend = ax.legend(handles_ck[::-1], labels_ck[::-1], loc='lower left', bbox_to_anchor=(-.27,-0.104),
+                               fancybox=True, shadow=False, ncol=3, frameon=False)
+            legend1 = ax.legend(handles_tv[::-1], labels_tv[::-1], loc='lower left', bbox_to_anchor=(-.27,-0.129),
+                               fancybox=True, shadow=False, ncol=4, frameon=False)
+            legend2 = ax.legend(handles_hy[::-1], labels_hy[::-1], loc='lower left', bbox_to_anchor=(-.27, -.154),
+                               fancybox=True, shadow=False, ncol=5, frameon=False)
+            plt.gca().add_artist(legend)
+            plt.gca().add_artist(legend1)
+
+
         elif experiment["size"] == sizes_in_inches["allGraphs"]:
             fig.tight_layout(rect=[0, 0.05, 1, 1])
             handles, labels = ax.get_legend_handles_labels()
@@ -414,8 +449,8 @@ for i_exp, experiment in enumerate(experiments):
         elif experiment["size"] == sizes_in_inches["wideDetailed"]:
             fig.tight_layout(rect=[0, 0.13, 1, 1])
 
-            rect = patches.Rectangle((-40,5.65),730,1,linewidth=1,edgecolor='black',facecolor='white', clip_on=False)
-            shadow = patches.Rectangle((-35,5.7),730,1,linewidth=1,edgecolor='grey',facecolor='grey', clip_on=False)
+            rect = patches.Rectangle((0,5.75),750,1,linewidth=1,edgecolor='black',facecolor='white', clip_on=False)
+            shadow = patches.Rectangle((5,5.8),750,1,linewidth=1,edgecolor='grey',facecolor='grey', clip_on=False)
             ax.add_patch(shadow)
             ax.add_patch(rect)
 
@@ -427,17 +462,17 @@ for i_exp, experiment in enumerate(experiments):
             hl_tv = [hl for hl in handles_and_labels if "TV" in hl[1]]
             handles_tv, labels_tv = zip(*hl_tv)
 
-            r = mpl.patches.Rectangle((0,0), 1, 1.5, fill=False, edgecolor='none',
-                                 visible=False)
+            r = mpl.patches.Rectangle((0,0), 1, 1.5, fill=False, edgecolor='none', visible=False)
+
             labels_ck = [l[7::] for l in labels_ck] + ["GPU CK"]
             handles_ck = handles_ck + (r,)
 
             labels_tv = [l[7::] for l in labels_tv] + ["GPU TV"]
             handles_tv = handles_tv + (r,)
 
-            legend = ax.legend(handles_ck[::-1], labels_ck[::-1], loc='lower left', bbox_to_anchor=(-.1,-0.33),
+            legend = ax.legend(handles_ck[::-1], labels_ck[::-1], loc='lower left', bbox_to_anchor=(-.05,-0.35),
                                fancybox=True, shadow=False, ncol=3, frameon=False)
-            legend1 = ax.legend(handles_tv[::-1], labels_tv[::-1], loc='lower left', bbox_to_anchor=(-.1,-0.41),
+            legend1 = ax.legend(handles_tv[::-1], labels_tv[::-1], loc='lower left', bbox_to_anchor=(-.05,-0.43),
                                fancybox=True, shadow=False, ncol=4, frameon=False)
             plt.gca().add_artist(legend)
         else:
