@@ -14,8 +14,9 @@ Header files of all the above contain an explanation of input parameters along w
 ## Cloning and building instructions
 If you are cloning this from the anonymized github link, you may use [clone-anonymous4open](https://github.com/ShoufaChen/clone-anonymous4open):
 - ```git clone https://github.com/ShoufaChen/clone-anonymous4open```
+- Install clone-anonymous4open's dependencies: ```pip3 install BeautifulSoup4``` and ```pip3 install lxml```
 - ```cd clone-anonymous4open```
-- ```python3 clone.py --clone-dir ../euler-meets-GPU  --target [https://anonymous.4open.science/repository/...]```
+- ```python3 clone.py --clone-dir ../euler-meets-GPU  --target [https://anonymous.4open.science/repository/.../]``` (Slash ("/") at the end of reporisory's URL is required)
 - ```cd ../euler-meets-GPU```
 - ```git clone https://github.com/moderngpu/moderngpu.git 3rdparty/moderngpu```
 - Fix Makefile before building: ```sed -i 's/\[.*\]/$@/g' Makefile```
