@@ -20,6 +20,7 @@ If you are cloning this from the anonymized github link, you may use [clone-anon
 - ```cd ../euler-meets-GPU```
 - ```git clone https://github.com/moderngpu/moderngpu.git 3rdparty/moderngpu```
 - Fix Makefiles before building: ```sed -i 's/\[.*\]/$@/g' Makefile``` and ```sed -i 's/\[.*\]/$@/g' test/bridges/Makefile```
+- You might want to add permissions for scripts to run: ```chmod +x bridges_test.sh lca_test.sh test/bridges/prepare.py test/bridges/run_experiments.sh test/bridges/run_and_export.sh test/combine_csv.py test/stats2csv.py```
 
 You may wish to update Makefile variables: CUDA, NVCC and you GPU's computing capability (NVCCSM) to match your system before building.
 
