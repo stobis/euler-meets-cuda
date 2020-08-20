@@ -19,7 +19,7 @@ If you are cloning this from the anonymized github link, you may use [clone-anon
 - ```python3 clone.py --clone-dir ../euler-meets-GPU  --target [https://anonymous.4open.science/repository/.../]``` (Slash ("/") at the end of reporisory's URL is required)
 - ```cd ../euler-meets-GPU```
 - ```git clone https://github.com/moderngpu/moderngpu.git 3rdparty/moderngpu```
-- Fix Makefile before building: ```sed -i 's/\[.*\]/$@/g' Makefile```
+- Fix Makefiles before building: ```sed -i 's/\[.*\]/$@/g' Makefile``` and ```sed -i 's/\[.*\]/$@/g' test/bridges/Makefile```
 
 You may wish to update Makefile variables: CUDA, NVCC and you GPU's computing capability (NVCCSM) to match your system before building.
 
