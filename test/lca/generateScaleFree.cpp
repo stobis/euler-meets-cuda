@@ -42,12 +42,6 @@ int main(int argc, char *argv[]) {
     int fatherIndex = (r - sumDegreeSoFar) / fatherDegree;
 
     int f = degreeArray[fatherDegree][fatherIndex];
-    // if(f < 0 || f > V) {
-    //   cout<<fatherDegree<<" "<<fatherIndex<<endl;
-    //   cout<<degreeArray.size()<<" "<<degreeArray[fatherDegree].size()<<endl;
-    //   cout<<f<<endl;
-    //   exit(1);
-    // }
     father.push_back(f);
 
     swap(degreeArray[fatherDegree][fatherIndex],
@@ -60,10 +54,6 @@ int main(int argc, char *argv[]) {
     degreeArray[1].push_back(father.size() - 1);
 
     degreesSum += 2;
-
-    // if(father.size() % 1000) {
-    //   cout<<father.size()<<" "<<degreeArray.size()<<endl;
-    // }
   }
   degreeArray.clear();
 
@@ -98,9 +88,4 @@ int main(int argc, char *argv[]) {
     LcaTestCase tc(tree, queries);
     writeToStdOut( tc );
   }
-
-  // for (int d = 1; d < degreeArray.size(); d++) {
-  //   if (degreeArray[d].size() > 0)
-  //     cout << "Degree = " << d << ", count = " << degreeArray[d].size() << endl;
-  // }
 }
