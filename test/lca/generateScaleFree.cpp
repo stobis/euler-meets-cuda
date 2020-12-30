@@ -1,45 +1,22 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
-// #include "tree.h"
+#include "tree.h"
 
 using namespace std;
 
-void shuffleFathers(vector<int> &in, vector<int> &out, int &root) {
-  int V = in.size();
-  vector<int> shuffle;
-  for (int i = -2; i < V; i++) {
-    shuffle.push_back(i);
-  }
-  random_shuffle(shuffle.begin(), shuffle.end());
-
-  vector<int> newPos;
-  newPos.resize(V);
-  for (int i = -2; i < V; i++) {
-    newPos[shuffle[i]] = i;
-  }
-
-  out.clear();
-  for (int i = -2; i < V; i++) {
-    if (shuffle[i] == -2) {
-      root = i;
-    }
-    out.push_back(in[shuffle[i]] == -3 ? -1 : newPos[in[shuffle[i]]]);
-  }
-}
-
 int main(int argc, char *argv[]) {
   int expectedArgc = 4;
-  //   if (argc < expectedArgc) {
-  //     cerr << "3 args needed: V, Q and Seed. Add filename for binary output" << endl;
-  //     exit(1);
-  //   }
-  int V = atoi(argv[1]);
-  //   int Q = atoi(argv[2]);
-  //   int seed = atoi(argv[3]);
+  if (argc < expectedArgc) {
+      cerr << "3 args needed: V, Q and Seed. Add filename for binary output" << endl;
+      exit(1);
+  }
 
-  //   srand(seed + V + Q);
-  srand(V);
+  int V = atoi(argv[1]);
+  int Q = atoi(argv[2]);
+  int seed = atoi(argv[3]);
+
+  srand(seed + V + Q);
 
   vector<int> father;
   father.push_back(-1);
@@ -57,7 +34,7 @@ int main(int argc, char *argv[]) {
 
     int sumDegreeSoFar = 0;
     int fatherDegree = 1;
-    while (sumDegreeSoFar + degreeArray[fatherDegree].size() * fatherDegree < r) {
+    while (sumDegreeSoFar + degreeArray[fatherDegree].size() * fatherDegree <= r) {
       sumDegreeSoFar += degreeArray[fatherDegree].size() * fatherDegree;
       fatherDegree++;
     }
@@ -65,6 +42,12 @@ int main(int argc, char *argv[]) {
     int fatherIndex = (r - sumDegreeSoFar) / fatherDegree;
 
     int f = degreeArray[fatherDegree][fatherIndex];
+    // if(f < 0 || f > V) {
+    //   cout<<fatherDegree<<" "<<fatherIndex<<endl;
+    //   cout<<degreeArray.size()<<" "<<degreeArray[fatherDegree].size()<<endl;
+    //   cout<<f<<endl;
+    //   exit(1);
+    // }
     father.push_back(f);
 
     swap(degreeArray[fatherDegree][fatherIndex],
@@ -77,10 +60,47 @@ int main(int argc, char *argv[]) {
     degreeArray[1].push_back(father.size() - 1);
 
     degreesSum += 2;
+
+    // if(father.size() % 1000) {
+    //   cout<<father.size()<<" "<<degreeArray.size()<<endl;
+    // }
+  }
+  degreeArray.clear();
+
+  vector<int> shuffledFathers;
+  int root;
+
+  shuffleFathers(father, shuffledFathers, root);
+
+  father.clear();
+
+  LcaParentsTree tree(V, root, shuffledFathers);
+
+  shuffledFathers.clear();
+
+
+  vector<int> q;
+  for(int i=0; i<Q*2; i++) {
+    q.push_back(rand() % V);
+  }
+  LcaQueries queries(Q, q);
+
+  q.clear();
+
+  if ( argc == expectedArgc + 1 )
+  {
+    ofstream out(argv[expectedArgc], ios::binary);
+    tree.writeToStream(out);
+    queries.writeToStream(out);
+  }
+  else
+  {
+    LcaTestCase tc(tree, queries);
+    writeToStdOut( tc );
   }
 
-  for (int d = 1; d < degreeArray.size(); d++) {
-    if (degreeArray[d].size() > 0)
-      cout << "Degree = " << d << ", count = " << degreeArray[d].size() << endl;
-  }
+  // for (int d = 1; d < degreeArray.size(); d++) {
+  //   if (degreeArray[d].size() > 0)
+  //     cout << "Degree = " << d << ", count = " << degreeArray[d].size() << endl;
+  // }
 }

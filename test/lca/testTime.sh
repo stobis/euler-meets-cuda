@@ -20,17 +20,21 @@ for T in ${testsToRun[@]}; do
 
 
     _numOfSeeds=E${T}DifferentSeeds
+    _generator=E${T}Generator
+
     for size in ${_testSizes[@]}; do
         for graspSize in ${_graspSizes[@]}; do
             if [ -z "$_numQueries" ]; then
-                genTest ${!_testsDir} b $size $size $graspSize ${!_numOfSeeds}
+                genTest ${!_testsDir} ${!_generator} $size $size $graspSize ${!_numOfSeeds}
             else
                 for queries in ${_numQueries[@]}; do
-                    genTest ${!_testsDir} b $size $queries $graspSize ${!_numOfSeeds}
+                    genTest ${!_testsDir} ${!$_generator} $size $queries $graspSize ${!_numOfSeeds}
                 done
             fi
         done
     done
+
+    exit
 
     _resultsDir=E${T}ResultsDir
     mkdir -p ${!_resultsDir} 

@@ -1,7 +1,7 @@
 # coding: utf-8
 
-usePgf = True
-# usePgf = False
+# usePgf = True
+usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -70,6 +70,7 @@ E3_ylim = (0.1, 60)
 E4_ylim = (0.01, 100)
 E4_ylim_div = (100000,1000000000)
 bridges_bars_ylim = (0.04, 10)
+bridges_kron_ylim = (0.01, 5.5)
 
 func_formatter = ticker.FuncFormatter(lambda y, _: '{:g}'.format(y))
 
@@ -147,7 +148,7 @@ experiments = [
     {"restrictions": [(csv_filename, "kron")],
      "x_param": csv_filename, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"],
      "yformatter": func_formatter, "skipHybrid": True, "y_label" : label_time_overall_s,
-     "x_label": label_lca_N},
+     "x_label": label_lca_N, "ylim": bridges_kron_ylim},
     
     {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["wide"],

@@ -48,6 +48,7 @@ testsToRun=(
     2
     3
     4
+    5
 )
 
 ## Experiment 1 - all algos, different graph sizes, shallow (grasp -1) and mid-deep (grasp 1000)
@@ -75,6 +76,7 @@ E1BatchSizes=(
     -1
 )
 E1DifferentSeeds=5
+E1Generator=simple
 
 ## Experiment 2 - CUDA inlabel by batch size
 E2SolutionsToTest=(
@@ -100,6 +102,7 @@ E2BatchSizes=(
     10000000
 )
 E2DifferentSeeds=5
+E2Generator=simple
 
 
 
@@ -133,6 +136,7 @@ E3BatchSizes=(
     -1
 )
 E3DifferentSeeds=5
+E3Generator=simple
 
 ## Experiment 4 - CUDA inlabel vs naive by num of queries
 E4SolutionsToTest=(
@@ -162,3 +166,31 @@ E4NumQueries=(
     64000000
     128000000
 )
+E4Generator=simple
+
+
+## Experiment 5 - Scale-Free
+E5SolutionsToTest=(
+    "cuda-inlabel"
+    "cuda-naive"
+    # "cpu-rmq"
+    "cpu-inlabel"
+)
+E5TestsDir=$testsDir/E5
+E5ResultsDir=$resultTimesDir/E5
+E5TestSizes=(
+    1000000
+    2000000
+    4000000
+    8000000
+    16000000
+    32000000
+)
+E5GraspSizes=( #irrelevant here
+    -1
+)
+E5BatchSizes=( #irrelevant here
+    -1
+)
+E5DifferentSeeds=5
+E5Generator=scaleFree
