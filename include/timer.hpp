@@ -6,7 +6,7 @@
 
 class Timer {
 private:
-  std::clock_t c_start, c_end;
+  std::chrono::nanoseconds start_ns, end_ns;
   std::string slug;
   long double overall;
 

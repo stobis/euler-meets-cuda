@@ -8,9 +8,15 @@
 #include "lca.h"
 #include "tree.h"
 #include "utils.h"
+#include "timer.hpp"
+
+#include <chrono>
+#include <thread>
+
 
 using namespace std;
 using namespace emc;
+
 
 const string help_msg = "Command line arguments\n \
   -h -- print this help and exit\n \

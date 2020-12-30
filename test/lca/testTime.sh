@@ -34,8 +34,6 @@ for T in ${testsToRun[@]}; do
         done
     done
 
-    exit
-
     _resultsDir=E${T}ResultsDir
     mkdir -p ${!_resultsDir} 
 
