@@ -14,7 +14,7 @@ function genTest {
     templName=$testDir/V_$V#Q_$Q#grasp_$graspSize
 
     for i in $(seq 1 $repeat); do
-        name=$templName#s$i.$testType.in
+        name=$templName#s$i.in
         if [ ! -f $name ]; then
             echo "generating $name"
 

@@ -3,7 +3,7 @@
 
 
 std::chrono::nanoseconds getCurrentNs() {
-  return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch());
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
 }
 
 Timer::Timer(std::string slug) : slug(slug), start_ns(getCurrentNs()), overall(0) {}

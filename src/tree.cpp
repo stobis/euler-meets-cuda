@@ -63,6 +63,10 @@ void writeToStdOut(LcaTestCase &tc) {
 
 LcaTestCase readFromFile(const char *filename) {
   ifstream in(filename, ios::binary);
+  if(!in.good()) {
+    cerr<<"Input file doesn't exist! Exiting."<<endl;
+    exit(1);
+  }
   return LcaTestCase(in);
 }
 LcaTestCase readFromStream(istream &inputStream) {

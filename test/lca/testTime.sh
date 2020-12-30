@@ -40,7 +40,7 @@ for T in ${testsToRun[@]}; do
     eval _solutionsToTest=( '"${E'${T}'SolutionsToTest[@]}"' )
     for solution in ${_solutionsToTest[@]}; do
         echo "Testing $solution"
-        for test in ${!_testsDir}/*.b.in; do
+        for test in ${!_testsDir}/*.in; do
             for batchSize in ${_batchSizes[@]}; do
                 testName=$(basename $test)
                 testOutName=$(echo $testName | sed 's/s[0-9][0-9]*.//g') 
