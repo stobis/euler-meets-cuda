@@ -29,7 +29,7 @@ typedef void (*CudaLcaFunction)(int N, const int *parents, int Q, const int *que
                                 int batchSize, mgpu::context_t &context);
 
 unordered_map<string, CpuLcaFunction> cpu_algorithms = {
-    {"cpu-inlabel", &cpu_lca_inlabel}, {"cpu-rmq", &cpu_lca_rmq}, {"cpu-simple", &cpu_lca_simple}};
+    {"cpu-inlabel", &cpu_lca_inlabel}, {"cpu-rmq", &cpu_lca_rmq}, {"cpu-simple", &cpu_lca_simple}, {"multicore-cpu-inlabel", &multicore_cpu_lca_inlabel}};
 
 unordered_map<string, CudaLcaFunction> cuda_algorithms = {{"cuda-inlabel", &cuda_lca_inlabel},
                                                           {"cuda-naive", &cuda_lca_naive}};
