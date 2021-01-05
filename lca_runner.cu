@@ -22,14 +22,14 @@ const string help_msg = "Command line arguments\n \
   -h -- print this help and exit\n \
   -i $input -- sets input file to $input\n \
   -o $output -- sets output file to $output\n \
-  -a [cuda-inlabel, cuda-naive, cpu-inlabel, cpu-rmq, cpu-simple] -- chooses algorithm to run\n";
+  -a [cuda-inlabel, cuda-naive, cpu-inlabel, cpu-rmq, cpu-simple, multicore-cpu-inlabel] -- chooses algorithm to run\n";
 
 typedef void (*CpuLcaFunction)(int N, const int *parents, int Q, const int *queries, int *answers);
 typedef void (*CudaLcaFunction)(int N, const int *parents, int Q, const int *queries, int *answers,
                                 int batchSize, mgpu::context_t &context);
 
 unordered_map<string, CpuLcaFunction> cpu_algorithms = {
-    {"cpu-inlabel", &cpu_lca_inlabel}, {"cpu-rmq", &cpu_lca_rmq}, {"cpu-simple", &cpu_lca_simple}};
+    {"cpu-inlabel", &cpu_lca_inlabel}, {"cpu-rmq", &cpu_lca_rmq}, {"cpu-simple", &cpu_lca_simple}, {"multicore-cpu-inlabel", &multicore_cpu_lca_inlabel}};
 
 unordered_map<string, CudaLcaFunction> cuda_algorithms = {{"cuda-inlabel", &cuda_lca_inlabel},
                                                           {"cuda-naive", &cuda_lca_naive}};
