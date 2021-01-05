@@ -22,7 +22,7 @@ const string help_msg = "Command line arguments\n \
   -h -- print this help and exit\n \
   -i $input -- sets input file to $input\n \
   -o $output -- sets output file to $output\n \
-  -a [cuda-inlabel, cuda-naive, cpu-inlabel, cpu-rmq, cpu-simple] -- chooses algorithm to run\n";
+  -a [cuda-inlabel, cuda-naive, cpu-inlabel, cpu-rmq, cpu-simple, multicore-cpu-inlabel] -- chooses algorithm to run\n";
 
 typedef void (*CpuLcaFunction)(int N, const int *parents, int Q, const int *queries, int *answers);
 typedef void (*CudaLcaFunction)(int N, const int *parents, int Q, const int *queries, int *answers,
