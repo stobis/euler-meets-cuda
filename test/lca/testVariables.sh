@@ -44,11 +44,11 @@ validitySolutionsToTest=(
 generateAnswers=true
 
 testsToRun=(
-    1
-    2
+    # 1
+    # 2
     3
-    4
-    5
+    # 4
+    # 5
 )
 
 ## Experiment 1 - all algos, different graph sizes, shallow (grasp -1) and mid-deep (grasp 1000)
@@ -88,6 +88,9 @@ E2ResultsDir=$resultTimesDir/E2
 E2TestSizes=(
     8000000
 )
+E2NumQueries=(
+    10000000
+)
 E2GraspSizes=(
     -1
 )
@@ -109,7 +112,7 @@ E2Generator=simple
 ## Experiment 3 - CUDA inlabel vs naive by grasp size
 E3SolutionsToTest=(
     "cuda-inlabel"
-    "cuda-naive"
+    # "cuda-naive"
 )
 E3TestsDir=$testsDir/E3
 E3ResultsDir=$resultTimesDir/E3

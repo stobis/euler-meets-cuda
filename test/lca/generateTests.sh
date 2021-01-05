@@ -16,7 +16,7 @@ function genTest {
     for i in $(seq 1 $repeat); do
         name=$templName#s$i.in
         if [ ! -f $name ]; then
-            echo "generating $name"
+            echo "generating $name with $generator"
 
             if [ "$generator" = "simple" ]; then
                 ./generateSimple.e $V $Q $graspSize ${seeds[$i]} $name 

@@ -144,6 +144,16 @@ experiments = [
     #  "x_param": csv_Q, "x_show": csv_Q, "type": "lines_xM", "size": sizes_in_inches["regular"],
     #  "y_param": csv_Q, "y_divide": csv_queries, "ylim": E4_ylim_div},
 
+
+    {"restrictions": [(csv_filename, "E5")],
+     "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
+     "y_param": csv_N, "y_divide": csv_preprocessing, "ylim": E1_div_ylim, 
+     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s},
+    {"restrictions": [(csv_filename, "E5")],
+     "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
+     "y_param": csv_Q, "y_divide": csv_queries, "ylim": E1_div_ylim,
+     "x_label": label_lca_N, "y_label": label_lca_queries_over_s},
+
     #Bridges
     {"restrictions": [(csv_filename, "kron")],
      "x_param": csv_filename, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"],

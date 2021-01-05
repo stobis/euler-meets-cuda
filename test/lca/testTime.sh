@@ -28,7 +28,7 @@ for T in ${testsToRun[@]}; do
                 genTest ${!_testsDir} ${!_generator} $size $size $graspSize ${!_numOfSeeds}
             else
                 for queries in ${_numQueries[@]}; do
-                    genTest ${!_testsDir} ${!$_generator} $size $queries $graspSize ${!_numOfSeeds}
+                    genTest ${!_testsDir} ${!_generator} $size $queries $graspSize ${!_numOfSeeds}
                 done
             fi
         done
@@ -44,7 +44,7 @@ for T in ${testsToRun[@]}; do
             for batchSize in ${_batchSizes[@]}; do
                 testName=$(basename $test)
                 testOutName=$(echo $testName | sed 's/s[0-9][0-9]*.//g') 
-                outName=${!_resultsDir}/$solution\$${testOutName::-5}\#batch_$batchSize\#\$$(date '+%Y-%m-%d-%H-%M-%S' -d @$(stat -c %Y $runnerPath)).out
+                outName=${!_resultsDir}/$solution\$${testOutName::-3}\#batch_$batchSize\#\$$(date '+%Y-%m-%d-%H-%M-%S' -d @$(stat -c %Y $runnerPath)).out
                 mv $test $outName.test
 
                 echo -e "\tRunning $(basename $outName)"
