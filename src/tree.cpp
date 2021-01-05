@@ -95,6 +95,11 @@ void writeAnswersToStdOut(int Q, int *ans) {
     cout << ans[i] << endl;
   }
 }
+void writeAnswersToStdErr(int Q, int *ans) {
+  for (int i = 0; i < Q; i++) {
+    cerr << ans[i] << endl;
+  }
+}
 void writeAnswersToFile(int Q, int *ans, const char *filename) {
   ofstream out(filename, ios::binary);
   out.write((char *)ans, sizeof(int) * Q);

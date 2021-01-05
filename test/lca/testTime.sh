@@ -49,7 +49,11 @@ for T in ${testsToRun[@]}; do
 
                 echo -e "\tRunning $(basename $outName)"
 
-                timeout $singleRunTimeout $runnerPath -i $outName.test -o /dev/null -a $solution >$outName -b $batchSize
+                if [[ $solution == "multicore"* ]]; then
+                    taskset -c 0-5,12-17 timeout $singleRunTimeout $runnerPath -i $outName.test -o /dev/null -a $solution >$outName -b $batchSize
+                else
+                    timeout $singleRunTimeout $runnerPath -i $outName.test -o /dev/null -a $solution >$outName -b $batchSize
+                fi
                 echo "" >>$outName
 
                 $statsPath $outName $tmpCsv

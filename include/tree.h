@@ -49,6 +49,7 @@ LcaTestCase readFromStdIn();
 
 void writeAnswersToFile(int Q, int *ans, const char *filename);
 void writeAnswersToStdOut(int Q, int *ans);
+void writeAnswersToStdErr(int Q, int *ans);
 
 // Returns (max_height, average_height) of tree nodes
 pair<int, double> getHeight(const LcaParentsTree &tree);

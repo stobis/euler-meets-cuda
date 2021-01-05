@@ -56,9 +56,9 @@ hatches = ['++', '**', 'oo', '----', '||', '..']
 field_colors = {"tarjan": {"Spanning Tree": "#0f2231", "List rank": "#2c6593", "Find bridges": "#6ca5d3"},
                 "naive": {"BFS": "#cc6600", "Naive bridges": "#ff9933"},
                 "hybrid": { "Spanning Tree": "#1a1a1a", "List rank": "#4d4d4d", "Distance and parent": "#808080", "Naive bridges": "#b3b3b3"} }
-algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a",
+algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a", "Multicore CPU Inlabel": "#000000",
                "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#999999", "cpu": "#4daf4a"}
-algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*",
+algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*", "Multicore CPU Inlabel": "|",
                "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "|"}
 
 sizes_in_inches = {"regular": (3.33, 2.4), "wide": (
@@ -85,7 +85,7 @@ label_time_overall_ms = "Total time [ms]"
 label_time_overall_s = "Total time [s]"
 
 #labels for algorithms
-algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "CPU Inlabel",
+algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "CPU Inlabel", "Multicore CPU Inlabel": "Multicore CPU Inlabel",
                "tarjan": "GPU TV", "naive": "GPU CK", "cpu": "CPU DFS", "hybrid": "GPU Hybrid"}
 
 algo_field_labels = {"Find bridges" : "Detect bridges", "Naive bridges": "Mark non-bridges",

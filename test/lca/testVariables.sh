@@ -26,9 +26,11 @@ validityTestsSizes=(
     500000
     1000000
     2000000
-    # 3000000
-    # 4000000
-    # 10000000
+    3000000
+    4000000
+    10000000
+    20000000
+    30000000
 )
 validityGraspSize=-1
 validityOutGeneratorAlgorithm="cpu-rmq"
@@ -36,7 +38,8 @@ validitySolutionsToTest=(
     cuda-inlabel
     cuda-naive
     cpu-inlabel
-    cpu-simple
+    # cpu-simple
+    multicore-cpu-inlabel
 )
 
 ### Time tests
@@ -44,19 +47,20 @@ validitySolutionsToTest=(
 generateAnswers=true
 
 testsToRun=(
-    # 1
+    1
     # 2
-    3
+    # 3
     # 4
     # 5
 )
 
 ## Experiment 1 - all algos, different graph sizes, shallow (grasp -1) and mid-deep (grasp 1000)
 E1SolutionsToTest=(
-    "cuda-inlabel"
-    "cuda-naive"
+    # "cuda-inlabel"
+    # "cuda-naive"
     # "cpu-rmq"
-    "cpu-inlabel"
+    # "cpu-inlabel"
+    multicore-cpu-inlabel
 )
 E1TestsDir=$testsDir/E1
 E1ResultsDir=$resultTimesDir/E1
