@@ -42,24 +42,27 @@ csv_preprocessing = "Preprocessing"
 csv_queries = "Queries"
 csv_avg_height = "AvgHeight"
 csv_max_height = "MaxHeight"
+csv_marking = "Marking"
 
 csv_ints = []
 csv_ints.extend([csv_N, csv_M, csv_Q, csv_grasp, csv_batch, csv_max_height])
 csv_floats = []
 csv_floats.extend([csv_overall, csv_BFS, csv_spanning_tree,
-                   csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges, csv_preprocessing, csv_queries, csv_avg_height])
+                   csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges, csv_preprocessing, csv_queries, csv_avg_height, csv_marking])
 
 csv_detailed_fields = [csv_BFS, csv_spanning_tree,
-                       csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges]
+                       csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges, csv_marking]
 
 hatches = ['++', '**', 'oo', '----', '||', '..']
 field_colors = {"tarjan": {"Spanning Tree": "#0f2231", "List rank": "#2c6593", "Find bridges": "#6ca5d3"},
                 "naive": {"BFS": "#cc6600", "Naive bridges": "#ff9933"},
-                "hybrid": { "Spanning Tree": "#1a1a1a", "List rank": "#4d4d4d", "Distance and parent": "#808080", "Naive bridges": "#b3b3b3"} }
+                "hybrid": { "Spanning Tree": "#1a1a1a", "List rank": "#4d4d4d", "Distance and parent": "#808080", "Naive bridges": "#b3b3b3"},
+                "multicore": {"BFS": "#961b1c", "Marking": "#de5253"} }
 algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a", "Multicore CPU Inlabel": "#d62728",
-               "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#999999", "cpu": "#4daf4a"}
+               "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#999999", "cpu": "#4daf4a",
+               "multicore": "#d62728"}
 algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*", "Multicore CPU Inlabel": "|",
-               "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "|"}
+               "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "|", "multicore": "|"}
 
 sizes_in_inches = {"regular": (3.33, 2.4), "wide": (
     6.8, 2.4), "huge": (6.8, 8), "allGraphs": (10, 25), "wideDetailed":(6.8, 3)}
@@ -86,11 +89,11 @@ label_time_overall_s = "Total time [s]"
 
 #labels for algorithms
 algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "CPU Inlabel", "Multicore CPU Inlabel": "M-CPU Inlabel",
-               "tarjan": "GPU TV", "naive": "GPU CK", "cpu": "CPU DFS", "hybrid": "GPU Hybrid"}
+               "tarjan": "GPU TV", "naive": "GPU CK", "cpu": "CPU DFS", "hybrid": "GPU Hybrid", "multicore": "M-CPU CK"}
 
 algo_field_labels = {"Find bridges" : "Detect bridges", "Naive bridges": "Mark non-bridges",
                      "Spanning Tree" : "Spanning tree", "List rank" : "Euler tour",
-                     "Distance and parent" : "Levels and parents", "BFS" : "BFS"}
+                     "Distance and parent" : "Levels and parents", "BFS" : "BFS", "Marking": "Marking"}
 
 # Here we declare what tests consist an experiment.
 experiments = [
@@ -196,7 +199,7 @@ filename_order = [
     "USA-road-d.CTR",
     "USA-road-d.USA"]
 
-bridges_algo_order = ["cpu", "naive", "tarjan", "hybrid"]
+bridges_algo_order = ["cpu", "multicore", "naive", "tarjan", "hybrid"]
 lca_algo_order = ["CPU Inlabel", "Multicore CPU Inlabel", "CUDA Naive","CUDA Inlabel"  ]
 
 # TODO(Adrian python3?)
@@ -336,9 +339,11 @@ for i_exp, experiment in enumerate(experiments):
             # ax.set_ylabel(experiment["x_show"])
             ax.set_xlabel("Time overall (ms)")
             if "skipHybrid" in experiment and experiment["skipHybrid"]:
-                height = 0.4
+                # height = 0.4
+                height = 0.3
             else:
-                height = 0.28
+                # height = 0.28
+                height = 0.20
             apparent_x = np.arange(len(x))
             y_sum = [sum(i) for i in y]
             if "skipHybrid" in experiment and experiment["skipHybrid"]:
@@ -365,7 +370,8 @@ for i_exp, experiment in enumerate(experiments):
         elif experiment["type"] == "bars":
             # ax.set_xlabel(experiment["x_show"])
             ax.set_ylabel("Time " + experiment["y_param"] + " (s)")
-            width = 0.3
+            # width = 0.3
+            width = 0.2
             apparent_x = np.arange(len(x))
             ax.set_ylim(bridges_bars_ylim[0], bridges_bars_ylim[1])
             bar_shift = (i_algo + 0.5 - ((len(algos) - 1) / 2.0)) * width

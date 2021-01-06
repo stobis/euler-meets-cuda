@@ -12,7 +12,7 @@ if [ "$1" != "all" ]; then
     VARIANTS=($1)
     OUTPUT=($2)
 else
-    VARIANTS=(naive tarjan hybrid cpu)
+    VARIANTS=(naive tarjan hybrid cpu multi)
     OUTPUT=($2)
 fi
 
@@ -25,7 +25,11 @@ do
         name="${VARIANTS[$ix]}"
         echo $name
         tmpf="$name.tmp.txt"
-        $EXEC -a $name -i $f >> $tmpf
+        if [[ $name == *"multi"* ]]; then
+            taskset -c 0-5,12-17 $EXEC -a $name -i $f >> $tmpf
+        else
+            $EXEC -a $name -i $f >> $tmpf
+        fi
     done
 done
 
