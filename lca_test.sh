@@ -28,7 +28,7 @@ while getopts "ht:cr:p" opt; do
     c)  run_check=1
         ;;
     t)  run_time=1
-        resultsFile=$(realpath $OPTARG)
+        resultsFileFinal=$(realpath $OPTARG)
         ;;
     r)  repeats=$OPTARG
         ;;
@@ -56,7 +56,7 @@ if [ "$run_check" = 1 ]; then
 fi
 
 if [ "$run_time" = 1 ]; then
-  if [ -z "$resultsFile" ]; then
+  if [ -z "$resultsFileFinal" ]; then
     echo "$__help"
     exit
   fi
@@ -73,15 +73,15 @@ if [ "$run_time" = 1 ]; then
   mkdir $tmpCsvFolder
   for ((i=0;i<$repeats;i++))
   do
-      ./testTime.sh $tmpCsvFolder/$i
+      . testTime.sh $tmpCsvFolder/$i
   done
-  if ../combine_csv.py $(pwd)/$tmpCsvFolder $resultsFile; then
+  if ../combine_csv.py $(pwd)/$tmpCsvFolder $resultsFileFinal; then
     rm -rf $tmpCsvFolder
   fi
   
   cd $cwd
 
   if [ "$gen_plot" = 1 ]; then
-    python ./test/plot.py $resultsFile
+    python ./test/plot.py $resultsFileFinal
   fi
 fi

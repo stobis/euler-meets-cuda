@@ -1,7 +1,7 @@
 # coding: utf-8
 
-# usePgf = True
-usePgf = False
+usePgf = True
+# usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -56,7 +56,7 @@ hatches = ['++', '**', 'oo', '----', '||', '..']
 field_colors = {"tarjan": {"Spanning Tree": "#0f2231", "List rank": "#2c6593", "Find bridges": "#6ca5d3"},
                 "naive": {"BFS": "#cc6600", "Naive bridges": "#ff9933"},
                 "hybrid": { "Spanning Tree": "#1a1a1a", "List rank": "#4d4d4d", "Distance and parent": "#808080", "Naive bridges": "#b3b3b3"} }
-algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a", "Multicore CPU Inlabel": "#000000",
+algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a", "Multicore CPU Inlabel": "#d62728",
                "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#999999", "cpu": "#4daf4a"}
 algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*", "Multicore CPU Inlabel": "|",
                "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "|"}
@@ -85,7 +85,7 @@ label_time_overall_ms = "Total time [ms]"
 label_time_overall_s = "Total time [s]"
 
 #labels for algorithms
-algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "CPU Inlabel", "Multicore CPU Inlabel": "Multicore CPU Inlabel",
+algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "CPU Inlabel", "Multicore CPU Inlabel": "M-CPU Inlabel",
                "tarjan": "GPU TV", "naive": "GPU CK", "cpu": "CPU DFS", "hybrid": "GPU Hybrid"}
 
 algo_field_labels = {"Find bridges" : "Detect bridges", "Naive bridges": "Mark non-bridges",
@@ -197,6 +197,7 @@ filename_order = [
     "USA-road-d.USA"]
 
 bridges_algo_order = ["cpu", "naive", "tarjan", "hybrid"]
+lca_algo_order = ["CPU Inlabel", "Multicore CPU Inlabel", "CUDA Naive","CUDA Inlabel"  ]
 
 # TODO(Adrian python3?)
 if len(sys.argv) < 2:
@@ -264,6 +265,8 @@ for i_exp, experiment in enumerate(experiments):
 
     if "tarjan" in algos:
         algos = bridges_algo_order
+    else:
+        algos = lca_algo_order
 
     for i_algo, algo in reversed(list(enumerate(algos))):
 

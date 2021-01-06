@@ -56,11 +56,11 @@ testsToRun=(
 
 ## Experiment 1 - all algos, different graph sizes, shallow (grasp -1) and mid-deep (grasp 1000)
 E1SolutionsToTest=(
-    # "cuda-inlabel"
-    # "cuda-naive"
+    "cuda-inlabel"
+    "cuda-naive"
     # "cpu-rmq"
-    # "cpu-inlabel"
-    multicore-cpu-inlabel
+    "cpu-inlabel"
+    "multicore-cpu-inlabel"
 )
 E1TestsDir=$testsDir/E1
 E1ResultsDir=$resultTimesDir/E1
@@ -85,8 +85,8 @@ E1CheckAnswers=true
 
 ## Experiment 2 - CUDA inlabel by batch size
 E2SolutionsToTest=(
-    # "cuda-inlabel"
-    # "cpu-inlabel"
+    "cuda-inlabel"
+    "cpu-inlabel"
     "multicore-cpu-inlabel"
 )
 E2TestsDir=$testsDir/E2
@@ -116,8 +116,8 @@ E2CheckAnswers=true
 
 ## Experiment 3 - CUDA inlabel vs naive by grasp size
 E3SolutionsToTest=(
-    # "cuda-inlabel"
-    # "cuda-naive"
+    "cuda-inlabel"
+    "cuda-naive"
     "multicore-cpu-inlabel"
 )
 E3TestsDir=$testsDir/E3
@@ -150,8 +150,8 @@ E3CheckAnswers=true
 
 ## Experiment 4 - CUDA inlabel vs naive by num of queries
 E4SolutionsToTest=(
-    # "cuda-inlabel"
-    # "cuda-naive"
+    "cuda-inlabel"
+    "cuda-naive"
     "multicore-cpu-inlabel"
 )
 E4TestsDir=$testsDir/E4
@@ -183,10 +183,10 @@ E4CheckAnswers=true
 
 ## Experiment 5 - Scale-Free
 E5SolutionsToTest=(
-    # "cuda-inlabel"
-    # "cuda-naive"
-    # "cpu-rmq"
-    # "cpu-inlabel"
+    "cuda-inlabel"
+    "cuda-naive"
+    "cpu-rmq"
+    "cpu-inlabel"
     "multicore-cpu-inlabel"
 )
 E5TestsDir=$testsDir/E5
@@ -207,4 +207,4 @@ E5BatchSizes=( #irrelevant here
 )
 E5DifferentSeeds=5
 E5Generator=scaleFree
-E2CheckAnswers=true
+E5CheckAnswers=true
