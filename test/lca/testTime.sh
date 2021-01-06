@@ -34,6 +34,30 @@ for T in ${testsToRun[@]}; do
         done
     done
 
+    _checkAns=E${T}CheckAnswers
+    if [ "${!_checkAns}" = true ] ; then
+        _outDir=E${T}TestsDir
+        outDir=${!_outDir}/outs
+        mkdir -p $outDir
+        echo "Generating answers for E${T}"
+        for test in ${!_testsDir}/*.in; do
+            testName=$(basename $test)
+            outName=$outDir/$testName.out
+
+            if [ ! -f $outName ]; then
+                echo "Generating $outName answer"
+                $runnerPath -i $test -o $outName -a $validityOutGeneratorAlgorithm 2>/dev/null >/dev/null
+
+                if [ ! -s $outName ]; then
+                    echo "Error generating answers! $outName is empty!"
+                    exit 1
+                fi
+                echo "$outName generated."
+            fi
+        done
+        echo "Done generating answers"
+    fi
+
     _resultsDir=E${T}ResultsDir
     mkdir -p ${!_resultsDir} 
 
@@ -50,11 +74,28 @@ for T in ${testsToRun[@]}; do
                 echo -e "\tRunning $(basename $outName)"
 
                 if [[ $solution == "multicore"* ]]; then
-                    taskset -c 0-5,12-17 timeout $singleRunTimeout $runnerPath -i $outName.test -o /dev/null -a $solution >$outName -b $batchSize
+                    taskset -c 0-5,12-17 timeout $singleRunTimeout $runnerPath -i $outName.test -o tmp.out -a $solution >$outName -b $batchSize
                 else
-                    timeout $singleRunTimeout $runnerPath -i $outName.test -o /dev/null -a $solution >$outName -b $batchSize
+                    timeout $singleRunTimeout $runnerPath -i $outName.test -o tmp.out -a $solution >$outName -b $batchSize
                 fi
+                timeout_status=$?
                 echo "" >>$outName
+
+                if [ "${!_checkAns}" = true ] ; then
+                    if [[ $timeout_status -eq 124 ]]; then
+                        echo -e "\t\tTimed out. Skipping ans check."
+                    else
+                        properAns=$outDir/$testName.out
+                        if diff tmp.out $properAns >/dev/null; then
+                            echo -e "\t\tAns check OK"
+                        else
+                            echo ""
+                            echo "  Wrong answer on $testName! Aborting."
+                            exit 1
+                        fi
+                    fi
+                fi
+                rm tmp.out 2>/dev/null
 
                 $statsPath $outName $tmpCsv
 
