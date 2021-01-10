@@ -30,7 +30,7 @@ void cpu_lca_rmq(int N, const int *parents, int Q, const int *queries, int *answ
 
 void cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers);
 
-void multicore_cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers);
+void multicore_cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers, int batch_size);
 
 } // namespace emc
 

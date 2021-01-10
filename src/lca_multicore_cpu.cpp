@@ -15,7 +15,7 @@ using namespace std;
 namespace emc {
 
 // MULTICORE CPU LCA INLABEL
-void multicore_cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers) {
+void multicore_cpu_lca_inlabel(int N, const int *parents, int Q, const int *queries, int *answers, int batch_size) {
   Timer timer("Multicore CPU Inlabel");
 
   int root = 0;
@@ -180,28 +180,31 @@ void multicore_cpu_lca_inlabel(int N, const int *parents, int Q, const int *quer
 
   timer.print_and_restart("Preprocessing");
 
-  #pragma omp parallel for
-  for (int i = 0; i < Q; i++) {
-    int x = queries[2 * i];
-    int y = queries[2 * i + 1];
-    if (inlabel[x] != inlabel[y]) {
-      int i = max(31 - __builtin_clz(inlabel[x] ^ inlabel[y]),
-                  max(__builtin_ctz(inlabel[x]), __builtin_ctz(inlabel[y])));
-      uint32_t b = inlabel[x] & (((uint32_t)-1) << i);
-      uint32_t common = ((ascendant[x] & ascendant[y]) >> i) << i;
-      int j = __builtin_ctz(common);
-      uint32_t inlabel_z = ((inlabel[x] >> j) | 1) << j;
-      auto climb = [&](int u) {
-        if (inlabel[u] == inlabel_z)
-          return u;
-        int k = 31 - __builtin_clz(ascendant[u] & ((1 << j) - 1));
-        uint32_t inlabel_w = ((inlabel[u] >> k) | 1) << k;
-        return parents[head[inlabel_w]];
-      };
-      x = climb(x);
-      y = climb(y);
+  for (int batch_start = 0; batch_start < Q; batch_start += batch_size) {
+    int batch_end = min(Q, batch_start + batch_size);
+    #pragma omp parallel for
+    for (int i = batch_start; i < batch_end; i++) {
+      int x = queries[2 * i];
+      int y = queries[2 * i + 1];
+      if (inlabel[x] != inlabel[y]) {
+        int i = max(31 - __builtin_clz(inlabel[x] ^ inlabel[y]),
+                    max(__builtin_ctz(inlabel[x]), __builtin_ctz(inlabel[y])));
+        uint32_t b = inlabel[x] & (((uint32_t)-1) << i);
+        uint32_t common = ((ascendant[x] & ascendant[y]) >> i) << i;
+        int j = __builtin_ctz(common);
+        uint32_t inlabel_z = ((inlabel[x] >> j) | 1) << j;
+        auto climb = [&](int u) {
+          if (inlabel[u] == inlabel_z)
+            return u;
+          int k = 31 - __builtin_clz(ascendant[u] & ((1 << j) - 1));
+          uint32_t inlabel_w = ((inlabel[u] >> k) | 1) << k;
+          return parents[head[inlabel_w]];
+        };
+        x = climb(x);
+        y = climb(y);
+      }
+      answers[i] = level[x] <= level[y] ? x : y;
     }
-    answers[i] = level[x] <= level[y] ? x : y;
   }
 
   timer.print_and_restart("Queries");
