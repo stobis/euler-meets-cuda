@@ -62,10 +62,10 @@ algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel"
                "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#999999", "cpu": "#4daf4a",
                "multicore": "#d62728"}
 algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*", "Multicore CPU Inlabel": "|",
-               "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "|", "multicore": "|"}
+               "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "*", "multicore": "|"}
 
-sizes_in_inches = {"regular": (3.33, 2.4), "wide": (
-    6.8, 2.4), "huge": (6.8, 8), "allGraphs": (10, 25), "wideDetailed":(6.8, 3)}
+sizes_in_inches = {"regular": (3.465, 2.55), "wide": (
+    7.1, 2.4), "huge": (7.1, 8), "allGraphs": (10, 25), "wideDetailed":(7.1 , 3)}
 # sizes_in_inches = {"regular": (5, 3), "wide": (8, 3)}
 
 E1_div_ylim = (100000,1000000000)
@@ -88,8 +88,8 @@ label_time_overall_ms = "Total time [ms]"
 label_time_overall_s = "Total time [s]"
 
 #labels for algorithms
-algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "CPU Inlabel", "Multicore CPU Inlabel": "M-CPU Inlabel",
-               "tarjan": "GPU TV", "naive": "GPU CK", "cpu": "CPU DFS", "hybrid": "GPU Hybrid", "multicore": "M-CPU CK"}
+algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "Single-core CPU Inlabel", "Multicore CPU Inlabel": "Multi-core CPU Inlabel",
+               "tarjan": "GPU TV", "naive": "GPU CK", "cpu": "Single-core CPU DFS", "hybrid": "GPU Hybrid", "multicore": "Multi-core CPU CK"}
 
 algo_field_labels = {"Find bridges" : "Detect bridges", "Naive bridges": "Mark non-bridges",
                      "Spanning Tree" : "Spanning tree", "List rank" : "Euler tour",
@@ -512,7 +512,7 @@ for i_exp, experiment in enumerate(experiments):
         # ax.yaxis.set_major_formatter(ScalarFormatter())
         handles, labels = ax.get_legend_handles_labels()
         if "ncol" in experiment:
-            ax.legend(handles[::-1], labels[::-1], ncol=experiment["ncol"])
+            ax.legend(handles[::-1], labels[::-1], ncol=experiment["ncol"], columnspacing=0.6)
         else:
             ax.legend(handles[::-1], labels[::-1], ncol=1)
             
