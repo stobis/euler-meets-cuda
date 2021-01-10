@@ -1,7 +1,7 @@
 # coding: utf-8
 
-usePgf = True
-# usePgf = False
+# usePgf = True
+usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -101,19 +101,19 @@ experiments = [
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, 1000)],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_N, "y_divide": csv_preprocessing, "ylim": E1_div_ylim, 
-     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s},
+     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s, "ncol": 2},
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, -1)],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_N, "y_divide": csv_preprocessing, "ylim": E1_div_ylim,
-     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s},
+     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s, "ncol": 2},
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, 1000)],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_Q, "y_divide": csv_queries, "ylim": E1_div_ylim,
-     "x_label": label_lca_N, "y_label": label_lca_queries_over_s},
+     "x_label": label_lca_N, "y_label": label_lca_queries_over_s, "ncol": 1},
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, -1)],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_Q, "y_divide": csv_queries, "ylim": E1_div_ylim,
-     "x_label": label_lca_N, "y_label": label_lca_queries_over_s},
+     "x_label": label_lca_N, "y_label": label_lca_queries_over_s, "ncol": 2},
 
 
     # {"restrictions": [(csv_filename, "E2")],
@@ -151,11 +151,11 @@ experiments = [
     {"restrictions": [(csv_filename, "E5")],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_N, "y_divide": csv_preprocessing, "ylim": E1_div_ylim, 
-     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s},
+     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s, "ncol": 2},
     {"restrictions": [(csv_filename, "E5")],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_Q, "y_divide": csv_queries, "ylim": E1_div_ylim,
-     "x_label": label_lca_N, "y_label": label_lca_queries_over_s},
+     "x_label": label_lca_N, "y_label": label_lca_queries_over_s, "ncol": 2},
 
     #Bridges
     {"restrictions": [(csv_filename, "kron")],
@@ -280,6 +280,9 @@ for i_exp, experiment in enumerate(experiments):
         # Filter data of a given algorithm
         algo_rows = filter(
             lambda row: True if row[csv_algo] == algo else False, current_rows)
+        
+        if not algo_rows:
+            continue
 
         plot_by_values = set()
 
@@ -508,7 +511,11 @@ for i_exp, experiment in enumerate(experiments):
         ax.set_yscale("log")
         # ax.yaxis.set_major_formatter(ScalarFormatter())
         handles, labels = ax.get_legend_handles_labels()
-        ax.legend(handles[::-1], labels[::-1])
+        if "ncol" in experiment:
+            ax.legend(handles[::-1], labels[::-1], ncol=experiment["ncol"])
+        else:
+            ax.legend(handles[::-1], labels[::-1], ncol=1)
+            
         fig.tight_layout()
 
     if "yformatter" in experiment:
