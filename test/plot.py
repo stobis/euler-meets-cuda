@@ -1,7 +1,7 @@
 # coding: utf-8
 
-# usePgf = True
-usePgf = False
+usePgf = True
+# usePgf = False
 
 import matplotlib as mpl
 if usePgf:
@@ -337,22 +337,22 @@ for i_exp, experiment in enumerate(experiments):
 
         # Plot data
         if experiment["type"] == "detailed":
-            if algo == "cpu":
+            if algo == "cpu" or algo == "multicore":
                 continue
             # ax.set_ylabel(experiment["x_show"])
             ax.set_xlabel("Time overall (ms)")
             if "skipHybrid" in experiment and experiment["skipHybrid"]:
-                # height = 0.4
-                height = 0.3
+                height = 0.4
+                # height = 0.3
             else:
-                # height = 0.28
-                height = 0.20
+                height = 0.28
+                # height = 0.20
             apparent_x = np.arange(len(x))
             y_sum = [sum(i) for i in y]
             if "skipHybrid" in experiment and experiment["skipHybrid"]:
-                bar_shift = (i_algo -0.5 - ((len(algos) -2) / 2.0)) * height
-            else:
                 bar_shift = (i_algo -0.5 - ((len(algos) -1) / 2.0)) * height
+            else:
+                bar_shift = (i_algo -0.5 - ((len(algos) -0) / 2.0)) * height
 
             ax.invert_yaxis()
             for i_field, field in reversed(list(enumerate(csv_detailed_fields))):
@@ -423,7 +423,7 @@ for i_exp, experiment in enumerate(experiments):
         fig.tight_layout()
         ax.set_yscale("log")
         handles, labels = ax.get_legend_handles_labels()
-        ax.legend(handles[::-1], labels[::-1], ncol=3)
+        ax.legend(handles[::-1], labels[::-1], ncol=4)
     elif experiment["type"] == "detailed":
         if experiment["size"] == sizes_in_inches["huge"]:
             fig.tight_layout(rect=[0, 0.08, 1, 1])
