@@ -63,6 +63,10 @@ void writeToStdOut(LcaTestCase &tc) {
 
 LcaTestCase readFromFile(const char *filename) {
   ifstream in(filename, ios::binary);
+  if(!in.good()) {
+    cerr<<"Input file doesn't exist! Exiting."<<endl;
+    exit(1);
+  }
   return LcaTestCase(in);
 }
 LcaTestCase readFromStream(istream &inputStream) {
@@ -89,6 +93,11 @@ LcaTestCase readFromStdIn() { return readFromStream(cin); }
 void writeAnswersToStdOut(int Q, int *ans) {
   for (int i = 0; i < Q; i++) {
     cout << ans[i] << endl;
+  }
+}
+void writeAnswersToStdErr(int Q, int *ans) {
+  for (int i = 0; i < Q; i++) {
+    cerr << ans[i] << endl;
   }
 }
 void writeAnswersToFile(int Q, int *ans, const char *filename) {
@@ -125,4 +134,27 @@ pair<int, double> getHeight(const LcaParentsTree &tree) {
   }
 
   return {maxHeight, (double)sumHeight / tree.V};
+}
+
+void shuffleFathers(vector<int> &in, vector<int> &out, int &root) {
+  int V = in.size();
+  vector<int> shuffle;
+  for (int i = 0; i < V; i++) {
+    shuffle.push_back(i);
+  }
+  random_shuffle(shuffle.begin(), shuffle.end());
+
+
+  out.clear();
+  out.resize(V);
+  for (int i = 0; i < V; i++) {
+    // cout<<i<<" "<<shuffle[i]<<" "<<in[i]<<endl;
+    if(in[i] == -1) {
+      out[shuffle[i]] = -1;
+      root = shuffle[i];
+    }
+    else {
+      out[shuffle[i]] = shuffle[in[i]];
+    }
+  }
 }

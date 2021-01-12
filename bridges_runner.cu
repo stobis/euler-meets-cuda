@@ -23,6 +23,7 @@ const string help_msg = "Command line arguments\n \
      tarjan - ECL-CC + Euler\n \
      hybrid - ECL-CC + naive\n \
      cpu - dfs on cpu\n \
+     multi - CK on multicore cpu\n \
   -s -- print stats of the input graph and exit\n";
 
 // Configuration of implementations to choose
@@ -41,6 +42,7 @@ int main(int argc, char *argv[]) {
   char *output_file = NULL;
   BridgesFunction bridges_algorithm_to_run = NULL;
   bool run_cpu_alg = false;
+  string alg;
   bool print_graph_stats = false;
 
   // Print help
@@ -65,10 +67,10 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'a': {
-      string alg = optarg;
+      alg = optarg;
       if (bridges_algorithms.count(alg) > 0)
         bridges_algorithm_to_run = bridges_algorithms[alg];
-      else if (alg == "cpu") {
+      else if (alg == "cpu" || alg == "multi") {
         run_cpu_alg = true;
       } else {
         cerr << "Unrecognized algorithm to use\n";
@@ -113,8 +115,13 @@ int main(int argc, char *argv[]) {
   bool *is_bridge_host = new bool[M];
 
   if (run_cpu_alg) {
-    cpu_bridges(N, M, input_graph.get_row_offsets().data(), input_graph.get_col_indices().data(),
-                is_bridge_host);
+    if (alg == "cpu")
+      cpu_bridges(N, M, input_graph.get_row_offsets().data(), input_graph.get_col_indices().data(),
+                  is_bridge_host);
+    else  // alg == "multi"
+      multicore_cpu_bridges(
+          N, M, input_graph.get_row_offsets().data(), input_graph.get_col_indices().data(), is_bridge_host);
+
   } else {
     mgpu::standard_context_t context(false);
 

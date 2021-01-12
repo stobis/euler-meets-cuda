@@ -16,7 +16,7 @@ mm:
   # tar --strip-components 1 -xvzf [file] --wildcards '*.mtx'
   # - https://sparse.tamu.edu/MM/DIMACS10/citationCiteseer.tar.gz
   - https://sparse.tamu.edu/MM/SNAP/cit-Patents.tar.gz
-  - https://sparse.tamu.edu/MM/DIMACS10/coPapersDBLP.tar.gz
+  # - https://sparse.tamu.edu/MM/DIMACS10/coPapersDBLP.tar.gz
   # - https://sparse.tamu.edu/MM/LAW/in-2004.tar.gz
   # - https://sparse.tamu.edu/MM/Pajek/internet.tar.gz
   # Kron
@@ -42,7 +42,7 @@ mm:
   # - http://nrvis.com/download/data/road/road-belgium-osm.zip
   # - http://nrvis.com/download/data/misc/roadNet-PA.zip
 #   # Web graphs/social networks
-  - http://nrvis.com/download/data/soc/soc-livejournal.zip
+  # - http://nrvis.com/download/data/soc/soc-livejournal.zip
   - http://nrvis.com/download/data/socfb/socfb-A-anon.zip
   - http://nrvis.com/download/data/web/web-wikipedia2009.zip
   - http://nrvis.com/download/data/ca/ca-hollywood-2009.zip

@@ -273,8 +273,9 @@ void cuda_lca_inlabel(int N, const int *parents, int Q, const int *queries, int 
             answers[qStart + thid] = suspects[1];
         },
         queriesToProcess, context);
+
+        context.synchronize();
   }
-  context.synchronize();
 
   CUCHECK(cudaFree(devLevel));
   CUCHECK(cudaFree(devInlabel));

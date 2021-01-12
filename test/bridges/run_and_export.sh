@@ -12,7 +12,7 @@ if [ "$1" != "all" ]; then
     VARIANTS=($1)
     OUTPUT=($2)
 else
-    VARIANTS=(naive tarjan hybrid cpu)
+    VARIANTS=(naive tarjan hybrid cpu multi)
     OUTPUT=($2)
 fi
 

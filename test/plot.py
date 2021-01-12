@@ -42,27 +42,30 @@ csv_preprocessing = "Preprocessing"
 csv_queries = "Queries"
 csv_avg_height = "AvgHeight"
 csv_max_height = "MaxHeight"
+csv_marking = "Marking"
 
 csv_ints = []
 csv_ints.extend([csv_N, csv_M, csv_Q, csv_grasp, csv_batch, csv_max_height])
 csv_floats = []
 csv_floats.extend([csv_overall, csv_BFS, csv_spanning_tree,
-                   csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges, csv_preprocessing, csv_queries, csv_avg_height])
+                   csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges, csv_preprocessing, csv_queries, csv_avg_height, csv_marking])
 
 csv_detailed_fields = [csv_BFS, csv_spanning_tree,
-                       csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges]
+                       csv_list_rank, csv_distance_parent, csv_find_bridges, csv_naive_bridges, csv_marking]
 
 hatches = ['++', '**', 'oo', '----', '||', '..']
 field_colors = {"tarjan": {"Spanning Tree": "#0f2231", "List rank": "#2c6593", "Find bridges": "#6ca5d3"},
                 "naive": {"BFS": "#cc6600", "Naive bridges": "#ff9933"},
-                "hybrid": { "Spanning Tree": "#1a1a1a", "List rank": "#4d4d4d", "Distance and parent": "#808080", "Naive bridges": "#b3b3b3"} }
-algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a",
-               "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#999999", "cpu": "#4daf4a"}
-algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*",
-               "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "|"}
+                "hybrid": { "Spanning Tree": "#1a1a1a", "List rank": "#4d4d4d", "Distance and parent": "#808080", "Naive bridges": "#b3b3b3"},
+                "multicore": {"BFS": "#961b1c", "Marking": "#de5253"} }
+algo_colors = {"CUDA Inlabel": "#377eb8", "CUDA Naive": "#ff7f00", "CPU Inlabel": "#4daf4a", "Multicore CPU Inlabel": "#d62728",
+               "tarjan": "#377eb8", "naive": "#ff7f00", "hybrid": "#999999", "cpu": "#4daf4a",
+               "multicore": "#d62728"}
+algo_markers = {"CUDA Inlabel": ".", "CUDA Naive": "x", "CPU Inlabel": "*", "Multicore CPU Inlabel": "|",
+               "tarjan": ".", "naive": "x", "hybrid": "*", "cpu": "*", "multicore": "|"}
 
-sizes_in_inches = {"regular": (3.33, 2.4), "wide": (
-    6.8, 2.4), "huge": (6.8, 8), "allGraphs": (10, 25), "wideDetailed":(6.8, 3)}
+sizes_in_inches = {"regular": (3.465, 2.55), "wide": (
+    7.1, 2.4), "huge": (7.1, 8), "allGraphs": (10, 25), "wideDetailed":(7.1 , 3)}
 # sizes_in_inches = {"regular": (5, 3), "wide": (8, 3)}
 
 E1_div_ylim = (100000,1000000000)
@@ -70,6 +73,7 @@ E3_ylim = (0.1, 60)
 E4_ylim = (0.01, 100)
 E4_ylim_div = (100000,1000000000)
 bridges_bars_ylim = (0.04, 10)
+bridges_kron_ylim = (0.01, 5.5)
 
 func_formatter = ticker.FuncFormatter(lambda y, _: '{:g}'.format(y))
 
@@ -84,12 +88,12 @@ label_time_overall_ms = "Total time [ms]"
 label_time_overall_s = "Total time [s]"
 
 #labels for algorithms
-algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "CPU Inlabel",
-               "tarjan": "GPU TV", "naive": "GPU CK", "cpu": "CPU DFS", "hybrid": "GPU Hybrid"}
+algo_labels = {"CUDA Inlabel": "GPU Inlabel", "CUDA Naive": u"GPU Naïve", "CPU Inlabel": "Single-core CPU Inlabel", "Multicore CPU Inlabel": "Multi-core CPU Inlabel",
+               "tarjan": "GPU TV", "naive": "GPU CK", "cpu": "Single-core CPU DFS", "hybrid": "GPU Hybrid", "multicore": "Multi-core CPU CK"}
 
 algo_field_labels = {"Find bridges" : "Detect bridges", "Naive bridges": "Mark non-bridges",
                      "Spanning Tree" : "Spanning tree", "List rank" : "Euler tour",
-                     "Distance and parent" : "Levels and parents", "BFS" : "BFS"}
+                     "Distance and parent" : "Levels and parents", "BFS" : "BFS", "Marking": "Marking"}
 
 # Here we declare what tests consist an experiment.
 experiments = [
@@ -97,19 +101,19 @@ experiments = [
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, 1000)],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_N, "y_divide": csv_preprocessing, "ylim": E1_div_ylim, 
-     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s},
+     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s, "ncol": 2},
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, -1)],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_N, "y_divide": csv_preprocessing, "ylim": E1_div_ylim,
-     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s},
+     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s, "ncol": 2},
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, 1000)],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_Q, "y_divide": csv_queries, "ylim": E1_div_ylim,
-     "x_label": label_lca_N, "y_label": label_lca_queries_over_s},
+     "x_label": label_lca_N, "y_label": label_lca_queries_over_s, "ncol": 1},
     {"restrictions": [(csv_filename, "E1"), (csv_grasp, -1)],
      "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
      "y_param": csv_Q, "y_divide": csv_queries, "ylim": E1_div_ylim,
-     "x_label": label_lca_N, "y_label": label_lca_queries_over_s},
+     "x_label": label_lca_N, "y_label": label_lca_queries_over_s, "ncol": 2},
 
 
     # {"restrictions": [(csv_filename, "E2")],
@@ -143,11 +147,21 @@ experiments = [
     #  "x_param": csv_Q, "x_show": csv_Q, "type": "lines_xM", "size": sizes_in_inches["regular"],
     #  "y_param": csv_Q, "y_divide": csv_queries, "ylim": E4_ylim_div},
 
+
+    {"restrictions": [(csv_filename, "E5")],
+     "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
+     "y_param": csv_N, "y_divide": csv_preprocessing, "ylim": E1_div_ylim, 
+     "x_label": label_lca_N, "y_label": label_lca_preprocessing_over_s, "ncol": 2},
+    {"restrictions": [(csv_filename, "E5")],
+     "x_param": csv_N, "x_show": csv_N, "type": "lines_xM", "size": sizes_in_inches["regular"],
+     "y_param": csv_Q, "y_divide": csv_queries, "ylim": E1_div_ylim,
+     "x_label": label_lca_N, "y_label": label_lca_queries_over_s, "ncol": 2},
+
     #Bridges
     {"restrictions": [(csv_filename, "kron")],
      "x_param": csv_filename, "x_show": csv_N, "type": "lines", "size": sizes_in_inches["regular"],
      "yformatter": func_formatter, "skipHybrid": True, "y_label" : label_time_overall_s,
-     "x_label": label_lca_N},
+     "x_label": label_lca_N, "ylim": bridges_kron_ylim},
     
     {"restrictions": [(csv_filename, "cit-Patents|soc-Live|ca-hollywood|socfb-A-anon|wikipedia|road-a|road-g|road-d.USA|road-d.CTR|road-d.W|road-d.E")],
      "x_param": csv_filename, "x_show": csv_filename, "type": "bars", "size": sizes_in_inches["wide"],
@@ -185,7 +199,8 @@ filename_order = [
     "USA-road-d.CTR",
     "USA-road-d.USA"]
 
-bridges_algo_order = ["cpu", "naive", "tarjan", "hybrid"]
+bridges_algo_order = ["cpu", "multicore", "naive", "tarjan", "hybrid"]
+lca_algo_order = ["CPU Inlabel", "Multicore CPU Inlabel", "CUDA Naive","CUDA Inlabel"  ]
 
 # TODO(Adrian python3?)
 if len(sys.argv) < 2:
@@ -253,6 +268,8 @@ for i_exp, experiment in enumerate(experiments):
 
     if "tarjan" in algos:
         algos = bridges_algo_order
+    else:
+        algos = lca_algo_order
 
     for i_algo, algo in reversed(list(enumerate(algos))):
 
@@ -263,6 +280,9 @@ for i_exp, experiment in enumerate(experiments):
         # Filter data of a given algorithm
         algo_rows = filter(
             lambda row: True if row[csv_algo] == algo else False, current_rows)
+        
+        if not algo_rows:
+            continue
 
         plot_by_values = set()
 
@@ -317,20 +337,22 @@ for i_exp, experiment in enumerate(experiments):
 
         # Plot data
         if experiment["type"] == "detailed":
-            if algo == "cpu":
+            if algo == "cpu" or algo == "multicore":
                 continue
             # ax.set_ylabel(experiment["x_show"])
             ax.set_xlabel("Time overall (ms)")
             if "skipHybrid" in experiment and experiment["skipHybrid"]:
                 height = 0.4
+                # height = 0.3
             else:
                 height = 0.28
+                # height = 0.20
             apparent_x = np.arange(len(x))
             y_sum = [sum(i) for i in y]
             if "skipHybrid" in experiment and experiment["skipHybrid"]:
-                bar_shift = (i_algo -0.5 - ((len(algos) -2) / 2.0)) * height
-            else:
                 bar_shift = (i_algo -0.5 - ((len(algos) -1) / 2.0)) * height
+            else:
+                bar_shift = (i_algo -0.5 - ((len(algos) -0) / 2.0)) * height
 
             ax.invert_yaxis()
             for i_field, field in reversed(list(enumerate(csv_detailed_fields))):
@@ -351,7 +373,8 @@ for i_exp, experiment in enumerate(experiments):
         elif experiment["type"] == "bars":
             # ax.set_xlabel(experiment["x_show"])
             ax.set_ylabel("Time " + experiment["y_param"] + " (s)")
-            width = 0.3
+            # width = 0.3
+            width = 0.2
             apparent_x = np.arange(len(x))
             ax.set_ylim(bridges_bars_ylim[0], bridges_bars_ylim[1])
             bar_shift = (i_algo + 0.5 - ((len(algos) - 1) / 2.0)) * width
@@ -400,7 +423,7 @@ for i_exp, experiment in enumerate(experiments):
         fig.tight_layout()
         ax.set_yscale("log")
         handles, labels = ax.get_legend_handles_labels()
-        ax.legend(handles[::-1], labels[::-1], ncol=3)
+        ax.legend(handles[::-1], labels[::-1], ncol=4)
     elif experiment["type"] == "detailed":
         if experiment["size"] == sizes_in_inches["huge"]:
             fig.tight_layout(rect=[0, 0.08, 1, 1])
@@ -488,7 +511,11 @@ for i_exp, experiment in enumerate(experiments):
         ax.set_yscale("log")
         # ax.yaxis.set_major_formatter(ScalarFormatter())
         handles, labels = ax.get_legend_handles_labels()
-        ax.legend(handles[::-1], labels[::-1])
+        if "ncol" in experiment:
+            ax.legend(handles[::-1], labels[::-1], ncol=experiment["ncol"], columnspacing=0.6)
+        else:
+            ax.legend(handles[::-1], labels[::-1], ncol=1)
+            
         fig.tight_layout()
 
     if "yformatter" in experiment:

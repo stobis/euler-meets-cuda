@@ -7,7 +7,7 @@ OBJDIR=obj
 # GCC compiler settings
 CXX=g++
 CXXINC=-I ./$(INCDIR)/
-CXXFLAGS=-O2 -std=c++11 -fno-stack-protector $(CXXINC)
+CXXFLAGS=-O2 -std=c++11 -fno-stack-protector -fopenmp $(CXXINC)
 
 # CUDA compiler settings
 CUDA=/usr/local/cuda

@@ -1,13 +1,21 @@
 #include "timer.hpp"
 #include <iostream>
 
-Timer::Timer(std::string slug) : slug(slug), c_start(std::clock()), overall(0) {}
 
-void Timer::start() { c_start = std::clock(); }
+std::chrono::nanoseconds getCurrentNs() {
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
+}
 
-void Timer::stop() { c_end = std::clock(); }
+Timer::Timer(std::string slug) : slug(slug), start_ns(getCurrentNs()), overall(0) {}
 
-long double Timer::get_ms() { return 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC; }
+void Timer::start() { start_ns = getCurrentNs(); }
+
+void Timer::stop() { end_ns = getCurrentNs(); }
+
+
+long double Timer::get_ms() { 
+  return (end_ns.count() - start_ns.count()) / 1e6;
+  }
 
 long double Timer::stop_and_get_ms() {
   stop();

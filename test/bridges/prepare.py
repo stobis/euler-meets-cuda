@@ -54,7 +54,7 @@ def download_one(format, url):
     subprocess.run(["rm", "-f", "in/" + testfilename])
 
     print('4. Convert input graph to connected')
-    subprocess.run(["./connect.e", "in/{0}.bin.tmp".format(testfilename), "in/{0}.bin".format(testfilename)])
+    subprocess.run(["./connect.e", "in/{0}.bin.tmp".format(testfilename), "in/{0}.bin".format(testfilename)], check=True)
     subprocess.run(["rm", "-f", "in/{0}.bin.tmp".format(testfilename)])
 
     return

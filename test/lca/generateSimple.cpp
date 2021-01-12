@@ -4,29 +4,6 @@
 
 using namespace std;
 
-void shuffleFathers(vector<int> &in, vector<int> &out, int &root) {
-  int V = in.size();
-  vector<int> shuffle;
-  for (int i = 0; i < V; i++) {
-    shuffle.push_back(i);
-  }
-  random_shuffle(shuffle.begin(), shuffle.end());
-
-  vector<int> newPos;
-  newPos.resize(V);
-  for (int i = 0; i < V; i++) {
-    newPos[shuffle[i]] = i;
-  }
-
-  out.clear();
-  for (int i = 0; i < V; i++) {
-    if (shuffle[i] == 0) {
-      root = i;
-    }
-    out.push_back(in[shuffle[i]] == -1 ? -1 : newPos[in[shuffle[i]]]);
-  }
-}
-
 int main( int argc, char* argv[] )
 {
   int expectedArgc = 5;

@@ -22,6 +22,12 @@ remake: clean all
 generateSimple.e: generateSimple.cpp ../../src/tree.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@ 
 
+generateScaleFree.e: generateScaleFree.cpp ../../src/tree.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@ 
+
+analyze.e: analyze.cpp ../../src/tree.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@ 
+
 .PHONY: all clean
 
 clean:
