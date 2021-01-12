@@ -25,11 +25,7 @@ do
         name="${VARIANTS[$ix]}"
         echo $name
         tmpf="$name.tmp.txt"
-        if [[ $name == *"multi"* ]]; then
-            taskset -c 0-5,12-17 $EXEC -a $name -i $f >> $tmpf
-        else
-            $EXEC -a $name -i $f >> $tmpf
-        fi
+        $EXEC -a $name -i $f >> $tmpf
     done
 done
 

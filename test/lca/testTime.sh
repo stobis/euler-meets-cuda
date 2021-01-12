@@ -72,12 +72,7 @@ for T in ${testsToRun[@]}; do
                 mv $test $outName.test
 
                 echo -e "\tRunning $(basename $outName)"
-
-                if [[ $solution == "multicore"* ]]; then
-                    taskset -c 0-5,12-17 timeout $singleRunTimeout $runnerPath -i $outName.test -o tmp.out -a $solution >$outName -b $batchSize
-                else
-                    timeout $singleRunTimeout $runnerPath -i $outName.test -o tmp.out -a $solution >$outName -b $batchSize
-                fi
+                timeout $singleRunTimeout $runnerPath -i $outName.test -o tmp.out -a $solution >$outName -b $batchSize
                 timeout_status=$?
                 echo "" >>$outName
 

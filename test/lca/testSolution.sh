@@ -36,13 +36,7 @@ for algorithm in ${validitySolutionsToTest[@]}; do
         outName=$validityAnswersDir/$testName.out
 
         echo -n "  Testing on $testName"
-
-        if [[ $algorithm == "multicore"* ]]; then
-            taskset -c 0-5,12-17 $runnerPath -i $test -o $validityAnswersDir/outTmp.out 2>/dev/null >/dev/null -a $algorithm
-        else
-            $runnerPath -i $test -o $validityAnswersDir/outTmp.out 2>/dev/null >/dev/null -a $algorithm
-        fi
-
+        $runnerPath -i $test -o $validityAnswersDir/outTmp.out 2>/dev/null >/dev/null -a $algorithm
 
         if diff $validityAnswersDir/outTmp.out $outName >/dev/null; then
             echo -e "\t\tOK"
